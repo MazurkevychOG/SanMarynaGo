@@ -1,0 +1,19 @@
+{
+  "id": "plyazh-dhermi",
+  "order": 26,
+  "name": "Пляж Dhermi",
+  "lat": 40.135637,
+  "lng": 19.647457,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "video",
+      "file": "photos/plyazh-dhermi/01.mp4",
+      "mime": "video/mp4",
+      "bytes": 1836141
+    }
+  ],
+  "updated": "2026-10-16"
+}

@@ -1,0 +1,33 @@
+{
+  "_comment": "Стабільні id (slug) для старих id із index.html. Не змінюйте після публікації: на них посилаються фото й файли.",
+  "slugs": {
+    "d0": "home-vlore-joanna",
+    "d1": "ullinj-serdit-mucias",
+    "d2": "fortress-of-bashtove",
+    "d3": "kantina-balaj-mifol",
+    "d4": "apollonia-pojan",
+    "d5": "gorica-bridge-berat",
+    "d6": "footbridge-ura-e-walesatit-lepenice",
+    "d7": "bridge-of-brataj",
+    "d8": "wine-cellar-kantina-eneo-kote",
+    "d9": "argjiro-winery-gjirokaster",
+    "d10": "gjirokaster-castle",
+    "d11": "ile-bridge-kutal",
+    "d12": "langarica-canyon",
+    "d13": "sopot-waterfall",
+    "d14": "blue-eye",
+    "d15": "mesopotam-restaurant",
+    "d16": "saranda-embankment",
+    "d17": "bora-bora-beach-ksamil",
+    "d18": "butrint-ancient-theatre",
+    "d19": "the-castle-of-porto-palermo",
+    "d20": "plazhi-i-himares",
+    "d21": "lucianos-fork-dhermi",
+    "d22": "llogara-view-point",
+    "d23": "llixhat-e-benjes-thermal-baths",
+    "d24": "abeille-restaurant",
+    "pmuv7ueh66g78a": "plyazh-dhermi",
+    "pmuv81wv3nras8": "arbri-olive-oil",
+    "pmuv84qn7f9idb": "fish-hub-albadriatico"
+  }
+}

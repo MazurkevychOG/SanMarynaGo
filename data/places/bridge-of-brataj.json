@@ -1,0 +1,21 @@
+{
+  "id": "bridge-of-brataj",
+  "order": 8,
+  "name": "Bridge of Brataj",
+  "lat": 40.2668864,
+  "lng": 19.6718241,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/bridge-of-brataj/01.webp",
+      "thumb": "photos/bridge-of-brataj/01_thumb.webp",
+      "width": 1167,
+      "height": 617,
+      "bytes": 289968
+    }
+  ],
+  "updated": "2026-10-16"
+}

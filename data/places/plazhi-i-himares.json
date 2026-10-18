@@ -1,0 +1,21 @@
+{
+  "id": "plazhi-i-himares",
+  "order": 21,
+  "name": "Plazhi i Himarës",
+  "lat": 40.1008123,
+  "lng": 19.7456809,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/plazhi-i-himares/01.webp",
+      "thumb": "photos/plazhi-i-himares/01_thumb.webp",
+      "width": 1243,
+      "height": 641,
+      "bytes": 138904
+    }
+  ],
+  "updated": "2026-10-16"
+}

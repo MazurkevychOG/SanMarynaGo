@@ -1,0 +1,21 @@
+{
+  "id": "argjiro-winery-gjirokaster",
+  "order": 10,
+  "name": "\"Argjiro\" Winery (Gjirokastër)",
+  "lat": 40.0990336,
+  "lng": 20.1501935,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/argjiro-winery-gjirokaster/01.webp",
+      "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
+      "width": 1035,
+      "height": 813,
+      "bytes": 205594
+    }
+  ],
+  "updated": "2026-10-16"
+}

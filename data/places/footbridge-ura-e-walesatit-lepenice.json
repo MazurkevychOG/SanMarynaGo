@@ -1,0 +1,21 @@
+{
+  "id": "footbridge-ura-e-walesatit-lepenice",
+  "order": 7,
+  "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
+  "lat": 40.3038256,
+  "lng": 19.6524006,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/footbridge-ura-e-walesatit-lepenice/01.webp",
+      "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
+      "width": 1238,
+      "height": 650,
+      "bytes": 344214
+    }
+  ],
+  "updated": "2026-10-16"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "bora-bora-beach-ksamil",
+  "order": 18,
+  "name": "Bora Bora beach | Ksamil",
+  "lat": 39.7713041,
+  "lng": 19.9984411,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/bora-bora-beach-ksamil/01.webp",
+      "thumb": "photos/bora-bora-beach-ksamil/01_thumb.webp",
+      "width": 771,
+      "height": 747,
+      "bytes": 191112
+    }
+  ],
+  "updated": "2026-10-16"
+}

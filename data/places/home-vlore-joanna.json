@@ -1,0 +1,21 @@
+{
+  "id": "home-vlore-joanna",
+  "order": 1,
+  "name": "Home Vlore Joanna",
+  "lat": 40.4241,
+  "lng": 19.493856,
+  "desc": "Current",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/home-vlore-joanna/01.webp",
+      "thumb": "photos/home-vlore-joanna/01_thumb.webp",
+      "width": 747,
+      "height": 857,
+      "bytes": 114276
+    }
+  ],
+  "updated": "2026-10-16"
+}

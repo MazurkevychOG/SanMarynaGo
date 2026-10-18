@@ -1,0 +1,21 @@
+{
+  "id": "kantina-balaj-mifol",
+  "order": 4,
+  "name": "Kantina Balaj (Mifol)",
+  "lat": 40.5963295,
+  "lng": 19.483349,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/01.webp",
+      "thumb": "photos/kantina-balaj-mifol/01_thumb.webp",
+      "width": 1215,
+      "height": 663,
+      "bytes": 160658
+    }
+  ],
+  "updated": "2026-10-16"
+}

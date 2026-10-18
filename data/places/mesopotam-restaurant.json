@@ -1,0 +1,21 @@
+{
+  "id": "mesopotam-restaurant",
+  "order": 16,
+  "name": "Mesopotam Restaurant",
+  "lat": 39.9105198,
+  "lng": 20.1028693,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/mesopotam-restaurant/01.webp",
+      "thumb": "photos/mesopotam-restaurant/01_thumb.webp",
+      "width": 1255,
+      "height": 655,
+      "bytes": 124984
+    }
+  ],
+  "updated": "2026-10-16"
+}

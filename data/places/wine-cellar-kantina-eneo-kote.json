@@ -1,0 +1,21 @@
+{
+  "id": "wine-cellar-kantina-eneo-kote",
+  "order": 9,
+  "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
+  "lat": 40.387768,
+  "lng": 19.605723,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/wine-cellar-kantina-eneo-kote/01.webp",
+      "thumb": "photos/wine-cellar-kantina-eneo-kote/01_thumb.webp",
+      "width": 781,
+      "height": 812,
+      "bytes": 58152
+    }
+  ],
+  "updated": "2026-10-16"
+}

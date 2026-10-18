@@ -1,0 +1,21 @@
+{
+  "id": "gjirokaster-castle",
+  "order": 11,
+  "name": "Фортеця Гірокастра (Gjirokastër Castle)",
+  "lat": 40.0727906,
+  "lng": 20.1392199,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/gjirokaster-castle/01.webp",
+      "thumb": "photos/gjirokaster-castle/01_thumb.webp",
+      "width": 1262,
+      "height": 652,
+      "bytes": 255894
+    }
+  ],
+  "updated": "2026-10-16"
+}

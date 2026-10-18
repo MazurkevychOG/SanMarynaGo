@@ -1,0 +1,21 @@
+{
+  "id": "ile-bridge-kutal",
+  "order": 12,
+  "name": "Ile bridge (Kutal)",
+  "lat": 40.2575881,
+  "lng": 20.3232416,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/ile-bridge-kutal/01.webp",
+      "thumb": "photos/ile-bridge-kutal/01_thumb.webp",
+      "width": 1177,
+      "height": 635,
+      "bytes": 198268
+    }
+  ],
+  "updated": "2026-10-16"
+}

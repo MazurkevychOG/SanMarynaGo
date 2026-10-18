@@ -1,0 +1,21 @@
+{
+  "id": "sopot-waterfall",
+  "order": 14,
+  "name": "Sopot Waterfall",
+  "lat": 40.1442433,
+  "lng": 20.4425384,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/sopot-waterfall/01.webp",
+      "thumb": "photos/sopot-waterfall/01_thumb.webp",
+      "width": 875,
+      "height": 702,
+      "bytes": 104104
+    }
+  ],
+  "updated": "2026-10-16"
+}

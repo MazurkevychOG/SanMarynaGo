@@ -1,0 +1,21 @@
+{
+  "id": "the-castle-of-porto-palermo",
+  "order": 20,
+  "name": "The Castle of Porto Palermo",
+  "lat": 40.0622157,
+  "lng": 19.790746,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/the-castle-of-porto-palermo/01.webp",
+      "thumb": "photos/the-castle-of-porto-palermo/01_thumb.webp",
+      "width": 997,
+      "height": 740,
+      "bytes": 104562
+    }
+  ],
+  "updated": "2026-10-16"
+}

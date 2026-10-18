@@ -1,0 +1,21 @@
+{
+  "id": "butrint-ancient-theatre",
+  "order": 19,
+  "name": "Butrint Ancient Theatre",
+  "lat": 39.7455936,
+  "lng": 20.0204852,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/butrint-ancient-theatre/01.webp",
+      "thumb": "photos/butrint-ancient-theatre/01_thumb.webp",
+      "width": 1267,
+      "height": 653,
+      "bytes": 302580
+    }
+  ],
+  "updated": "2026-10-16"
+}

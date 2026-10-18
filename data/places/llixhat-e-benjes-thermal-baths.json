@@ -1,0 +1,21 @@
+{
+  "id": "llixhat-e-benjes-thermal-baths",
+  "order": 25,
+  "name": "Llixhat e Bënjës - Thermal Baths",
+  "lat": 40.2441306,
+  "lng": 20.4319674,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/llixhat-e-benjes-thermal-baths/01.webp",
+      "thumb": "photos/llixhat-e-benjes-thermal-baths/01_thumb.webp",
+      "width": 763,
+      "height": 772,
+      "bytes": 172194
+    }
+  ],
+  "updated": "2026-10-16"
+}

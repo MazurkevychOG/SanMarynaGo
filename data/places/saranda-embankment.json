@@ -1,0 +1,21 @@
+{
+  "id": "saranda-embankment",
+  "order": 17,
+  "name": "Saranda Embankment",
+  "lat": 39.8734834,
+  "lng": 20.0104313,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/saranda-embankment/01.webp",
+      "thumb": "photos/saranda-embankment/01_thumb.webp",
+      "width": 570,
+      "height": 932,
+      "bytes": 89140
+    }
+  ],
+  "updated": "2026-10-16"
+}

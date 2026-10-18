@@ -1,0 +1,21 @@
+{
+  "id": "ullinj-serdit-mucias",
+  "order": 2,
+  "name": "Ullinj serdit (Muçias)",
+  "lat": 40.8963827,
+  "lng": 19.5000843,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/ullinj-serdit-mucias/01.webp",
+      "thumb": "photos/ullinj-serdit-mucias/01_thumb.webp",
+      "width": 566,
+      "height": 858,
+      "bytes": 23968
+    }
+  ],
+  "updated": "2026-10-16"
+}

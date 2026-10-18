@@ -1,0 +1,21 @@
+{
+  "id": "abeille-restaurant",
+  "order": 23,
+  "name": "Abeille Restaurant",
+  "lat": 40.1574251,
+  "lng": 19.8151497,
+  "desc": "ресторан в горах",
+  "gmapsUrl": "https://maps.app.goo.gl/mv7MvqYbRNroeGXo7",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/abeille-restaurant/01.webp",
+      "thumb": "photos/abeille-restaurant/01_thumb.webp",
+      "width": 627,
+      "height": 871,
+      "bytes": 47946
+    }
+  ],
+  "updated": "2026-10-16"
+}

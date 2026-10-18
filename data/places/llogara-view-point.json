@@ -1,0 +1,21 @@
+{
+  "id": "llogara-view-point",
+  "order": 24,
+  "name": "Llogara View point",
+  "lat": 40.1894877,
+  "lng": 19.6000919,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/llogara-view-point/01.webp",
+      "thumb": "photos/llogara-view-point/01_thumb.webp",
+      "width": 1178,
+      "height": 652,
+      "bytes": 47462
+    }
+  ],
+  "updated": "2026-10-16"
+}

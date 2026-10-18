@@ -1,0 +1,21 @@
+{
+  "id": "langarica-canyon",
+  "order": 13,
+  "name": "Langarica Canyon",
+  "lat": 40.2459895,
+  "lng": 20.4383168,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/langarica-canyon/01.webp",
+      "thumb": "photos/langarica-canyon/01_thumb.webp",
+      "width": 720,
+      "height": 1280,
+      "bytes": 301342
+    }
+  ],
+  "updated": "2026-10-16"
+}

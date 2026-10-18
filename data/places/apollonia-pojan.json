@@ -1,0 +1,29 @@
+{
+  "id": "apollonia-pojan",
+  "order": 5,
+  "name": "Apollonia (Pojan)",
+  "lat": 40.72134,
+  "lng": 19.4710887,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/01.webp",
+      "thumb": "photos/apollonia-pojan/01_thumb.webp",
+      "width": 892,
+      "height": 852,
+      "bytes": 218714
+    },
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/02.webp",
+      "thumb": "photos/apollonia-pojan/02_thumb.webp",
+      "width": 940,
+      "height": 733,
+      "bytes": 306504
+    }
+  ],
+  "updated": "2026-10-16"
+}

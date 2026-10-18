@@ -1,0 +1,21 @@
+{
+  "id": "blue-eye",
+  "order": 15,
+  "name": "Блакитне Око (Blue Eye)",
+  "lat": 39.9236423,
+  "lng": 20.1924637,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/blue-eye/01.webp",
+      "thumb": "photos/blue-eye/01_thumb.webp",
+      "width": 1226,
+      "height": 637,
+      "bytes": 360712
+    }
+  ],
+  "updated": "2026-10-16"
+}

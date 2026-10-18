@@ -1,0 +1,29 @@
+{
+  "id": "fortress-of-bashtove",
+  "order": 3,
+  "name": "Fortress of Bashtovë",
+  "lat": 41.0471305,
+  "lng": 19.4962406,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/fortress-of-bashtove/01.webp",
+      "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
+      "width": 1285,
+      "height": 602,
+      "bytes": 245464
+    },
+    {
+      "type": "image",
+      "file": "photos/fortress-of-bashtove/02.webp",
+      "thumb": "photos/fortress-of-bashtove/02_thumb.webp",
+      "width": 1165,
+      "height": 580,
+      "bytes": 73328
+    }
+  ],
+  "updated": "2026-10-16"
+}

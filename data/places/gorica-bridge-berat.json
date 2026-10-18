@@ -1,0 +1,29 @@
+{
+  "id": "gorica-bridge-berat",
+  "order": 6,
+  "name": "Gorica Bridge (Berat)",
+  "lat": 40.7032111,
+  "lng": 19.9446481,
+  "desc": "",
+  "gmapsUrl": "",
+  "category": null,
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/gorica-bridge-berat/01.webp",
+      "thumb": "photos/gorica-bridge-berat/01_thumb.webp",
+      "width": 1296,
+      "height": 667,
+      "bytes": 219332
+    },
+    {
+      "type": "image",
+      "file": "photos/gorica-bridge-berat/02.webp",
+      "thumb": "photos/gorica-bridge-berat/02_thumb.webp",
+      "width": 1270,
+      "height": 637,
+      "bytes": 101338
+    }
+  ],
+  "updated": "2026-10-16"
+}
