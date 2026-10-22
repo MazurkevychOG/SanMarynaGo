@@ -4,7 +4,9 @@
   "private": true,
   "description": "MyMaps — статичний сайт із каталогом місць (data/) та скриптами для їх створення й перевірки",
   "type": "module",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "migrate": "node scripts/migrate.mjs",
     "add-place": "node scripts/add-place.mjs",
@@ -12,7 +14,8 @@
     "build-index": "node scripts/build-index.mjs",
     "validate": "node scripts/validate.mjs",
     "fill-near": "node scripts/fill-near.mjs",
-    "check": "node scripts/build-index.mjs --check && node scripts/validate.mjs"
+    "check": "node scripts/build-index.mjs --check && node scripts/validate.mjs",
+    "import-bundle": "node scripts/import-bundle.mjs"
   },
   "devDependencies": {
     "sharp": "^0.33.5"
