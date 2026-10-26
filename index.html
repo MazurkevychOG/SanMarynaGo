@@ -1,8 +1,7 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uk"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
     <title>SanMarynaGo</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -198,30 +197,7 @@
         .place-row { position: relative; overflow: hidden; border-bottom: 1px solid #edf2f7; background: #fff; }
         .place-row.hidden-by-search { display: none; }
         .swipe-content { position: relative; z-index: 2; background: #fff; display: grid; grid-template-columns: var(--cols); align-items: center; padding: 12px 10px; touch-action: pan-y; }
-       .swipe-actions {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: block;
-    pointer-events: none;
-}
-
-.swipe-actions .act-del {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    pointer-events: auto;
-}
-
-.swipe-actions .act-edit {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    pointer-events: auto;
-}
-        
+        .swipe-actions { position: absolute; top: 0; bottom: 0; right: 0; z-index: 1; display: flex; }
         .act { width: 96px; height: 100%; border-radius: 0; flex-direction: column; gap: 4px; font-size: 30px; justify-content: center; padding: 0; }
         .act span { font-size: 14px; font-weight: 700; }
         .act-edit { background: #f1c40f; color: #333; }
@@ -257,7 +233,7 @@
             .act { width: 84px; }
         }
         @media (hover: hover) and (pointer: fine) {
-            .swipe-actions { z-index: 3; opacity: 0; pointer-events: none; right: 12px;left: auto; top: 50%; bottom: auto; height: auto; transform: translateY(-50%); gap: 10px; transition: opacity .15s; }
+            .swipe-actions { z-index: 3; opacity: 0; pointer-events: none; right: 12px; top: 50%; bottom: auto; height: auto; transform: translateY(-50%); gap: 10px; transition: opacity .15s; }
             .place-row:hover .swipe-actions, .place-row:focus-within .swipe-actions { opacity: 1; pointer-events: auto; }
             .act { width: 56px; height: 56px; border-radius: 10px; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
             .act span { display: none; }
@@ -656,8 +632,8 @@
 
             row.innerHTML = `
                 <div class="swipe-actions">
-                    <button type="button" class="act act-del" data-a="del" title="Видалити">🗑<span>Видалити</span></button>
                     <button type="button" class="act act-edit" data-a="edit" title="Редагувати">✎<span>Змінити</span></button>
+                    <button type="button" class="act act-del" data-a="del" title="Видалити">🗑<span>Видалити</span></button>
                 </div>
                 <div class="swipe-content">
                     <div class="c-left">
@@ -699,7 +675,7 @@
     const WAVE_A = 0.64;                                // наскільки смуга тоншає на піку (частка висоти)
     function applyRow(row, x) {
         const c = row.querySelector('.swipe-content');
-        const w = (row.querySelector('.swipe-actions') || {}).offsetWidth || 96;
+        const w = (row.querySelector('.swipe-actions') || {}).offsetWidth || 132;
         const p = Math.min(1, Math.max(0, Math.abs(x) / w));
         row._x = x; row._p = p;
         c.style.willChange = x === 0 ? '' : 'transform';      // не тримаємо десятки композитних шарів — на iPhone це давало порожні картки
@@ -735,7 +711,7 @@
             const s = segs[k];
             s.style.transform = `scaleY(${thick(s.offsetLeft + s.offsetWidth / 2).toFixed(3)})`;
         }
-       if (act) act.style.transform = `scaleY(${thick(x > 0 ? 0 : cw).toFixed(3)})`;     // кнопки стискаються в такт хвилі разом, як одне ціле
+        if (act) act.style.transform = `scaleY(${thick(cw).toFixed(3)})`;      // кнопки стискаються в такт хвилі разом, як одне ціле
         row._clip = poly;
     }
     function animateRow(row, toX) {
@@ -743,7 +719,7 @@
         const w = (row.querySelector('.swipe-actions') || {}).offsetWidth || 132;
         const from = row._x || 0, dist = Math.abs(toX - from);
         if (dist < 1) { row._raf = 0; applyRow(row, toX); return; }
-        const ms = 800 + 480 * Math.min(1, dist / w);     // повільніше, щоб ефект було видно
+        const ms = 420 + 480 * Math.min(1, dist / w);     // повільніше, щоб ефект було видно
         const t0 = performance.now();
         const step = now => {
             const t = Math.min(1, (now - t0) / ms);
@@ -798,7 +774,7 @@
 
     function initSwipe(row) {
         const content = row.querySelector('.swipe-content');
-        const width = () => (row.querySelector('.swipe-actions').offsetWidth || 96);
+        const width = () => (row.querySelector('.swipe-actions').offsetWidth || 132);
         let sx = 0, sy = 0, base = 0, mode = null, pid = null;
         row._x = 0;
         content.addEventListener('pointerdown', e => {
@@ -821,7 +797,7 @@
                 else return;
             }
             const w = width();
-            const nx = Math.max(-w, Math.min(w, base + dx));
+            const nx = Math.max(-w - 24, Math.min(0, base + dx));
             applyRow(row, nx);
         });
         const settleIfNeeded = () => {                       // тап під час анімації зупиняв картку на півдорозі — тепер доводимо її до стану спокою
@@ -831,42 +807,17 @@
             animateRow(row, row.classList.contains('open') ? -w : 0);
         };
         const end = () => {
-    if (mode !== 'swipe') {
-        mode = null;
-        settleIfNeeded();
-        return;
-    }
-
-    mode = null;
-    row._swipedAt = Date.now();
-
-    const w = width();
-    const x = row._x || 0;
-
-    // Якщо картка вже відкрита, свайп у протилежний бік закриває її
-    if ((base < 0 && x > base + 20) ||
-        (base > 0 && x < base - 20)) {
-        row.classList.remove('open');
-        animateRow(row, 0);
-        if (openRow === row) openRow = null;
-        return;
-    }
-
-    // Звичайний стан: вліво — редагування, вправо — видалення
-    if (x < -w / 2) {
-        row.classList.add('open');
-        animateRow(row, -w);
-        openRow = row;
-    } else if (x > w / 2) {
-        row.classList.add('open');
-        animateRow(row, w);
-        openRow = row;
-    } else {
-        row.classList.remove('open');
-        animateRow(row, 0);
-        if (openRow === row) openRow = null;
-    }
-};
+            if (mode !== 'swipe') { mode = null; settleIfNeeded(); return; }
+            mode = null;
+            row._swipedAt = Date.now();
+            const w = width();
+            if (row._x < -w / 2) {
+                row.classList.add('open'); animateRow(row, -w); openRow = row;
+            } else {
+                row.classList.remove('open'); animateRow(row, 0);
+                if (openRow === row) openRow = null;
+            }
+        };
         content.addEventListener('pointerup', end);
         content.addEventListener('pointercancel', end);
         // Після свайпу або коли рядок відкритий — тап по вмісту лише закриває рядок, не «клікає» по посиланню/фото
