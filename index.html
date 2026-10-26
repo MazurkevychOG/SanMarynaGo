@@ -719,7 +719,7 @@
         const w = (row.querySelector('.swipe-actions') || {}).offsetWidth || 132;
         const from = row._x || 0, dist = Math.abs(toX - from);
         if (dist < 1) { row._raf = 0; applyRow(row, toX); return; }
-        const ms = 650 + 500 * Math.min(1, dist / w);     // повільніше, щоб ефект було видно
+        const ms = 800 + 480 * Math.min(1, dist / w);     // повільніше, щоб ефект було видно
         const t0 = performance.now();
         const step = now => {
             const t = Math.min(1, (now - t0) / ms);
