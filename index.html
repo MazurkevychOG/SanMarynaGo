@@ -711,7 +711,7 @@
             const s = segs[k];
             s.style.transform = `scaleY(${thick(s.offsetLeft + s.offsetWidth / 2).toFixed(3)})`;
         }
-        if (act) act.style.transform = `scaleY(${thick(cw).toFixed(3)})`;      // кнопки стискаються в такт хвилі разом, як одне ціле
+       if (act) act.style.transform = `scaleY(${thick(x > 0 ? 0 : cw).toFixed(3)})`;     // кнопки стискаються в такт хвилі разом, як одне ціле
         row._clip = poly;
     }
     function animateRow(row, toX) {
@@ -797,7 +797,7 @@
                 else return;
             }
             const w = width();
-            const nx = Math.max(-w - 24, Math.min(0, base + dx));
+            const nx = Math.max(0, Math.min(w + 24, base + dx));
             applyRow(row, nx);
         });
         const settleIfNeeded = () => {                       // тап під час анімації зупиняв картку на півдорозі — тепер доводимо її до стану спокою
@@ -811,8 +811,8 @@
             mode = null;
             row._swipedAt = Date.now();
             const w = width();
-            if (row._x < -w / 2) {
-                row.classList.add('open'); animateRow(row, -w); openRow = row;
+            if (row._x < w / 2) {
+                row.classList.add('open'); animateRow(row, w); openRow = row;
             } else {
                 row.classList.remove('open'); animateRow(row, 0);
                 if (openRow === row) openRow = null;
