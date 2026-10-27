@@ -252,6 +252,9 @@
         .search-inner input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 18px; height: 100%; padding: 0; -webkit-appearance: none; appearance: none; }
         .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: none; }
         .search-clear.show { display: inline-flex; }
+        /* Список зупиняється так, що перша картка стає рівно під сірою смугою (висота смуги — у --sticky-h) */
+        .content-area { scroll-snap-type: y mandatory; scroll-padding-top: var(--sticky-h, 0px); }
+        .place-row { scroll-snap-align: start; }
         /* Смуга прокрутки справа — втричі товща за стандартну (телефон: ~4px → 12px; комп'ютер: ~8px → 24px) */
         .content-area::-webkit-scrollbar, .sidebar-inner::-webkit-scrollbar, .settings-page::-webkit-scrollbar { width: 12px; height: 12px; }
         .content-area::-webkit-scrollbar-track, .sidebar-inner::-webkit-scrollbar-track, .settings-page::-webkit-scrollbar-track { background: #edf2f7; }
@@ -268,6 +271,8 @@
         .modal-content { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; touch-action: none; overflow: hidden; -webkit-user-select: none; user-select: none; }
         .modal-content img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; will-change: transform; -webkit-touch-callout: none; }
         .modal-content video { max-width: 100%; max-height: 100%; }
+        .modal-content { position: relative; }
+        .vid-swipe { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 5; touch-action: none; background: transparent; }
         #galleryCount { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); color: #fff; background: rgba(0,0,0,.45); padding: 4px 12px; border-radius: 14px; font-size: 14px; pointer-events: none; }
         .gal-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; padding: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 34px; justify-content: center; border-radius: 10px; }
         .gal-prev { left: 8px; } .gal-next { right: 8px; }
@@ -878,6 +883,8 @@
         if (!ca) return;
         const h = mh && getComputedStyle(mh).display !== 'none' ? mh.offsetHeight : 0;
         ca.style.setProperty('--hdr-h', h + 'px');
+        const stt = document.querySelector('.sticky-top');
+        if (stt) ca.style.setProperty('--sticky-h', stt.offsetHeight + 'px');
     }
     window.addEventListener('resize', syncStickyOffset);
     window.addEventListener('orientationchange', () => setTimeout(syncStickyOffset, 300));
@@ -885,7 +892,8 @@
         const ca = document.querySelector('.content-area');
         if (ca) ca.addEventListener('scroll', () => closeOpenRow(), { passive: true });
         const mh = document.querySelector('.mobile-header');
-        if (mh && typeof ResizeObserver !== 'undefined') new ResizeObserver(syncStickyOffset).observe(mh);
+        const stt = document.querySelector('.sticky-top');
+        if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(syncStickyOffset); if (mh) ro.observe(mh); if (stt) ro.observe(stt); }
     })();
 
     // Коли прокрутка зупинилась і верхня смуга (шапка, пошук, заголовок списку) перекриває частину картки — догортаємо назад, щоб картку було видно повністю
@@ -944,6 +952,7 @@
         const scroller = findScroller(el);
         try { cap.setPointerCapture(e.pointerId); } catch (err) { }
         reorderingNow = true;
+        if (scroller) scroller.style.scrollSnapType = 'none';
 
         const clearMark = () => { if (mark) { mark.el.classList.remove(mark.cls); mark = null; } };
         const update = () => {
@@ -1001,6 +1010,7 @@
             el.classList.remove('is-dragging');
             if (ghost) ghost.remove();
             reorderingNow = false;
+            if (scroller) scroller.style.scrollSnapType = '';
             if (opts.onEnd) opts.onEnd();
             if (moved && ev.type === 'pointerup' && pos !== from) onDrop(from, pos);
             if (opts.onDone) opts.onDone();                       // вже після перемальовування списку
@@ -1074,14 +1084,24 @@
         showCurrentMedia();
         document.getElementById('mediaModal').style.display = 'flex';
     }
+    // Шар свайпу покриває відео, крім нижньої панелі плеєра (перемотка/звук), яка лишається робочою
+    function positionVidSwipe() {
+        const c = document.getElementById('mediaContainer'), v = c && c.querySelector('video'), o = document.getElementById('vidSwipe');
+        if (!v || !o) return;
+        const cr = c.getBoundingClientRect(), vr = v.getBoundingClientRect();
+        o.style.bottom = Math.max(0, cr.bottom - (vr.bottom - 72)) + 'px';
+    }
+    window.addEventListener('resize', positionVidSwipe);
     function showCurrentMedia() {
         const container = document.getElementById('mediaContainer');
         const m = currentGalleryMedia[currentGalleryIndex];
         const n = currentGalleryMedia.length;
         galZoom = { s: 1, x: 0, y: 0 };
         container.innerHTML = (m.type || '').startsWith('video/')
-            ? `<video src="${esc(m.data)}" controls autoplay playsinline></video>`
+            ? `<video src="${esc(m.data)}" controls autoplay playsinline></video><div class="vid-swipe" id="vidSwipe"></div>`
             : `<img src="${esc(m.data)}" alt="" draggable="false">`;
+        const vEl = container.querySelector('video');
+        if (vEl) { vEl.addEventListener('loadedmetadata', positionVidSwipe); vEl.addEventListener('resize', positionVidSwipe); positionVidSwipe(); setTimeout(positionVidSwipe, 300); }
         document.getElementById('galleryCount').textContent = (currentGalleryIndex + 1) + ' / ' + n;
         document.getElementById('galleryCount').style.display = n > 1 ? '' : 'none';
         document.getElementById('galPrev').style.display = n > 1 ? '' : 'none';
@@ -1114,7 +1134,7 @@
             }
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            if (!vid) { try { stage.setPointerCapture(e.pointerId); } catch (err) { } }   // для відео захоплюємо лише коли почався свайп
+            try { stage.setPointerCapture(e.pointerId); } catch (err) { }
             if (ptrs.size === 1) { down = { x: e.clientX, y: e.clientY, moved: false }; pinched = false; }
             if (ptrs.size === 2) {
                 const [p, q] = [...ptrs.values()];
@@ -1167,7 +1187,8 @@
             if (galZoom.s > 1 || e.type !== 'pointerup') return;
             const dx = e.clientX - d.x, dy = e.clientY - d.y;
             if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) galleryGo(dx < 0 ? 1 : -1);   // свайп
-            else if (!d.moved && !isVideo()) {                                                         // одиночний дотик (на відео — лишається рідна поведінка плеєра)
+            else if (!d.moved && isVideo()) { const v = stage.querySelector('video'); if (v) { if (v.paused) v.play().catch(() => { }); else v.pause(); } }   // тап по відео = пауза/плей
+            else if (!d.moved) {                                                         // одиночний дотик (на відео — лишається рідна поведінка плеєра)
                 const r = stage.getBoundingClientRect();
                 galleryGo((e.clientX - r.left) < r.width / 2 ? -1 : 1);
             }
@@ -1782,7 +1803,7 @@
         persistSelection(); render();
     }
     function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); render(); }
-    function sync() { recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }
+    function sync() { places.forEach((p, i) => { p.order = i + 1; }); recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }   // order перераховується для ВСІХ карток
 
 
     // ===== Маршрут Google Maps =====
@@ -1867,6 +1888,46 @@
     // Якщо вже вийшли дублі (ваша картка + копія з каталогу), вони зливаються в одну. Місця, яких у вас немає, додаються в кінець;
     // місця, які ви самі видалили з каталогу, назад не повертаються.
     let _updating = false;
+    const _hashCache = new Map(), _sizeCache = new Map();
+    function imgHash(src) {                                    // «відбиток» зображення 9×8 (dHash): стійкий до перекодування й зміни розміру
+        if (_hashCache.has(src)) return _hashCache.get(src);
+        const pr = new Promise(res => {
+            const im = new Image();
+            im.onload = () => {
+                try {
+                    const W = 9, H = 8, c = document.createElement('canvas'); c.width = W; c.height = H;
+                    const x = c.getContext('2d'); x.drawImage(im, 0, 0, W, H);
+                    const d = x.getImageData(0, 0, W, H).data; let bits = '';
+                    for (let y = 0; y < H; y++) for (let xx = 0; xx < W - 1; xx++) {
+                        const a = (y * W + xx) * 4, b = a + 4;
+                        bits += (d[a] * .3 + d[a + 1] * .59 + d[a + 2] * .11) > (d[b] * .3 + d[b + 1] * .59 + d[b + 2] * .11) ? '1' : '0';
+                    }
+                    res(bits);
+                } catch (e) { res(null); }
+            };
+            im.onerror = () => res(null);
+            im.src = src;
+        });
+        _hashCache.set(src, pr); return pr;
+    }
+    async function mediaBytes(m) {
+        const src = String(m.data);
+        if (src.startsWith('data:')) return decodedBytes(src);
+        if (_sizeCache.has(src)) return _sizeCache.get(src);
+        let n = -1;
+        try { n = (await (await fetch(src)).blob()).size; } catch (e) { }
+        _sizeCache.set(src, n); return n;
+    }
+    async function mediaSame(a, b) {
+        if (a.data === b.data) return true;
+        const va = String(a.type || '').startsWith('video/'), vb = String(b.type || '').startsWith('video/');
+        if (va !== vb) return false;
+        if (va) { const [x, y] = await Promise.all([mediaBytes(a), mediaBytes(b)]); return x > 0 && x === y; }   // відео: однаковий розмір файлу
+        const [ha, hb] = await Promise.all([imgHash(a.data), imgHash(b.data)]);
+        if (!ha || !hb) return false;
+        let d = 0; for (let i = 0; i < ha.length; i++) if (ha[i] !== hb[i]) d++;
+        return d <= 6;
+    }
     async function updateFromCatalog() {
         if (_updating) return;
         _updating = true;
@@ -1877,12 +1938,27 @@
             catch (err) { console.error('Update:', err); alert('Не вдалося завантажити каталог із GitHub: ' + err.message); return; }
             recomputeDeleted();                                   // що ви видалили локально — рахуємо за СТАРИМ каталогом
             const key = n => String(n || '').trim().toLowerCase();
-            const mediaKey = m => m.data;
             let added = 0, enriched = 0, merged = 0;
-            const addMedia = (t, list) => {                      // додає фото/відео, яких у картці ще немає
-                const have = new Set(t.media.map(mediaKey));
+            toast('Порівнюю фото…');
+            // Те саме фото може лежати у вашій картці як base64 (імпорт, стара версія), а в каталозі — як файл: порівнюємо за ВМІСТОМ, а не за адресою
+            const addMedia = async (t, list) => {               // додає фото/відео, яких у картці ще немає (за вмістом)
                 let n = 0;
-                for (const m of list) if (!have.has(mediaKey(m))) { t.media.push({ ...m }); have.add(mediaKey(m)); n++; }
+                for (const m of list) {
+                    let dup = false;
+                    for (const x of t.media) { if (await mediaSame(x, m)) { dup = true; break; } }
+                    if (!dup) { t.media.push({ ...m }); n++; }
+                }
+                return n;
+            };
+            const dropCatalogCopies = async t => {              // раніше задубльовані фото: лишаємо ваш варіант, зайву копію з каталогу прибираємо
+                let n = 0;
+                for (let i = t.media.length - 1; i >= 0; i--) {
+                    const m = t.media[i];
+                    if (String(m.data).startsWith('data:')) continue;
+                    for (const u of t.media) {
+                        if (u !== m && String(u.data).startsWith('data:') && await mediaSame(u, m)) { t.media.splice(i, 1); n++; break; }
+                    }
+                }
                 return n;
             };
             for (const c of cat) {
@@ -1900,17 +1976,19 @@
                 }
                 let changed = false;
                 for (const d of extra) {                           // зливаємо дублі: фото й порожні поля переходять у головну
-                    if (addMedia(target, d.media)) changed = true;
+                    if (await addMedia(target, d.media)) changed = true;
                     for (const f of ['gmapsUrl', 'desc', 'near']) if (!target[f] && d[f]) { target[f] = d[f]; changed = true; }
                     if (d.selected) target.selected = true;
                     places.splice(places.indexOf(d), 1);
                     merged++; changed = true;
                 }
-                if (addMedia(target, c.media)) changed = true;
+                if (await addMedia(target, c.media)) changed = true;
+                if (await dropCatalogCopies(target)) changed = true;
                 for (const f of ['gmapsUrl', 'desc', 'near', 'coords']) if (!target[f] && c[f]) { target[f] = c[f]; changed = true; }
                 if (target.id !== c.id) { target.id = c.id; changed = true; }
                 if (changed) { target.dirty = true; enriched++; }
             }
+            _hashCache.clear(); _sizeCache.clear();
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
             sync();
@@ -2150,7 +2228,7 @@
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
                     catch (e) { throw new Error(`фото місця «${p.name}» не вдалося прочитати (${e.message})`); }
                 }
-                out.push({ id: p.id, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), media });
+                out.push({ id: p.id, order: out.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), media });
             }
             const payload = JSON.stringify({ format: 'maps-places', version: 2, exportedAt: new Date().toISOString(), places: out, deleted: deletedIds });
             const d = new Date(), pad = n => String(n).padStart(2, '0');
@@ -2185,10 +2263,12 @@
                 desc: String(p.desc ?? ''),
                 gmapsUrl: String(p.gmapsUrl ?? ''),
                 ...(p.near ? { near: String(p.near) } : {}),
+                ...(Number.isFinite(Number(p.order)) && p.order !== null && p.order !== '' ? { order: Number(p.order) } : {}),
                 selected: !!p.selected,
                 media
             });
         });
+        if (out.length && out.every(x => 'order' in x)) out.sort((a, b) => a.order - b.order);   // файл містить порядок — відновлюємо його
         return out;
     }
 
