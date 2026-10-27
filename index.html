@@ -285,7 +285,9 @@
         .place-row.drop-before::before, .place-row.drop-after::after { content: ''; position: absolute; left: 0; right: 0; height: 4px; background: #4285F4; z-index: 6; }
         .place-row.drop-before::before { top: 0; } .place-row.drop-after::after { bottom: 0; }
         .place-row.is-dragging { opacity: .35; }
-        .flash-row .swipe-content { animation: flashRow 1.2s ease; }
+        /* Підсвічування картки має закінчуватись НЕпрозорим білим: з transparent кнопки ✎/🗑, що лежать під карткою, просвічували 1,2 с */
+        @keyframes flashRowOpaque { 0% { background: #fff3cd; } 100% { background: #fff; } }
+        .flash-row .swipe-content { animation: flashRowOpaque 1.2s ease; }
         .search-inner input::-webkit-search-cancel-button, .search-inner input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
         .fab-add.editing .finger g { fill: #e74c3c; }
         .modal-content img { transform-origin: center center; }
@@ -450,8 +452,8 @@
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
-            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Export</button>
-            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Import</button>
+            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Експорт: усе одним файлом (.json)</button>
+            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Імпорт із файлу…</button>
         </div>
         <div class="settings-section">
             <h3>Звук</h3>
