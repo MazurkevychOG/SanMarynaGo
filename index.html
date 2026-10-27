@@ -250,8 +250,17 @@
         .search-bar.open { height: 84px; border-bottom-width: 1px; }
         .search-inner { display: flex; align-items: center; gap: 8px; margin: 10px 12px 2px; padding: 0 6px 0 12px; height: 46px; background: #f1f3f5; border-radius: 23px; }
         .search-inner input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 18px; height: 100%; padding: 0; -webkit-appearance: none; appearance: none; }
-        .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #cbd5e0; color: #fff; font-size: 16px; justify-content: center; display: none; }
+        .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: none; }
         .search-clear.show { display: inline-flex; }
+        /* Смуга прокрутки справа — втричі товща за стандартну (телефон: ~4px → 12px; комп'ютер: ~8px → 24px) */
+        .content-area::-webkit-scrollbar, .sidebar-inner::-webkit-scrollbar, .settings-page::-webkit-scrollbar { width: 12px; height: 12px; }
+        .content-area::-webkit-scrollbar-track, .sidebar-inner::-webkit-scrollbar-track, .settings-page::-webkit-scrollbar-track { background: #edf2f7; }
+        .content-area::-webkit-scrollbar-thumb, .sidebar-inner::-webkit-scrollbar-thumb, .settings-page::-webkit-scrollbar-thumb { background: #a0aec0; border-radius: 6px; border: 2px solid #edf2f7; min-height: 48px; }
+        @media (hover: hover) and (pointer: fine) {
+            .content-area::-webkit-scrollbar, .sidebar-inner::-webkit-scrollbar, .settings-page::-webkit-scrollbar { width: 24px; }
+            .content-area::-webkit-scrollbar-thumb, .sidebar-inner::-webkit-scrollbar-thumb, .settings-page::-webkit-scrollbar-thumb { border-radius: 10px; border-width: 4px; }
+        }
+        @-moz-document url-prefix() { .content-area, .sidebar-inner, .settings-page { scrollbar-width: auto; scrollbar-color: #a0aec0 #edf2f7; } }
         .search-info { font-size: 13px; color: #718096; padding: 2px 20px 0; height: 20px; }
 
         /* ===== Галерея ===== */
@@ -377,20 +386,6 @@
 
         /* ===== Без «відскоку» прокрутки на iPhone (артефакти знизу списку), шапка списку може переноситись ===== */
         html, body, .content-area { overscroll-behavior: none; }
-
-        /* Смужка прокрутки праворуч — утричі товща для зручнішого захоплення */
-        .content-area::-webkit-scrollbar,
-        .sidebar-inner::-webkit-scrollbar,
-        .sidebar::-webkit-scrollbar,
-        .settings-page::-webkit-scrollbar { width: 18px; }
-        .content-area::-webkit-scrollbar-thumb,
-        .sidebar-inner::-webkit-scrollbar-thumb,
-        .sidebar::-webkit-scrollbar-thumb,
-        .settings-page::-webkit-scrollbar-thumb { background: #aeb8c4; border: 2px solid transparent; background-clip: content-box; border-radius: 12px; }
-        .content-area,
-        .sidebar-inner,
-        .sidebar,
-        .settings-page { scrollbar-width: auto; scrollbar-color: #aeb8c4 transparent; }
         .list-head { flex-wrap: wrap; height: auto; min-height: 56px; padding-top: 6px; padding-bottom: 6px; row-gap: 6px; }
         @media (max-width: 700px) { .list-head { min-height: 50px; } .lh-count { font-size: 13px; } }
         /* ===== Сторінка налаштувань ===== */
@@ -467,8 +462,8 @@
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
-            <button type="button" class="set-btn" onclick="settingsAction('export')">Export</button>
-            <button type="button" class="set-btn" onclick="settingsAction('import')">Import</button>
+            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Експорт: усе одним файлом (.json)</button>
+            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Імпорт із файлу…</button>
         </div>
         <div class="settings-section">
             <h3>Звук</h3>
@@ -614,9 +609,10 @@
     }
 
     let _persistTimer = null, _warned = false;
-    function persistPlaces() {
+    let stateReady = false;                 // стає true після завантаження — до цього нічого не записуємо, щоб не затерти збережене
+    function persistPlaces(now) {
         clearTimeout(_persistTimer);
-        _persistTimer = setTimeout(async () => {
+        const run = async () => {
             try { await idbSet('state', { base: 2, places, deleted: deletedIds, deletedNames }); }
             catch (err) {
                 console.error('Помилка збереження в IndexedDB:', err);
@@ -625,8 +621,11 @@
                     alert('Не вдалося зберегти зміни в браузері. Зробіть «⚙ → Експорт», щоб не втратити зміни.');
                 }
             }
-        }, 300);
+        };
+        if (now) run(); else _persistTimer = setTimeout(run, 300);
     }
+    document.addEventListener('visibilitychange', () => { if (stateReady && document.visibilityState === 'hidden') persistPlaces(true); });
+    window.addEventListener('pagehide', () => { if (stateReady) persistPlaces(true); });
     // Вибір зберігається окремо й за id (не за номером рядка), тому не «з'їжджає»
     // після перетягування або видалення.
     function persistSelection() {
@@ -804,7 +803,7 @@
                 try { if (navigator.vibrate) navigator.vibrate(16); } catch (err) { }
                 startReorder({ currentTarget: content, pointerId: pid, pointerType: ptype, clientX: sx, clientY: sy, button: 0, target: content, preventDefault() { } },
                     row, () => Array.from(tbody.children),
-                    (from, to) => { const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); },
+                    (from, to) => { const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); persistPlaces(true); },   // номери всіх карток перераховуються в render(), порядок зберігається одразу
                     { ghost: () => rowGhost(row, i), immediate: true, onEnd: () => { row._reordering = false; }, onDone: () => { suppressClickUntil = Date.now() + 450; } });
             }, ptype === 'mouse' ? 250 : LONG_PRESS_MS);
         });
@@ -887,6 +886,33 @@
         if (ca) ca.addEventListener('scroll', () => closeOpenRow(), { passive: true });
         const mh = document.querySelector('.mobile-header');
         if (mh && typeof ResizeObserver !== 'undefined') new ResizeObserver(syncStickyOffset).observe(mh);
+    })();
+
+    // Коли прокрутка зупинилась і верхня смуга (шапка, пошук, заголовок списку) перекриває частину картки — догортаємо назад, щоб картку було видно повністю
+    (function initScrollSettle() {
+        const ca = document.querySelector('.content-area');
+        const top = document.querySelector('.sticky-top');
+        if (!ca || !top) return;
+        let timer = null, finger = false;
+        const settle = () => {
+            if (finger || reorderingNow) return;
+            const limit = top.getBoundingClientRect().bottom;
+            const rows = document.getElementById('placesTable').children;
+            for (const r of rows) {
+                if (r.classList.contains('hidden-by-search')) continue;
+                const rc = r.getBoundingClientRect();
+                if (rc.bottom <= limit + 1) continue;           // повністю сховалась під смугою — це нормально
+                if (rc.top >= limit - 1) break;                 // ця й усі нижче — видно повністю
+                ca.scrollTo({ top: Math.max(0, ca.scrollTop - (limit - rc.top)), behavior: 'smooth' });
+                break;
+            }
+        };
+        const later = () => { clearTimeout(timer); timer = setTimeout(settle, 180); };
+        ca.addEventListener('scroll', later, { passive: true });
+        ca.addEventListener('pointerdown', () => { finger = true; clearTimeout(timer); }, true);
+        const up = () => { finger = false; later(); };
+        ca.addEventListener('pointerup', up, true);
+        ca.addEventListener('pointercancel', up, true);
     })();
 
     // ===== Перетягування (миша + дотик, через Pointer Events) =====
@@ -1081,10 +1107,14 @@
         let startDist = 1, startScale = 1, down = null, pinched = false;
         const isVideo = () => !!stage.querySelector('video');
         stage.addEventListener('pointerdown', e => {
-            if (isVideo()) return;
+            const vid = stage.querySelector('video');
+            if (vid) {                                          // відео: нижню панель керування (перемотка, звук) не чіпаємо, решта — для свайпу
+                const r = vid.getBoundingClientRect();
+                if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY > r.bottom - 70) return;
+            }
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
-            try { stage.setPointerCapture(e.pointerId); } catch (err) { }
+            if (!vid) { try { stage.setPointerCapture(e.pointerId); } catch (err) { } }   // для відео захоплюємо лише коли почався свайп
             if (ptrs.size === 1) { down = { x: e.clientX, y: e.clientY, moved: false }; pinched = false; }
             if (ptrs.size === 2) {
                 const [p, q] = [...ptrs.values()];
@@ -1107,8 +1137,9 @@
                 if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 8) down.moved = true;
                 const ddx = e.clientX - down.x, ddy = e.clientY - down.y;
                 if (galZoom.s === 1 && Math.abs(ddy) > 12 && Math.abs(ddy) > Math.abs(ddx) * 1.2) {      // тягнемо вниз або вгору — фото їде за пальцем, фон світлішає
+                    if (!down.vert && isVideo()) { try { stage.setPointerCapture(e.pointerId); } catch (err) { } }
                     down.vert = true;
-                    const im = document.querySelector('#mediaContainer img');
+                    const im = document.querySelector('#mediaContainer img, #mediaContainer video');   // фото або відео їде за пальцем
                     if (im) im.style.transform = `translateY(${ddy}px)`;
                     document.getElementById('mediaModal').style.setProperty('background', `rgba(0,0,0,${Math.max(0.25, 1 - Math.abs(ddy) / 520).toFixed(2)})`, 'important');
                 }
@@ -1126,7 +1157,7 @@
             if (d.vert) {                                                           // свайп вниз = натиснути червоний відбиток
                 document.getElementById('mediaModal').style.removeProperty('background');
                 if (Math.abs(e.clientY - d.y) > 90 && e.type === 'pointerup') closeGallery();
-                else applyGalTransform();
+                else { const v = stage.querySelector('video'); if (v) v.style.transform = ''; else applyGalTransform(); }
                 return;
             }
             if (pinched) {
@@ -1136,7 +1167,7 @@
             if (galZoom.s > 1 || e.type !== 'pointerup') return;
             const dx = e.clientX - d.x, dy = e.clientY - d.y;
             if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) galleryGo(dx < 0 ? 1 : -1);   // свайп
-            else if (!d.moved) {                                                                       // одиночний дотик
+            else if (!d.moved && !isVideo()) {                                                         // одиночний дотик (на відео — лишається рідна поведінка плеєра)
                 const r = stage.getBoundingClientRect();
                 galleryGo((e.clientX - r.left) < r.width / 2 ? -1 : 1);
             }
@@ -1403,64 +1434,6 @@
         if (!parseCoords(coords)) { alert('Координати: 41.047, 19.496 — або Plus Code (наприклад 8FGXPFC9+GX чи PFC9+GX9, Fier)'); return false; }
         return true;
     }
-    // Групуємо місця після додавання/редагування/імпорту/оновлення каталогу:
-    // спершу за найближчим населеним пунктом, а самі групи та місця без назви населеного пункту
-    // упорядковуємо за географічною близькістю. Ручне перетягування карток не змінює порядок автоматично.
-    function groupPlacesTerritorially() {
-        if (places.length < 2) return;
-        const point = p => parseCoords(p.coords);
-        const distance = (a, b) => {
-            const ca = point(a), cb = point(b);
-            return ca && cb ? haversine(ca, cb) : Infinity;
-        };
-        const keyNear = p => p.near && normText(p.near) ? normText(p.near) : '';
-        const groupsMap = new Map();
-        places.forEach((p, i) => {
-            const k = keyNear(p) || '__unknown__';
-            if (!groupsMap.has(k)) groupsMap.set(k, []);
-            groupsMap.get(k).push({ p, originalIndex: i });
-        });
-        const groups = [...groupsMap.entries()].map(([key, items]) => {
-            const pts = items.map(x => point(x.p)).filter(Boolean);
-            const center = pts.length ? [pts.reduce((s, c) => s + c[0], 0) / pts.length, pts.reduce((s, c) => s + c[1], 0) / pts.length] : null;
-            return { key, items, center, firstIndex: Math.min(...items.map(x => x.originalIndex)) };
-        });
-        // Починаємо з групи, яка раніше стояла першою, а наступну беремо за найближчим центром.
-        const orderedGroups = [];
-        let current = groups.find(g => g.firstIndex === 0) || groups[0];
-        while (current) {
-            orderedGroups.push(current);
-            groups.splice(groups.indexOf(current), 1);
-            if (!groups.length) break;
-            const last = current.center;
-            current = groups.reduce((best, g) => {
-                if (!best) return g;
-                if (!last) return g.firstIndex < best.firstIndex ? g : best;
-                if (!g.center) return best;
-                const d = haversine(last, g.center), bd = best.center ? haversine(last, best.center) : Infinity;
-                return d < bd ? g : best;
-            }, null);
-        }
-        const sorted = [];
-        for (const group of orderedGroups) {
-            const remaining = group.items.slice();
-            let item = remaining.find(x => x.originalIndex === group.firstIndex) || remaining[0];
-            while (item) {
-                sorted.push(item.p);
-                remaining.splice(remaining.indexOf(item), 1);
-                if (!remaining.length) break;
-                const c = point(item.p);
-                item = remaining.reduce((best, x) => {
-                    if (!best) return x;
-                    if (!c) return x.originalIndex < best.originalIndex ? x : best;
-                    const d = distance(item.p, x.p), bd = distance(item.p, best.p);
-                    return d < bd ? x : best;
-                }, null);
-            }
-        }
-        places = sorted;
-    }
-
     // Нове місце ставимо поряд зі схожим за територією: спершу те саме місто/район (за назвою найближчого
     // населеного пункту), інакше найближче за відстанню (до 25 км) — і вставляємо одразу після нього.
     function insertIndexFor(np) {
@@ -1528,11 +1501,9 @@
             places.splice(at, 0, data);
             data._at = at;
         }
-        groupPlacesTerritorially();
         sync();
         closeFormDissolve();
-        const savedIndex = places.findIndex(p => p.id === data.id);
-        if (savedIndex >= 0) setTimeout(() => flashRow(savedIndex), 120);
+        if (data._at !== undefined) { const at = data._at; delete data._at; setTimeout(() => flashRow(at), 120); }
     }
 
     function handleEdit(i) {
@@ -1811,17 +1782,7 @@
         persistSelection(); render();
     }
     function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); render(); }
-    function sync() {
-        recomputeDeleted();
-        persistPlaces();
-        persistSelection();
-        render();                 // оновити список у поточній черговості місць після кожної зміни
-        applySearchIfReady();
-    }
-    function applySearchIfReady() {
-        // applySearch оголошена нижче; виклик відбувається після ініціалізації DOM.
-        if (document.getElementById('searchInput')) applySearch();
-    }
+    function sync() { recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }
 
 
     // ===== Маршрут Google Maps =====
@@ -1952,19 +1913,26 @@
             }
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
-            groupPlacesTerritorially();
             sync();
+            touchVersion();
             toast(added || enriched || merged
                 ? `Update: додано нових ${added}, збагачено ${enriched}` + (merged ? `, злито дублів ${merged}` : '')
                 : 'Update: нових даних немає — у вас уже все актуальне');
             refreshLocalInfo();
         } finally { _updating = false; }
     }
+    // Версія = місцевий час (де ви зараз) останнього оновлення чи зміни: Update, додавання, редагування, видалення, порядок, імпорт.
+    const VER_KEY = 'appVersionTs';
+    function touchVersion() {
+        try { localStorage.setItem(VER_KEY, String(Date.now())); } catch (e) { }
+        refreshAppVersion();
+    }
     function refreshAppVersion() {
         const el = document.getElementById('appVersion');
         if (!el) return;
-        // Дата/час останньої зміни самого файлу; відображення — у локальному часовому поясі пристрою.
-        const d = new Date(document.lastModified);
+        let ts = NaN;
+        try { ts = Number(localStorage.getItem(VER_KEY)); } catch (e) { }
+        const d = ts > 0 ? new Date(ts) : new Date(document.lastModified);   // ще не було змін — час файлу
         if (Number.isNaN(d.getTime())) { el.textContent = 'v.'; return; }
         const pad = n => String(n).padStart(2, '0');
         el.textContent = `v.${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}.${pad(d.getMinutes())}.${pad(d.getSeconds())}`;
@@ -2046,7 +2014,7 @@
         const info = document.getElementById('searchInfo');
         if (info) info.textContent = set ? ('Знайдено: ' + m.length + ' з ' + places.length) : (raw ? 'Введіть щонайменше 3 символи' : '');
         const clr = document.getElementById('searchClear');
-        if (clr) clr.classList.toggle('show', searchQuery().length >= 1);
+        if (clr) clr.classList.toggle('show', !!searchQuery());
         updateListCount();
     }
     function openSearch(focus) {
@@ -2066,7 +2034,7 @@
         const bar = document.getElementById('searchBar');
         const input = document.getElementById('searchInput');
         const clr = document.getElementById('searchClear');
-        input.addEventListener('input', applySearch);
+        ['input', 'keyup', 'change', 'search', 'compositionend', 'paste'].forEach(ev => input.addEventListener(ev, () => setTimeout(applySearch, 0)));   // хрестик — від 1 символа
         input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); input.blur(); } });
         input.addEventListener('blur', () => { setTimeout(() => { if (!input.value && document.activeElement !== input) closeSearch(); }, 200); });
         clr.addEventListener('pointerdown', e => e.preventDefault());           // не відбираємо фокус у поля
@@ -2267,7 +2235,6 @@
                 });
             }
             clearForm();
-            groupPlacesTerritorially();
             sync();
             toast('Імпортовано місць: ' + items.length);
         } catch (err) {
@@ -2982,10 +2949,10 @@
         if (sl && Array.isArray(sl.ids)) { const ids = new Set(sl.ids); places.forEach(p => { p.selected = ids.has(p.id); }); }
         placeMap();
         restoreReturnToggle();
-        groupPlacesTerritorially();
         render();
         syncStickyOffset();
         initMap();
+        stateReady = true;
     }
     init();
 </script>
