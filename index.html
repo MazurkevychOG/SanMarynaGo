@@ -238,7 +238,7 @@
             .swipe-actions { z-index: 3; opacity: 0; pointer-events: none; right: 12px; top: 50%; bottom: auto; height: auto; transform: translateY(-50%); gap: 10px; transition: opacity .15s; }
             .place-row:hover .swipe-actions, .place-row:focus-within .swipe-actions { opacity: 1; pointer-events: auto; }
             .place-row.suppress-actions:hover .swipe-actions,
-            .place-row.suppress-actions:focus-within .swipe-actions { opacity: 0; pointer-events: none; }
+            .place-row.suppress-actions:focus-within .swipe-actions { opacity: 0; pointer-events: none; transition: none; }
             .act { width: 56px; min-width: 56px; height: 56px; min-height: 56px; flex: 0 0 56px; border-radius: 50%; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
             .act-edit { background: #f1c40f; color: #333; }
             .act-del { background: #e74c3c; color: #fff; }
@@ -659,7 +659,7 @@
                 </div>`;
             tbody.appendChild(row);
 
-            row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(true); handleEdit(i); };
+            row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(true); hideRowActions(row); handleEdit(i); };
             row.querySelector('[data-a="del"]').onclick = () => { closeOpenRow(true); handleDelete(i); };
 
             // Зміна порядку: утримуйте палець (або кнопку миші) на картці — фото чи назві — і тягніть
@@ -751,9 +751,19 @@
     // ===== Перетягування картки: утримайте палець на картці (фото, назва) і тягніть =====
     const LONG_PRESS_MS = 380;                           // дотик; для миші — 250 мс
     let suppressClickUntil = 0;
-    document.addEventListener('pointermove', () => {
-        document.querySelectorAll('.place-row.suppress-actions').forEach(row => row.classList.remove('suppress-actions'));
-    }, { passive: true, once: true });
+    // Круглі кнопки картки зникають одразу після «Змінити» і не з'являються знову, поки курсор не вийде за межі цієї картки
+    let editRowEl = null;
+    function hideRowActions(row) {
+        if (!row) return;
+        editRowEl = row;
+        row.classList.add('suppress-actions');
+        const f = document.activeElement;
+        if (f && row.contains(f) && f.blur) f.blur();         // без :focus-within кнопки не «залипають»
+    }
+    document.addEventListener('pointerout', e => {
+        const row = e.target && e.target.closest && e.target.closest('.place-row.suppress-actions');
+        if (row && !row.contains(e.relatedTarget)) row.classList.remove('suppress-actions');
+    }, true);
     document.addEventListener('touchstart', () => {
         document.querySelectorAll('.place-row.suppress-actions').forEach(row => row.classList.remove('suppress-actions'));
     }, { passive: true, once: true });
@@ -1669,8 +1679,8 @@
         if (focused && focused.closest && focused.closest('.place-row') && focused.blur) focused.blur();
         document.querySelectorAll('.place-row :focus').forEach(el => { if (el.blur) el.blur(); });
         closeOpenRow(true);
-        // Після скасування ховаємо круглі кнопки навіть якщо курсор лишився над карткою.
-        document.querySelectorAll('.place-row').forEach(row => row.classList.add('suppress-actions'));
+        // Після скасування круглі кнопки лишаються схованими, поки курсор не вийде за межі цієї картки.
+        hideRowActions(editRowEl);
         closeFormDissolve();
         if (ed !== '' && places[Number(ed)]) flashRow(Number(ed));   // показуємо, до якого місця повернулись
     }
