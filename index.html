@@ -1767,9 +1767,11 @@
             ? `Локальні зміни лише в цьому браузері: нових або змінених місць — ${dirty}, видалених із каталогу — ${deletedIds.length}. Щоб передати їх, зробіть «Експорт».`
             : 'Локальних змін немає: показано каталог із репозиторію.';
     }
-    // Update: докачує каталог із репозиторію (GitHub) і ДОПОВНЮЄ ним поточні дані на пристрої.
-    // Ваші нові/змінені місця, їхнє фото й порядок лишаються; нові картки каталогу додаються в кінець,
-    // незмінені картки оновлюються до свіжої версії каталогу; місця, які ви самі видалили, назад не повертаються.
+    // Update: докачує каталог із репозиторію (GitHub) і ЗБАГАЧУЄ ним поточні картки — нічого з ваших даних не видаляє.
+    // Картка каталогу й ваша картка — одне й те саме місце, якщо збігається id або назва (без урахування регістру).
+    // У вашу картку додаються: фото, яких у ній ще немає, а також посилання на карту, опис, «найближче селище» — якщо у вас ці поля порожні.
+    // Якщо вже вийшли дублі (ваша картка + копія з каталогу), вони зливаються в одну. Місця, яких у вас немає, додаються в кінець;
+    // місця, які ви самі видалили з каталогу, назад не повертаються.
     let _updating = false;
     async function updateFromCatalog() {
         if (_updating) return;
@@ -1780,25 +1782,46 @@
             try { cat = await loadCatalog(); }
             catch (err) { console.error('Update:', err); alert('Не вдалося завантажити каталог із GitHub: ' + err.message); return; }
             recomputeDeleted();                                   // що ви видалили локально — рахуємо за СТАРИМ каталогом
-            const byId = new Map(cat.map(c => [c.id, c]));
-            const sig = p => JSON.stringify([p.name, p.coords, p.desc, p.gmapsUrl, (p.media || []).map(m => m.data)]);
-            let added = 0, updated = 0, removed = 0;
-            const next = [];
-            for (const p of places) {
-                if (p.dirty) { next.push(p); continue; }          // ваша версія — не чіпаємо
-                const c = byId.get(p.id);
-                if (c) { if (sig(c) !== sig(p)) updated++; c.selected = p.selected; next.push(c); }
-                else if (catalogIds.has(p.id)) removed++;         // зникла з каталогу, а ви її не змінювали
-                else next.push(p);
+            const key = n => String(n || '').trim().toLowerCase();
+            const mediaKey = m => m.data;
+            let added = 0, enriched = 0, merged = 0;
+            const addMedia = (t, list) => {                      // додає фото/відео, яких у картці ще немає
+                const have = new Set(t.media.map(mediaKey));
+                let n = 0;
+                for (const m of list) if (!have.has(mediaKey(m))) { t.media.push({ ...m }); have.add(mediaKey(m)); n++; }
+                return n;
+            };
+            for (const c of cat) {
+                const cands = places.filter(p => p.id === c.id || (key(p.name) && key(p.name) === key(c.name)));
+                if (!cands.length) {
+                    if (!deletedIds.includes(c.id)) { places.push(c); added++; }
+                    continue;
+                }
+                // головна картка — ваша (змінена), інакше перша знайдена
+                const target = cands.find(p => p.dirty) || cands[0];
+                const extra = cands.filter(p => p !== target);
+                if (!target.dirty && !extra.length && target.id === c.id) {   // незмінена копія каталогу — просто свіжа версія
+                    Object.assign(target, c, { selected: target.selected, dirty: false });
+                    continue;
+                }
+                let changed = false;
+                for (const d of extra) {                           // зливаємо дублі: фото й порожні поля переходять у головну
+                    if (addMedia(target, d.media)) changed = true;
+                    for (const f of ['gmapsUrl', 'desc', 'near']) if (!target[f] && d[f]) { target[f] = d[f]; changed = true; }
+                    if (d.selected) target.selected = true;
+                    places.splice(places.indexOf(d), 1);
+                    merged++; changed = true;
+                }
+                if (addMedia(target, c.media)) changed = true;
+                for (const f of ['gmapsUrl', 'desc', 'near', 'coords']) if (!target[f] && c[f]) { target[f] = c[f]; changed = true; }
+                if (target.id !== c.id) { target.id = c.id; changed = true; }
+                if (changed) { target.dirty = true; enriched++; }
             }
-            const have = new Set(next.map(p => p.id));
-            for (const c of cat) if (!have.has(c.id) && !deletedIds.includes(c.id)) { next.push(c); added++; }
-            places = next;
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
             sync();
-            toast(added || updated || removed
-                ? `Update: додано ${added}, оновлено ${updated}` + (removed ? `, прибрано ${removed}` : '')
+            toast(added || enriched || merged
+                ? `Update: додано нових ${added}, збагачено ${enriched}` + (merged ? `, злито дублів ${merged}` : '')
                 : 'Update: нових даних немає — у вас уже все актуальне');
             refreshLocalInfo();
         } finally { _updating = false; }
