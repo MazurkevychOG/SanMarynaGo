@@ -810,8 +810,9 @@
         const settleIfNeeded = () => {                       // тап під час анімації зупиняв картку на півдорозі — тепер доводимо її до стану спокою
             if (row._raf) return;
             const w = width(), x = row._x || 0;
-            if (x === 0 || x === -w) return;
-            animateRow(row, row.classList.contains('open') ? -w : 0);
+            const openX = -w - 24; // додатковий зсув, щоб картка повністю відкривала ліве коло
+            if (x === 0 || x === openX) return;
+            animateRow(row, row.classList.contains('open') ? openX : 0);
         };
         const end = () => {
             if (mode !== 'swipe') { mode = null; settleIfNeeded(); return; }
@@ -819,7 +820,7 @@
             row._swipedAt = Date.now();
             const w = width();
             if (row._x < -w / 2) {
-                row.classList.add('open'); animateRow(row, -w); openRow = row;
+                row.classList.add('open'); animateRow(row, -w - 24); openRow = row;
             } else {
                 row.classList.remove('open'); animateRow(row, 0);
                 if (openRow === row) openRow = null;
