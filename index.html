@@ -443,8 +443,8 @@
             <h3>Файл обміну</h3>
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
-            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Export</button>
-            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Import</button>
+            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Експорт: усе одним файлом (.json)</button>
+            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Імпорт із файлу…</button>
         </div>
         <div class="settings-section">
             <h3>Звук</h3>
@@ -537,6 +537,8 @@
     let places = [];
     let deletedIds = [];                 // id карток каталогу, видалених локально (щоб оновлення каталогу їх не повертало)
     let catalogIds = new Set();
+    let deletedNames = [];               // назви видалених вами карток — Update не повертає їх навіть якщо в каталозі інший id
+    const nameKey = n => String(n || '').trim().toLowerCase();
 
     function uid() { return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function normalize(p, i) {
@@ -591,7 +593,7 @@
     function persistPlaces() {
         clearTimeout(_persistTimer);
         _persistTimer = setTimeout(async () => {
-            try { await idbSet('state', { base: 2, places, deleted: deletedIds }); }
+            try { await idbSet('state', { base: 2, places, deleted: deletedIds, deletedNames }); }
             catch (err) {
                 console.error('Помилка збереження в IndexedDB:', err);
                 if (!_warned) {
@@ -1674,6 +1676,7 @@
         const ok = await confirmDialog('Видалити місце?', '«' + p.name + '» буде видалено разом з усіма фото й відео.', 'Видалити повністю');
         if (!ok) return;
         const ed = document.getElementById('editIndex').value;
+        if (nameKey(p.name) && !deletedNames.includes(nameKey(p.name))) deletedNames.push(nameKey(p.name));
         places.splice(i, 1);
         if (ed !== '') {
             const e = Number(ed);
@@ -1794,7 +1797,7 @@
             for (const c of cat) {
                 const cands = places.filter(p => p.id === c.id || (key(p.name) && key(p.name) === key(c.name)));
                 if (!cands.length) {
-                    if (!deletedIds.includes(c.id)) { places.push(c); added++; }
+                    if (!deletedIds.includes(c.id) && !deletedNames.includes(key(c.name))) { places.push(c); added++; }
                     continue;
                 }
                 // головна картка — ваша (змінена), інакше перша знайдена
@@ -2813,6 +2816,7 @@
         try { await idbOpen(); st = await idbGet('state'); sl = await idbGet('selection'); }
         catch (err) { console.warn('IndexedDB недоступна, працюємо без збереження в браузері:', err); }
         const localList = st && Array.isArray(st.places) ? st.places : null;
+        deletedNames = st && Array.isArray(st.deletedNames) ? st.deletedNames : [];
         if (localList) localList.forEach(p => { if (!('base' in st) && p.dirty === undefined) p.dirty = true; });   // стан зі старої версії сайту — це ваші дані, лишаємо їх
         if (cat) {
             catalogIds = new Set(cat.map(p => p.id));
@@ -2827,7 +2831,7 @@
                     // незмінена, але зникла з каталогу — прибираємо
                 }
                 const have = new Set(places.map(p => p.id));
-                for (const cp of cat) if (!have.has(cp.id) && !deletedIds.includes(cp.id)) places.push(cp);   // нові в каталозі — в кінець
+                for (const cp of cat) if (!have.has(cp.id) && !deletedIds.includes(cp.id) && !deletedNames.includes(nameKey(cp.name))) places.push(cp);   // нові в каталозі — в кінець
             } else places = cat;
         } else if (localList) {
             places = localList; places.forEach(normalize);
