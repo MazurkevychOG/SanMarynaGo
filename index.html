@@ -49,7 +49,7 @@
             .content-area { width: 100%; flex: 1; overflow-y: auto; font-size: 16px; border-left: none; border-bottom: 1px solid #eaeaea; }
 
             /* Форма — фіксована панель знизу, згорнута за замовчуванням */
-            .sidebar { width: 100%; flex-shrink: 0; padding: 0; box-shadow: 0 -3px 15px rgba(0,0,0,0.12); order: 2; max-height: 55dvh; overflow-y: auto; display: none; }
+            .sidebar { width: 100%; flex-shrink: 0; padding: 0; box-shadow: 0 -3px 15px rgba(0,0,0,0.12); order: 2; max-height: 82dvh; overflow-y: auto; display: none; }
             .sidebar.open { display: flex; }
 
             .sidebar-inner { padding: 14px 14px 20px; display: flex; flex-direction: column; gap: 10px; width: 100%; }
@@ -447,6 +447,7 @@
             <h3>Файл обміну</h3>
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
+            <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
             <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Експорт: усе одним файлом (.json)</button>
             <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Імпорт із файлу…</button>
         </div>
@@ -656,8 +657,8 @@
                 </div>`;
             tbody.appendChild(row);
 
-            row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(); handleEdit(i); };
-            row.querySelector('[data-a="del"]').onclick = () => { closeOpenRow(); handleDelete(i); };
+            row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(true); handleEdit(i); };
+            row.querySelector('[data-a="del"]').onclick = () => { closeOpenRow(true); handleDelete(i); };
 
             // Зміна порядку: утримуйте палець (або кнопку миші) на картці — фото чи назві — і тягніть
             initRowReorder(row, i, tbody);
@@ -1654,6 +1655,7 @@
     // Скасувати: вийти з режиму редагування й повернутися до реєстру місць (панель закривається, місце не змінюється)
     function cancelEdit() {
         const ed = document.getElementById('editIndex').value;
+        closeOpenRow(true);
         closeFormDissolve();
         if (ed !== '' && places[Number(ed)]) flashRow(Number(ed));   // показуємо, до якого місця повернулись
     }
@@ -1834,7 +1836,17 @@
             refreshLocalInfo();
         } finally { _updating = false; }
     }
-    function openSettings() { closeCtx(); refreshLocalInfo(); document.body.classList.add('settings-open'); }
+    function refreshAppVersion() {
+        const el = document.getElementById('appVersion');
+        if (!el) return;
+        // document.lastModified зазвичай відображає Last-Modified файлу, який віддає сервер.
+        // Якщо хостинг не передає час Git-деплою, браузер не може отримати його напряму.
+        const d = new Date(document.lastModified);
+        if (Number.isNaN(d.getTime())) { el.textContent = 'v.'; return; }
+        const pad = n => String(n).padStart(2, '0');
+        el.textContent = `v.${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}.${pad(d.getMinutes())}.${pad(d.getSeconds())}`;
+    }
+    function openSettings() { closeCtx(); refreshLocalInfo(); refreshAppVersion(); document.body.classList.add('settings-open'); }
     function closeSettings() { document.body.classList.remove('settings-open'); }
     function settingsAction(kind) {
         if (kind === 'update') updateFromCatalog();
