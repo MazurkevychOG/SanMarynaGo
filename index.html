@@ -197,9 +197,9 @@
         .place-row { position: relative; overflow: hidden; border-bottom: 1px solid #edf2f7; background: #fff; }
         .place-row.hidden-by-search { display: none; }
         .swipe-content { position: relative; z-index: 2; background: #fff; display: grid; grid-template-columns: var(--cols); align-items: center; padding: 12px 10px; touch-action: pan-y; }
-        .swipe-actions { position: absolute; top: 0; bottom: 0; right: 0; z-index: 1; display: flex; }
-        .act { width: 96px; height: 100%; border-radius: 0; flex-direction: column; gap: 4px; font-size: 30px; justify-content: center; padding: 0; }
-        .act span { font-size: 14px; font-weight: 700; }
+        .swipe-actions { position: absolute; top: 0; bottom: 0; right: 0; z-index: 1; display: flex; align-items: center; gap: 10px; }
+        .act { width: 56px; min-width: 56px; height: 56px; min-height: 56px; box-sizing: border-box; flex: 0 0 56px; border-radius: 50%; flex-direction: column; gap: 0; font-size: 24px; line-height: 1; justify-content: center; align-items: center; padding: 0; }
+        .act span { display: none; }
         .act-edit { background: #f1c40f; color: #333; }
         .act-del { background: #e74c3c; color: #fff; }
         .c-chk { display: flex; justify-content: center; }
@@ -230,12 +230,14 @@
             .drag-handle { margin: -10px 0; }
             .drag-handle.grip { font-size: 26px; }
             .drag-handle.num { font-size: 22px; }
-            .act { width: 84px; }
+            .swipe-actions { top: 0; bottom: 0; right: 8px; align-items: center; gap: 8px; }
+            .act { width: 56px; min-width: 56px; height: 56px; min-height: 56px; flex: 0 0 56px; border-radius: 50%; font-size: 24px; }
+            .act span { display: none; }
         }
         @media (hover: hover) and (pointer: fine) {
             .swipe-actions { z-index: 3; opacity: 0; pointer-events: none; right: 12px; top: 50%; bottom: auto; height: auto; transform: translateY(-50%); gap: 10px; transition: opacity .15s; }
             .place-row:hover .swipe-actions, .place-row:focus-within .swipe-actions { opacity: 1; pointer-events: auto; }
-            .act { width: 56px; height: 56px; border-radius: 50%; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+            .act { width: 56px; min-width: 56px; height: 56px; min-height: 56px; flex: 0 0 56px; border-radius: 50%; font-size: 24px; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
             .act-edit { background: #f1c40f; color: #333; }
             .act-del { background: #e74c3c; color: #fff; }
             .act span { display: none; }
@@ -692,7 +694,7 @@
             c.style.clipPath = ''; c.style.webkitClipPath = '';
             c.style.transform = x ? `translateX(${x}px)` : '';
             for (let k = 0; k < segs.length; k++) segs[k].style.transform = '';
-            if (act) act.style.transform = '';
+            if (act) { act.style.transform = ''; act.querySelectorAll('.act').forEach(b => b.style.transform = ''); }
             row._clip = '';
             return;
         }
@@ -716,7 +718,7 @@
             const s = segs[k];
             s.style.transform = `scaleY(${thick(s.offsetLeft + s.offsetWidth / 2).toFixed(3)})`;
         }
-        if (act) act.style.transform = `scaleY(${thick(cw).toFixed(3)})`;      // кнопки стискаються в такт хвилі разом, як одне ціле
+        if (act) act.style.transform = ''; // кнопки не стискаються під час свайпу
         row._clip = poly;
     }
     function animateRow(row, toX) {
