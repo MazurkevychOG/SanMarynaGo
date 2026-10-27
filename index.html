@@ -230,7 +230,7 @@
             .drag-handle { margin: -10px 0; }
             .drag-handle.grip { font-size: 26px; }
             .drag-handle.num { font-size: 22px; }
-            .swipe-actions { top: 0; bottom: 0; right: 24px; align-items: center; gap: 8px; }
+            .swipe-actions { top: 0; bottom: 0; right: 12px; align-items: center; gap: 8px; }   /* 12px від краю екрана = 12px від краю відсунутої картки */
             .act { width: 56px; min-width: 56px; height: 56px; min-height: 56px; flex: 0 0 56px; border-radius: 50%; font-size: 24px; }
             .act span { display: none; }
         }
@@ -253,8 +253,7 @@
         .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: none; }
         .search-clear.show { display: inline-flex; }
         /* Список зупиняється так, що перша картка стає рівно під сірою смугою (висота смуги — у --sticky-h) */
-        .content-area { scroll-snap-type: y mandatory; scroll-padding-top: var(--sticky-h, 0px); }
-        .place-row { scroll-snap-align: start; }
+        .content-area { scroll-padding-top: var(--sticky-h, 0px); }
         /* Смуга прокрутки справа — втричі товща за стандартну (телефон: ~4px → 12px; комп'ютер: ~8px → 24px) */
         .content-area::-webkit-scrollbar, .sidebar-inner::-webkit-scrollbar, .settings-page::-webkit-scrollbar { width: 12px; height: 12px; }
         .content-area::-webkit-scrollbar-track, .sidebar-inner::-webkit-scrollbar-track, .settings-page::-webkit-scrollbar-track { background: #edf2f7; }
@@ -324,6 +323,9 @@
         .finger-btn { overflow: hidden; flex: none; }
         .fab-add { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; outline: none; cursor: grab; }
         .fab-add:focus, .fab-add:active { outline: none; }
+        /* Плаваючий відбиток: на 30% більший (56 → 73px) і з плюсом посередині */
+        .fab-add.finger-btn { width: 73px !important; height: 73px !important; }
+        .fab-add.finger-btn::after { content: '+'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -54%); font-size: 46px; font-weight: 800; line-height: 1; color: #fff; text-shadow: 0 0 3px rgba(0,0,0,.7), 0 1px 5px rgba(0,0,0,.55); pointer-events: none; }
         .action-buttons { display: flex; justify-content: center; align-items: flex-start; gap: 36px; margin-top: 10px; }
         .fa-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .fa-cap { font-size: 12px; color: #718096; font-weight: 600; }
@@ -896,31 +898,50 @@
         if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(syncStickyOffset); if (mh) ro.observe(mh); if (stt) ro.observe(stt); }
     })();
 
-    // Коли прокрутка зупинилась і верхня смуга (шапка, пошук, заголовок списку) перекриває частину картки — догортаємо назад, щоб картку було видно повністю
+    // Коли прокрутка зупинилась, а верхня смуга (шапка, пошук, заголовок списку) перекриває частину картки — дотягуємо В ТОЙ БІК, куди ви прокручували:
+    // вниз — картка, що ховалась, їде під смугу повністю, і рівно під смугою стає наступна; вгору — картка висувається з-під смуги повністю.
+    // Напрямок = загальний рух від початку жесту до зупинки (а не остання мікро-подія), тож проти руху дотягування не відбувається.
+    // Біля самого кінця списку нічого не дотягуємо, щоб можна було побачити останню картку.
     (function initScrollSettle() {
         const ca = document.querySelector('.content-area');
         const top = document.querySelector('.sticky-top');
         if (!ca || !top) return;
-        let timer = null, finger = false;
+        let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0;
         const settle = () => {
-            if (finger || reorderingNow) return;
+            const o = origin; origin = null;                                   // жест завершено
+            if (finger || reorderingNow || o === null) return;
+            if (ca.scrollTop + ca.clientHeight >= ca.scrollHeight - 4) return; // кінець списку — не чіпаємо
+            if (ca.scrollTop <= 0) return;
+            const net = ca.scrollTop - o;
             const limit = top.getBoundingClientRect().bottom;
             const rows = document.getElementById('placesTable').children;
             for (const r of rows) {
                 if (r.classList.contains('hidden-by-search')) continue;
                 const rc = r.getBoundingClientRect();
-                if (rc.bottom <= limit + 1) continue;           // повністю сховалась під смугою — це нормально
+                if (rc.bottom <= limit + 1) continue;           // вже повністю під смугою
                 if (rc.top >= limit - 1) break;                 // ця й усі нижче — видно повністю
-                ca.scrollTo({ top: Math.max(0, ca.scrollTop - (limit - rc.top)), behavior: 'smooth' });
+                const hidden = limit - rc.top;                  // скільки картки сховано під смугою
+                let dir = net > 2 ? 1 : net < -2 ? -1 : (hidden > rc.height / 2 ? 1 : -1);   // руху майже не було — до ближчого краю
+                const delta = dir > 0 ? (rc.bottom - limit) : -hidden;
+                selfUntil = Date.now() + 700;                   // власний плавний скрол не вважаємо новим жестом
+                ca.scrollTo({ top: Math.max(0, ca.scrollTop + delta), behavior: 'smooth' });
                 break;
             }
         };
-        const later = () => { clearTimeout(timer); timer = setTimeout(settle, 180); };
-        ca.addEventListener('scroll', later, { passive: true });
-        ca.addEventListener('pointerdown', () => { finger = true; clearTimeout(timer); }, true);
+        const later = () => { clearTimeout(timer); timer = setTimeout(settle, 160); };
+        ca.addEventListener('scroll', () => {
+            if (Date.now() < selfUntil) { prev = ca.scrollTop; return; }
+            if (origin === null) origin = prev;                // початок нового жесту: звідки рушили
+            prev = ca.scrollTop;
+            later();
+        }, { passive: true });
+        const down = () => { finger = true; clearTimeout(timer); if (origin === null) origin = ca.scrollTop; };
         const up = () => { finger = false; later(); };
-        ca.addEventListener('pointerup', up, true);
-        ca.addEventListener('pointercancel', up, true);
+        ca.addEventListener('touchstart', down, { passive: true });
+        ca.addEventListener('touchend', up, { passive: true });
+        ca.addEventListener('touchcancel', up, { passive: true });
+        ca.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') down(); }, true);
+        ca.addEventListener('pointerup', e => { if (e.pointerType === 'mouse') up(); }, true);
     })();
 
     // ===== Перетягування (миша + дотик, через Pointer Events) =====
@@ -1608,7 +1629,7 @@
         });
 
         function setPos(x, y) {
-            const w = fab.offsetWidth || 56, h = fab.offsetHeight || 56;
+            const w = fab.offsetWidth || 73, h = fab.offsetHeight || 73;
             x = Math.min(Math.max(0, x), Math.max(0, window.innerWidth - w));
             y = Math.min(Math.max(0, y), Math.max(0, window.innerHeight - h));
             fab.style.setProperty('left', x + 'px', 'important');
@@ -1895,7 +1916,7 @@
             const im = new Image();
             im.onload = () => {
                 try {
-                    const W = 9, H = 8, c = document.createElement('canvas'); c.width = W; c.height = H;
+                    const W = 17, H = 16, c = document.createElement('canvas'); c.width = W; c.height = H;
                     const x = c.getContext('2d'); x.drawImage(im, 0, 0, W, H);
                     const d = x.getImageData(0, 0, W, H).data; let bits = '';
                     for (let y = 0; y < H; y++) for (let xx = 0; xx < W - 1; xx++) {
@@ -1924,9 +1945,9 @@
         if (va !== vb) return false;
         if (va) { const [x, y] = await Promise.all([mediaBytes(a), mediaBytes(b)]); return x > 0 && x === y; }   // відео: однаковий розмір файлу
         const [ha, hb] = await Promise.all([imgHash(a.data), imgHash(b.data)]);
-        if (!ha || !hb) return false;
+        if (!ha || !hb) { const [x, y] = await Promise.all([mediaBytes(a), mediaBytes(b)]); return x > 0 && x === y; }   // не вдалося розкодувати — порівнюємо за розміром файлу
         let d = 0; for (let i = 0; i < ha.length; i++) if (ha[i] !== hb[i]) d++;
-        return d <= 6;
+        return d <= 28;
     }
     async function updateFromCatalog() {
         if (_updating) return;
