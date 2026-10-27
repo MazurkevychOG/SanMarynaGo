@@ -467,8 +467,8 @@
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
-            <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Експорт: усе одним файлом (.json)</button>
-            <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Імпорт із файлу…</button>
+            <button type="button" class="set-btn" onclick="settingsAction('export')">Export</button>
+            <button type="button" class="set-btn" onclick="settingsAction('import')">Import</button>
         </div>
         <div class="settings-section">
             <h3>Звук</h3>
@@ -1403,6 +1403,64 @@
         if (!parseCoords(coords)) { alert('Координати: 41.047, 19.496 — або Plus Code (наприклад 8FGXPFC9+GX чи PFC9+GX9, Fier)'); return false; }
         return true;
     }
+    // Групуємо місця після додавання/редагування/імпорту/оновлення каталогу:
+    // спершу за найближчим населеним пунктом, а самі групи та місця без назви населеного пункту
+    // упорядковуємо за географічною близькістю. Ручне перетягування карток не змінює порядок автоматично.
+    function groupPlacesTerritorially() {
+        if (places.length < 2) return;
+        const point = p => parseCoords(p.coords);
+        const distance = (a, b) => {
+            const ca = point(a), cb = point(b);
+            return ca && cb ? haversine(ca, cb) : Infinity;
+        };
+        const keyNear = p => p.near && normText(p.near) ? normText(p.near) : '';
+        const groupsMap = new Map();
+        places.forEach((p, i) => {
+            const k = keyNear(p) || '__unknown__';
+            if (!groupsMap.has(k)) groupsMap.set(k, []);
+            groupsMap.get(k).push({ p, originalIndex: i });
+        });
+        const groups = [...groupsMap.entries()].map(([key, items]) => {
+            const pts = items.map(x => point(x.p)).filter(Boolean);
+            const center = pts.length ? [pts.reduce((s, c) => s + c[0], 0) / pts.length, pts.reduce((s, c) => s + c[1], 0) / pts.length] : null;
+            return { key, items, center, firstIndex: Math.min(...items.map(x => x.originalIndex)) };
+        });
+        // Починаємо з групи, яка раніше стояла першою, а наступну беремо за найближчим центром.
+        const orderedGroups = [];
+        let current = groups.find(g => g.firstIndex === 0) || groups[0];
+        while (current) {
+            orderedGroups.push(current);
+            groups.splice(groups.indexOf(current), 1);
+            if (!groups.length) break;
+            const last = current.center;
+            current = groups.reduce((best, g) => {
+                if (!best) return g;
+                if (!last) return g.firstIndex < best.firstIndex ? g : best;
+                if (!g.center) return best;
+                const d = haversine(last, g.center), bd = best.center ? haversine(last, best.center) : Infinity;
+                return d < bd ? g : best;
+            }, null);
+        }
+        const sorted = [];
+        for (const group of orderedGroups) {
+            const remaining = group.items.slice();
+            let item = remaining.find(x => x.originalIndex === group.firstIndex) || remaining[0];
+            while (item) {
+                sorted.push(item.p);
+                remaining.splice(remaining.indexOf(item), 1);
+                if (!remaining.length) break;
+                const c = point(item.p);
+                item = remaining.reduce((best, x) => {
+                    if (!best) return x;
+                    if (!c) return x.originalIndex < best.originalIndex ? x : best;
+                    const d = distance(item.p, x.p), bd = distance(item.p, best.p);
+                    return d < bd ? x : best;
+                }, null);
+            }
+        }
+        places = sorted;
+    }
+
     // Нове місце ставимо поряд зі схожим за територією: спершу те саме місто/район (за назвою найближчого
     // населеного пункту), інакше найближче за відстанню (до 25 км) — і вставляємо одразу після нього.
     function insertIndexFor(np) {
@@ -1470,9 +1528,11 @@
             places.splice(at, 0, data);
             data._at = at;
         }
+        groupPlacesTerritorially();
         sync();
         closeFormDissolve();
-        if (data._at !== undefined) { const at = data._at; delete data._at; setTimeout(() => flashRow(at), 120); }
+        const savedIndex = places.findIndex(p => p.id === data.id);
+        if (savedIndex >= 0) setTimeout(() => flashRow(savedIndex), 120);
     }
 
     function handleEdit(i) {
@@ -1892,6 +1952,7 @@
             }
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
+            groupPlacesTerritorially();
             sync();
             toast(added || enriched || merged
                 ? `Update: додано нових ${added}, збагачено ${enriched}` + (merged ? `, злито дублів ${merged}` : '')
@@ -2206,6 +2267,7 @@
                 });
             }
             clearForm();
+            groupPlacesTerritorially();
             sync();
             toast('Імпортовано місць: ' + items.length);
         } catch (err) {
@@ -2920,6 +2982,7 @@
         if (sl && Array.isArray(sl.ids)) { const ids = new Set(sl.ids); places.forEach(p => { p.selected = ids.has(p.id); }); }
         placeMap();
         restoreReturnToggle();
+        groupPlacesTerritorially();
         render();
         syncStickyOffset();
         initMap();
