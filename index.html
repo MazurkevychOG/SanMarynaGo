@@ -517,7 +517,7 @@
 </div>
 
 <!-- FAB кнопка для мобільного -->
-<input type="file" id="importFile" accept=".json,application/json,text/plain" style="display:none" onchange="importData(this)">
+<input type="file" id="importFile" accept=".json,application/json,text/plain" multiple style="display:none" onchange="importData(this)">
 <div id="mapOverlay">
     <div class="map-bar">
         <span class="map-bar-title">🗺 Карта</span>
@@ -2627,22 +2627,64 @@
         const b = await r.blob();
         return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
     }
+    // Експорт ділиться на файли не більше 25 МБ: mymaps-РРРР-ММ-ДД-1.json, -2.json … і віддається всі разом
+    const EXPORT_PART_MAX = 25 * 1024 * 1024;
+    async function deliverFiles(files) {                  // files: [{ blob, name }]
+        try {
+            if (isCoarse() && typeof File === 'function' && navigator.canShare && navigator.share) {
+                const fs = files.map(f => new File([f.blob], f.name, { type: f.blob.type }));
+                if (navigator.canShare({ files: fs })) { await navigator.share({ files: fs, title: files[0].name }); return; }
+            }
+        } catch (e) {
+            if (e && e.name === 'AbortError') return;      // користувач закрив меню
+            console.warn('Поділитися не вдалося, звичайне завантаження:', e);
+        }
+        for (let k = 0; k < files.length; k++) {           // усі файли підряд, з короткою паузою, щоб браузер не відсіяв завантаження
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(files[k].blob);
+            a.download = files[k].name;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+            if (k < files.length - 1) await new Promise(r => setTimeout(r, 400));
+        }
+    }
     async function exportData() {
         toast('Готую файл обміну…');
         try {
             recomputeDeleted();
-            const out = [];
+            const items = [];                              // кожне місце — вже готовий JSON-рядок і його розмір у байтах
             for (const p of places) {
                 const media = [];
                 for (const m of p.media) {
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
                     catch (e) { throw new Error(`фото місця «${p.name}» не вдалося прочитати (${e.message})`); }
                 }
-                out.push({ id: p.id, order: out.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), media });
+                const s = JSON.stringify({ id: p.id, order: items.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), media });
+                items.push({ s, size: new Blob([s]).size });
             }
-            const payload = JSON.stringify({ format: 'maps-places', version: 2, exportedAt: new Date().toISOString(), places: out, deleted: deletedIds });
+            // групуємо за розміром (запас 64 КБ на службові поля)
+            const limit = EXPORT_PART_MAX - 64 * 1024;
+            const groups = []; let cur = [], curSize = 0, oversize = 0;
+            for (const it of items) {
+                if (cur.length && curSize + it.size + 1 > limit) { groups.push(cur); cur = []; curSize = 0; }
+                cur.push(it.s); curSize += it.size + 1;
+                if (it.size > limit) oversize++;
+            }
+            if (cur.length || !groups.length) groups.push(cur);
             const d = new Date(), pad = n => String(n).padStart(2, '0');
-            deliverFile(new Blob([payload], { type: 'application/json' }), `mymaps-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`);
+            const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+            const when = d.toISOString(), N = groups.length, w = String(N).length;
+            const files = groups.map((g, k) => ({
+                blob: new Blob([
+                    `{"format":"maps-places","version":2,"part":${k + 1},"parts":${N},"exportedAt":${JSON.stringify(when)},"places":[`,
+                    g.join(','),
+                    `],"deleted":${JSON.stringify(k === 0 ? deletedIds : [])}}`
+                ], { type: 'application/json' }),
+                name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json`
+            }));
+            if (N > 1) toast(`Експорт: ${N} файлів (до 25 МБ кожен)`);
+            if (oversize) toast(`⚠ ${oversize} місць самі більші за 25 МБ — вони в окремих файлах`);
+            await deliverFiles(files);
         } catch (err) { console.error(err); alert('Не вдалося підготувати файл обміну: ' + err.message); }
     }
 
@@ -2703,13 +2745,17 @@
     }
 
     async function importData(input) {
-        const f = input.files && input.files[0];
+        const fl = Array.from(input.files || []).sort((x, y) => x.name.localeCompare(y.name, undefined, { numeric: true }));
         input.value = '';
-        if (!f) return;
+        if (!fl.length) return;
         try {
-            const raw = JSON.parse(await readFileAsText(f));
-            const list = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.places) ? raw.places : null);
-            if (!list) throw new Error('у файлі немає списку місць');
+            let list = [];                                  // кілька частин експорту зливаються в один список
+            for (const f of fl) {
+                const raw = JSON.parse(await readFileAsText(f));
+                const part = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.places) ? raw.places : null);
+                if (!part) throw new Error('у файлі «' + f.name + '» немає списку місць');
+                list = list.concat(part);
+            }
             const items = sanitizeImported(list);
             if (!items.length) throw new Error('не знайдено жодного коректного місця');
             const mode = await askImportMode(items.length, list.length - items.length);
