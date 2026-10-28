@@ -505,6 +505,49 @@
         .srm-acts { display: flex; gap: 8px; margin-top: 14px; }
         .srm-acts button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; background: #edf2f7; color: #2d3748; }
         .srm-acts button.ok { background: #27ae60; color: #fff; }
+    
+        /* Збільшені кнопки головного екрана */
+        .btn-profile { width: 47px; height: 47px; }
+        .btn-profile svg { width: 26px; height: 26px; }
+        .mobile-controls .btn-map-open,
+        .mobile-controls #gmapsLink,
+        .mobile-controls .btn-save-file,
+        .top-controls .btn-map-open,
+        .top-controls #gmapsLink,
+        .top-controls .btn-save-file {
+            font-size: 1.3em !important;
+            padding: 9px 13px !important;
+        }
+        .mobile-controls .btn-save-file[aria-label="Налаштування"],
+        .top-controls .btn-save-file[aria-label="Налаштування"] {
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px;
+            padding: 0 !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mobile-controls .btn-save-file[aria-label="Налаштування"] .gear-w,
+        .top-controls .btn-save-file[aria-label="Налаштування"] .gear-w {
+            display: block;
+            font-size: 40px;
+            line-height: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(1.12);
+            transform-origin: center;
+        }
+        @media (max-width: 700px) {
+            .mobile-header { gap: 4px; }
+            .mobile-controls { gap: 5px; }
+            .mobile-controls .btn-map-open,
+            .mobile-controls #gmapsLink { font-size: 1.3em !important; }
+        }
+
     </style>
 </head>
 <body>
@@ -2627,8 +2670,8 @@
         const b = await r.blob();
         return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
     }
-    // Експорт ділиться на файли не більше 25 МБ: mymaps-РРРР-ММ-ДД-1.json, -2.json … і віддається всі разом
-    const EXPORT_PART_MAX = 25 * 1024 * 1024;
+    // Експорт ділиться на файли із запасом: не більше 23 MiB: mymaps-РРРР-ММ-ДД-1.json, -2.json … і віддається всі разом
+    const EXPORT_PART_MAX = 23 * 1024 * 1024;
     async function deliverFiles(files) {                  // files: [{ blob, name }]
         try {
             if (isCoarse() && typeof File === 'function' && navigator.canShare && navigator.share) {
@@ -2683,7 +2726,7 @@
                 name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json`
             }));
             if (N > 1) toast(`Експорт: ${N} файлів (до 25 МБ кожен)`);
-            if (oversize) toast(`⚠ ${oversize} місць самі більші за 25 МБ — вони в окремих файлах`);
+            if (oversize) toast(`⚠ ${oversize} місць перевищують ліміт одного файлу. Перевірте фото цих місць.`);
             await deliverFiles(files);
         } catch (err) { console.error(err); alert('Не вдалося підготувати файл обміну: ' + err.message); }
     }
