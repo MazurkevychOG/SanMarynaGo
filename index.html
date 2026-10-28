@@ -290,11 +290,12 @@
         .fab-add.editing { border-color: #e74c3c; background: #fff; }
 
         /* ===== Карта: маршрут, GPS, назад до місць ===== */
-        .route-label { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; background: #fff; color: #1a56c4; border: 3px solid #4285F4; border-radius: 24px; padding: 4px 16px; font-size: 26px; font-weight: 700; box-shadow: 0 1px 5px rgba(0,0,0,.3); pointer-events: none; }
+        .route-label { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; background: #fff; color: #1a56c4; border: 2px solid #4285F4; border-radius: 12px; padding: 2px 8px; font-size: 13px; font-weight: 700; box-shadow: 0 1px 5px rgba(0,0,0,.3); pointer-events: none; }
         .route-label.est { color: #b35c00; border-color: #e67e22; }
         .route-summary { background: rgba(255,255,255,.95); border-radius: 14px; padding: 8px 16px; font-size: 30px; box-shadow: 0 1px 6px rgba(0,0,0,.3); line-height: 1.3; }
         .route-summary small { display: block; font-size: 11px; color: #718096; }
         .gps-dot { width: 20px; height: 20px; border-radius: 50%; background: #2ecc71; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(46,204,113,.45), 0 2px 6px rgba(0,0,0,.4); }
+        .gear-w { color: #fff !important; -webkit-text-fill-color: #fff; font-family: 'Segoe UI Symbol', 'Arial Unicode MS', sans-serif; font-variant-emoji: text; }
         .map-name-tip { font-size: 15px; font-weight: 700; color: #2d3748; padding: 4px 10px; border-radius: 8px; pointer-events: none; }
         .map-reset a { width: 34px; height: 34px; line-height: 34px; font-size: 20px; font-weight: 700; text-align: center; color: #e74c3c !important; cursor: pointer; display: block; text-decoration: none; }
         .btn-map-close { width: auto !important; padding: 0 14px !important; font-size: 14px !important; background: #4285F4 !important; }
@@ -480,7 +481,22 @@
         .save-route-btn { display: none; flex: none; align-items: center; justify-content: center; width: 36px; height: 34px; padding: 0 !important; border: none; border-radius: 8px; background: #27ae60; color: #fff; font-size: 18px !important; line-height: 1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
         .save-route-btn:active { transform: scale(.94); }
         #saveRouteModal { display: none; position: fixed; inset: 0; z-index: 3500; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
-        #saveRouteModal.open { display: flex; }
+        #saveRouteModal.open, #stopModal.open, #editRouteModal.open { display: flex; }
+        #editRouteModal { display: none; position: fixed; inset: 0; z-index: 3600; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
+        .erm-box { max-height: 88vh; overflow-y: auto; }
+        .erm-lab { margin: 12px 0 6px; font-size: 13px; color: #718096; }
+        #ermList { max-height: 36vh; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
+        .erm-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #edf2f7; font-size: 15px; color: #2d3748; }
+        .erm-row:last-child { border-bottom: none; }
+        .erm-row .n { flex: none; width: 22px; color: #718096; font-size: 13px; }
+        .erm-row .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .erm-row .t.gone { color: #c0392b; font-style: italic; }
+        .erm-row button { flex: none; width: 34px; height: 34px; border: none; border-radius: 8px; background: #fde8e8; color: #c0392b; font-size: 16px; cursor: pointer; }
+        .erm-empty { padding: 12px; color: #718096; font-size: 14px; }
+        #ermAdd { width: 100%; box-sizing: border-box; margin-top: 8px; padding: 11px; font-size: 16px; border: 1px solid #cbd5e0; border-radius: 10px; background: #fff; color: #2d3748; }
+        .erm-ret { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 15px; color: #2d3748; }
+        .erm-ret input { width: auto !important; margin: 0; }
+        #stopModal { display: none; position: fixed; inset: 0; z-index: 3600; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
         .srm-box { width: 100%; max-width: 380px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
         .srm-box h3 { margin: 0 0 10px; font-size: 18px; color: #2d3748; }
         .srm-box input { width: 100%; box-sizing: border-box; padding: 12px; font-size: 16px; border: 1px solid #cbd5e0; border-radius: 10px; }
@@ -531,6 +547,27 @@
         </div>
     </div>
 </div>
+<div id="editRouteModal" role="dialog" aria-label="Редагувати маршрут">
+    <div class="srm-box erm-box">
+        <h3>✎ Редагувати маршрут</h3>
+        <input type="text" id="ermName" maxlength="80" placeholder="Назва маршруту" autocomplete="off" enterkeyhint="done">
+        <div class="erm-lab" id="ermLab"></div>
+        <div id="ermList"></div>
+        <select id="ermAdd" onchange="ermAddPoint(this)"></select>
+        <label class="erm-ret"><input type="checkbox" id="ermRet"> туди й назад (повернення на старт)</label>
+        <div class="srm-meta">Відстань і час буде перераховано під час збереження.</div>
+        <div class="srm-acts"><button type="button" onclick="closeEditRoute()">Скасувати</button><button type="button" class="ok" id="ermSave" onclick="saveEditRoute()">Зберегти</button></div>
+    </div>
+</div>
+<div id="stopModal" role="dialog" aria-label="Витрати на точці">
+    <div class="srm-box">
+        <h3 id="stopTitle">⏱ Витрати на точці</h3>
+        <label class="pf-field"><span>Час на точці, хв</span><input class="pf-input" id="stopMin" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+        <label class="pf-field"><span id="stopCostLbl">Гроші</span><input class="pf-input" id="stopCost" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+        <div class="srm-meta">Додається до підсумку маршруту. У збережені маршрути не записується.</div>
+        <div class="srm-acts"><button type="button" onclick="closeStopDlg()">Скасувати</button><button type="button" onclick="clearStopDlg()">Очистити</button><button type="button" class="ok" onclick="saveStopDlg()">OK</button></div>
+    </div>
+</div>
 <div id="saveRouteModal" role="dialog" aria-label="Зберегти маршрут">
     <div class="srm-box">
         <h3>💾 Зберегти маршрут</h3>
@@ -570,7 +607,7 @@
         <span class="mobile-title">📍 SanMarynaGO</span></div>
         <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 map</button>
             <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 routes</a><span class="route-parts"></span>
-            <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування">⚙</button>
+            <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
         </div>
     </div>
         <div class="search-bar" id="searchBar">
@@ -598,7 +635,7 @@
             <div class="top-controls desktop-only">
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route Google Map</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
-                <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування">⚙</button>
+                <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
         </div>
         <div class="form-container">
@@ -720,6 +757,7 @@
     // Вибір зберігається окремо й за id (не за номером рядка), тому не «з'їжджає»
     // після перетягування або видалення.
     function persistSelection() {
+        autoClearReturn();
         idbSet('selection', { ids: places.filter(p => p.selected).map(p => p.id) })
             .catch(err => console.error('Помилка збереження вибору:', err));
     }
@@ -2259,7 +2297,7 @@
                 '<div class="pf-route-meta">' + (r.ids || []).length + ' точок · ' + (r.est ? '≈ ' : '') + esc(fmtKm(r.dist || 0)) + ' · ' + esc(fmtTime(r.dur || 0)) + (r.ret ? ' · туди й назад' : '') + (when ? ' · ' + when : '') + '</div>' +
                 '<div class="pf-route-fuel">' + esc(pfFuelText(f, p.cur)) + '</div>' +
                 '<div class="pf-route-acts"><button type="button" onclick="pfRouteAct(\'open\',\'' + esc(r.id) + '\')">▶ Відкрити</button>' +
-                '<button type="button" class="sec" title="Перейменувати" aria-label="Перейменувати" onclick="pfRouteAct(\'rename\',\'' + esc(r.id) + '\')">✎</button>' +
+                '<button type="button" class="sec" title="Редагувати" aria-label="Редагувати" onclick="pfRouteAct(\'rename\',\'' + esc(r.id) + '\')">✎</button>' +
                 '<button type="button" class="del" title="Видалити" aria-label="Видалити" onclick="pfRouteAct(\'del\',\'' + esc(r.id) + '\')">🗑</button></div></div>';
         }).join('') : '<div class="pf-empty">Ще немає збережених маршрутів</div>';
     }
@@ -2297,6 +2335,60 @@
         else if (e.key === 'Escape') closeSaveRoute();
     });
     document.addEventListener('pointerdown', e => { if (e.target && e.target.id === 'saveRouteModal') closeSaveRoute(); });
+    let ermId = null, ermIds = [];
+    const ermOrd = id => { const k = places.findIndex(p => p.id === id); return k < 0 ? 1e9 : k; };
+    function openEditRoute(id) {
+        const r = pfRoutesLoad().find(x => x.id === id); if (!r) return;
+        ermId = id; ermIds = (r.ids || []).slice().sort((a, b) => ermOrd(a) - ermOrd(b));
+        pf$('ermName').value = r.name || '';
+        pf$('ermRet').checked = !!r.ret;
+        ermRender();
+        pf$('editRouteModal').classList.add('open');
+    }
+    function closeEditRoute() { pf$('editRouteModal').classList.remove('open'); ermId = null; }
+    function ermRender() {
+        pf$('ermLab').textContent = 'Точки маршруту (' + ermIds.length + ') — порядок як у списку місць';
+        pf$('ermList').innerHTML = ermIds.length ? ermIds.map((pid, k) => {
+            const p = places.find(x => x.id === pid);
+            return '<div class="erm-row"><span class="n">' + (k + 1) + '</span><span class="t' + (p ? '' : ' gone') + '">' + (p ? esc(p.name) : 'місце вже видалено') + '</span>' +
+                '<button type="button" title="Прибрати з маршруту" aria-label="Прибрати з маршруту" onclick="ermRemove(' + k + ')">✕</button></div>';
+        }).join('') : '<div class="erm-empty">У маршруті немає точок</div>';
+        const sel = pf$('ermAdd');
+        const rest = places.filter(p => !ermIds.includes(p.id));
+        sel.innerHTML = '<option value="">＋ Додати точку…</option>' + rest.map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('');
+    }
+    function ermRemove(k) { ermIds.splice(k, 1); ermRender(); }
+    function ermAddPoint(sel) {
+        const v = sel.value; if (!v) return;
+        if (!ermIds.includes(v)) { ermIds.push(v); ermIds.sort((a, b) => ermOrd(a) - ermOrd(b)); }
+        ermRender();
+    }
+    async function saveEditRoute() {
+        const list = pfRoutesLoad();
+        const r = list.find(x => x.id === ermId); if (!r) { closeEditRoute(); return; }
+        const ids = ermIds.filter(pid => places.some(p => p.id === pid));
+        if (!ids.length) { toast('Додайте хоча б одну точку'); return; }
+        const btn = pf$('ermSave'); btn.disabled = true; btn.textContent = 'Рахую…';
+        r.name = pf$('ermName').value.trim() || r.name || 'Маршрут';
+        r.ids = ids; r.ret = pf$('ermRet').checked;
+        const pts = ids.map(pid => parseCoords(places.find(p => p.id === pid).coords)).filter(Boolean);
+        if (r.ret && pts.length >= 2) pts.push(pts[0]);
+        if (pts.length >= 2) {
+            const sum = o => ({ dist: o.legs.reduce((s, l) => s + l.distance, 0), dur: o.legs.reduce((s, l) => s + l.duration, 0) });
+            const e = sum(estimateRoute(pts)); r.dist = e.dist; r.dur = e.dur; r.est = true;
+            try { const real = await fetchRoute(pts); if (real) { const q = sum(real); r.dist = q.dist; r.dur = q.dur; r.est = false; } } catch (err) { }
+        } else { r.dist = 0; r.dur = 0; r.est = false; }
+        btn.disabled = false; btn.textContent = 'Зберегти';
+        if (!pfRoutesSave(list)) return;
+        closeEditRoute(); pfRender();
+        toast('✔ Маршрут «' + r.name + '» оновлено');
+    }
+    document.addEventListener('keydown', e => {
+        const m = document.getElementById('editRouteModal');
+        if (!m || !m.classList.contains('open')) return;
+        if (e.key === 'Escape') closeEditRoute();
+        else if (e.key === 'Enter' && e.target && e.target.id === 'ermName') { e.preventDefault(); saveEditRoute(); }
+    });
     function pfRouteAct(kind, id) {
         const list = pfRoutesLoad();
         const i = list.findIndex(r => r.id === id);
@@ -2306,9 +2398,7 @@
             if (!confirm('Видалити маршрут «' + r.name + '»?')) return;
             list.splice(i, 1); pfRoutesSave(list); pfRender();
         } else if (kind === 'rename') {
-            const nn = prompt('Нова назва маршруту', r.name);
-            if (nn === null) return;
-            r.name = nn.trim() || r.name; pfRoutesSave(list); pfRender();
+            openEditRoute(id);
         } else if (kind === 'open') {
             const ids = new Set(r.ids || []);
             const have = new Set(places.map(p => p.id));
@@ -2356,8 +2446,9 @@
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         if (!n) { el.style.display = 'none'; el.textContent = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
+        const ex = extrasTotals();
         const tm = (routeTotals && eff >= 2)
-            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration) + ' · ' + fmtKm(routeTotals.distance)
+            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + (ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '')
             : '';
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
@@ -2365,6 +2456,11 @@
     }
     // «Повернутися на старт»: перемикач. Якщо увімкнено — і маршрут Google, і лінія на карті
     // добудовують зворотний відрізок до ПЕРШОЇ вибраної точки.
+    function autoClearReturn() {
+        if (places.some(p => p.selected)) return;
+        const el = document.getElementById('returnToStart');
+        if (el && el.checked) { el.checked = false; onReturnToggle(el); }
+    }
     function onReturnToggle(el) {
         try { localStorage.setItem('return_to_start', el.checked ? '1' : '0'); } catch (e) { }
         const lab = document.getElementById('returnToggle');
@@ -2945,8 +3041,44 @@
     }
 
     // ----- Назви на карті (тап — показати, ще тап — сховати), утримання — вибір точки, кнопка скидання -----
+    // Витрати на точках (хв, гроші): лише для поточного розрахунку, зберігаються в браузері окремо і у збережені маршрути не потрапляють
+    let stopExtras = {};
+    try { stopExtras = JSON.parse(localStorage.getItem('stop_extras') || '{}') || {}; } catch (e) { stopExtras = {}; }
+    function saveExtras() { try { localStorage.setItem('stop_extras', JSON.stringify(stopExtras)); } catch (e) { } }
+    function extrasTotals() {
+        let min = 0, cost = 0;
+        places.forEach(p => { if (!p.selected) return; const x = stopExtras[p.id]; if (x) { min += x.min || 0; cost += x.cost || 0; } });
+        return { min, cost };
+    }
+    let stopIdx = -1, stopOpenAt = 0;
+    function openStopDlg(i) {
+        const p = places[i]; if (!p) return;
+        stopIdx = i; stopOpenAt = Date.now(); markerHoldAt = Date.now();
+        const x = stopExtras[p.id] || {}, cur = (pfLoad().cur || '€');
+        $('stopTitle').textContent = '⏱ ' + (i + 1) + '. ' + p.name;
+        $('stopCostLbl').textContent = 'Гроші, ' + cur;
+        $('stopMin').value = x.min ? String(x.min).replace('.', ',') : '';
+        $('stopCost').value = x.cost ? String(x.cost).replace('.', ',') : '';
+        $('stopModal').classList.add('open');
+        try { if (navigator.vibrate) navigator.vibrate([20, 40, 20]); } catch (e) { }
+    }
+    function closeStopDlg() { if (Date.now() - stopOpenAt < 500) return; $('stopModal').classList.remove('open'); stopIdx = -1; }
+    function clearStopDlg() { if (Date.now() - stopOpenAt < 500) return; $('stopMin').value = ''; $('stopCost').value = ''; saveStopDlg(true); }
+    function saveStopDlg(force) {
+        if (!force && Date.now() - stopOpenAt < 500) return;
+        const p = places[stopIdx]; if (!p) { $('stopModal').classList.remove('open'); return; }
+        const n = v => { const x = parseFloat(String(v).replace(/\s+/g, '').replace(',', '.')); return isFinite(x) && x > 0 ? x : 0; };
+        const min = n($('stopMin').value), cost = n($('stopCost').value);
+        if (min || cost) stopExtras[p.id] = { min, cost }; else delete stopExtras[p.id];
+        saveExtras();
+        $('stopModal').classList.remove('open'); stopIdx = -1;
+        refreshExtras();
+        toast(min || cost ? '✔ Додано до маршруту' : 'Витрати на точці скинуто');
+    }
+    function refreshExtras() { updateListCount(); renderRouteSummary(); }
     const shownNames = new Set();
-    let markerHoldAt = 0;
+    let markerHoldAt = 0, markerHold = null;
+    function dropHold() { if (markerHold) { clearTimeout(markerHold.t2); markerHold = null; } }
     function holdToggle(i) {
         const p = places[i]; if (!p) return;
         markerHoldAt = Date.now();
@@ -2983,7 +3115,12 @@
 
         // iOS не генерує contextmenu при довгому натисканні — робимо самі (Android спрацює і так, дубль відсікається)
         let timer = null, start = null;
-        const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+        const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } dropHold(); };
+        const endTouch = () => {
+            if (timer) { clearTimeout(timer); timer = null; }
+            if (markerHold && markerHold.armed) { const i = markerHold.i; dropHold(); holdToggle(i); }   // відпустили до 2 с — вибір / зняття
+            else dropHold();
+        };
         el.addEventListener('touchstart', (e) => {
             cancel();
             if (e.touches.length !== 1 || e.target.closest('.leaflet-control')) return;
@@ -2994,16 +3131,21 @@
                 const icon = start.target.closest('.leaflet-marker-icon');
                 const d = icon && icon.querySelector('[data-idx]');
                 if (icon && !d) return;                                   // зелений маркер нового місця
-                if (d) return holdToggle(Number(d.dataset.idx));
+                if (d) {
+                    const idx = Number(d.dataset.idx);
+                    markerHold = { i: idx, armed: true, t2: setTimeout(() => { if (!markerHold) return; markerHold = null; openStopDlg(idx); }, 2000 - 550) };
+                    try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) { }
+                    return;
+                }
                 openMapMenu(map.mouseEventToLatLng({ clientX: start.x, clientY: start.y }), start.x, start.y);
             }, 550);
         }, { passive: true });
         el.addEventListener('touchmove', (e) => {
-            if (!timer) return;
+            if (!timer && !markerHold) return;
             const t = e.touches[0];
             if (e.touches.length > 1 || Math.hypot(t.clientX - start.x, t.clientY - start.y) > 10) cancel();
         }, { passive: true });
-        el.addEventListener('touchend', cancel, { passive: true });
+        el.addEventListener('touchend', endTouch, { passive: true });
         el.addEventListener('touchcancel', cancel, { passive: true });
     }
 
@@ -3189,17 +3331,17 @@
         routeData.legs.forEach((leg, i) => {
             if (leg.skip || !leg.geom.length) return;
             const text = (routeData.estimated ? '≈ ' : '') + fmtTime(leg.duration) + ' · ' + fmtKm(leg.distance);
-            const w = Math.max(140, text.length * 14.8 + 38), h = 52;
+            const w = Math.max(70, text.length * 7.4 + 18), h = 26;
             const px = leg.geom.map(g => map.latLngToContainerPoint(g));
             const dest = px[px.length - 1];
             let total = 0;
             for (let k = 1; k < px.length; k++) total += Math.hypot(px[k].x - px[k - 1].x, px[k].y - px[k - 1].y);
             const cands = [];
-            for (const B0 of [92, 144, 204, 276, 360, 460, 580, 720]) {           // вздовж лінії, від пункту призначення вглиб відрізка
+            for (const B0 of [46, 72, 102, 138, 180, 230, 290, 360]) {           // вздовж лінії, від пункту призначення вглиб відрізка
                 const at = pointBack(px, Math.min(B0, total * 0.9));
-                for (const o of [0, 1, -1, 2, -2]) cands.push({ cx: at.x + at.nx * o * (h / 2 + 12), cy: at.y + at.ny * o * (h / 2 + 12) });
+                for (const o of [0, 1, -1, 2, -2]) cands.push({ cx: at.x + at.nx * o * (h / 2 + 9), cy: at.y + at.ny * o * (h / 2 + 9) });
             }
-            for (const rho of [90, 130, 180, 240, 320, 420]) {                     // і навколо пункту призначення, коли на лінії тісно
+            for (const rho of [62, 88, 120, 160, 210, 270]) {                     // і навколо пункту призначення, коли на лінії тісно
                 for (let a0 = 0; a0 < 20; a0++) {
                     const ang = a0 / 20 * Math.PI * 2;
                     cands.push({ cx: dest.x + Math.cos(ang) * (rho + w / 2 - 20), cy: dest.y + Math.sin(ang) * (rho + h / 2 - 12) });
@@ -3243,6 +3385,16 @@
         const w = routeWidthAt(z) / k;
         routeLine.setStyle(routeLineEst ? { weight: w, dashArray: (w * 2) + ' ' + (w * 2) } : { weight: w });
     }
+    let routeSumEl = null, routeSum = null;
+    function renderRouteSummary() {
+        if (!routeSumEl || !routeSum) return;
+        const ex = extrasTotals(), cur = pfLoad().cur || '€';
+        const hasEx = ex.min > 0 || ex.cost > 0;
+        const total = routeSum.t + ex.min * 60;
+        routeSumEl.innerHTML = `🧭 <b>${fmtKm(routeSum.d)}</b> · <b>${fmtTime(total)}</b>` +
+            (hasEx ? `<small style="font-size:16px;color:#2d3748">🚗 ${fmtTime(routeSum.t)}${ex.min ? ' + ⏱ ' + fmtTime(ex.min * 60) : ''}${ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + esc(cur) : ''}</small>` : '') +
+            `<small>${routeSum.n} точок${routeSum.est ? ' · оцінка по прямій' : ' · авто · маршрути OSRM, © OpenStreetMap'}</small>`;
+    }
     function drawRoute(r, pts, skipLast) {
         if (!map) return;
         clearRoute();
@@ -3268,7 +3420,9 @@
             onAdd() {
                 const d = L.DomUtil.create('div', 'route-summary');
                 L.DomEvent.disableClickPropagation(d);
-                d.innerHTML = `🧭 <b>${fmtKm(totalD)}</b> · <b>${fmtTime(totalT)}</b><small>${pts.length - (pts.length > 2 && pts[0] === pts[pts.length - 1] ? 1 : 0)} точок${r.estimated ? ' · оцінка по прямій' : ' · авто · маршрути OSRM, © OpenStreetMap'}</small>`;
+                routeSumEl = d;
+                routeSum = { d: totalD, t: totalT, n: pts.length - (pts.length > 2 && pts[0] === pts[pts.length - 1] ? 1 : 0), est: !!r.estimated };
+                renderRouteSummary();
                 return d;
             }
         });
@@ -3331,14 +3485,20 @@
             // утримання лівої кнопки миші на точці — вибір / зняття (на дотику це робить таймер у setupContextAndLongPress)
             const mel = mk.getElement && mk.getElement();
             if (mel) {
-                let ht = null;
-                const stop = () => { if (ht) { clearTimeout(ht); ht = null; } };
+                let t1 = null, t2 = null, armed = false, opened = false;
+                const stop = () => { clearTimeout(t1); clearTimeout(t2); t1 = t2 = null; armed = false; };
                 mel.addEventListener('pointerdown', e => {
-                    stop();
+                    stop(); opened = false;
                     if (e.pointerType !== 'mouse' || e.button !== 0) return;
-                    ht = setTimeout(() => { ht = null; holdToggle(i); }, 500);
+                    t1 = setTimeout(() => { armed = true; }, 500);
+                    t2 = setTimeout(() => { armed = false; opened = true; openStopDlg(i); }, 2000);
                 });
-                ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => mel.addEventListener(t, stop));
+                mel.addEventListener('pointerup', () => {
+                    const was = armed; stop();
+                    if (was) holdToggle(i);                     // відпустили до 2 с — вибір / зняття
+                    else if (opened) markerHoldAt = Date.now(); // вікно вже відкрито — не рахувати як клік
+                });
+                ['pointerleave', 'pointercancel'].forEach(t => mel.addEventListener(t, stop));
             }
         });
     }
