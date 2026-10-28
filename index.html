@@ -473,6 +473,20 @@
         .pf-route-acts button.del { background: #fde8e8; color: #c0392b; flex: none; width: 44px; }
         .pf-empty { color: #718096; font-size: 14px; text-align: center; padding: 10px 0 2px; }
         @media (max-width: 420px) { .pf-grid { grid-template-columns: 1fr 1fr; } .pf-grid .pf-field:last-child { grid-column: 1 / -1; } }
+
+        /* ===== Кнопка «зберегти маршрут» та діалог назви ===== */
+        .save-route-btn { display: none; flex: none; align-items: center; justify-content: center; width: 36px; height: 34px; padding: 0 !important; border: none; border-radius: 8px; background: #27ae60; color: #fff; font-size: 18px !important; line-height: 1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+        .save-route-btn:active { transform: scale(.94); }
+        #saveRouteModal { display: none; position: fixed; inset: 0; z-index: 3500; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
+        #saveRouteModal.open { display: flex; }
+        .srm-box { width: 100%; max-width: 380px; background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+        .srm-box h3 { margin: 0 0 10px; font-size: 18px; color: #2d3748; }
+        .srm-box input { width: 100%; box-sizing: border-box; padding: 12px; font-size: 16px; border: 1px solid #cbd5e0; border-radius: 10px; }
+        .srm-box input:focus { outline: none; border-color: #4285F4; box-shadow: 0 0 0 3px rgba(66,133,244,.2); }
+        .srm-meta { margin-top: 8px; font-size: 13px; color: #718096; }
+        .srm-acts { display: flex; gap: 8px; margin-top: 14px; }
+        .srm-acts button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; background: #edf2f7; color: #2d3748; }
+        .srm-acts button.ok { background: #27ae60; color: #fff; }
     </style>
 </head>
 <body>
@@ -490,7 +504,7 @@
     <div class="map-bar">
         <span class="map-bar-title">🗺 Карта</span>
         <div class="map-bar-actions">
-            <a id="gmapsLinkMap" class="link-btn btn-export" href="#" target="_blank">Маршрут</a><span class="route-parts"></span>
+            <a id="gmapsLinkMap" class="link-btn btn-export" href="#" target="_blank">Маршрут</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
             <button class="btn-map-close" onclick="closeMobileMap()">☰ Місця</button>
         </div>
     </div>
@@ -515,6 +529,14 @@
         </div>
     </div>
 </div>
+<div id="saveRouteModal" role="dialog" aria-label="Зберегти маршрут">
+    <div class="srm-box">
+        <h3>💾 Зберегти маршрут</h3>
+        <input type="text" id="srmName" maxlength="80" placeholder="Назва маршруту" autocomplete="off" enterkeyhint="done">
+        <div class="srm-meta" id="srmMeta"></div>
+        <div class="srm-acts"><button type="button" onclick="closeSaveRoute()">Скасувати</button><button type="button" class="ok" onclick="confirmSaveRoute()">Зберегти</button></div>
+    </div>
+</div>
 <div id="profilePage" class="settings-page" role="dialog" aria-label="Особистий кабінет">
     <div class="settings-box">
         <div class="settings-bar">
@@ -530,12 +552,6 @@
                 <label class="pf-field"><span>Валюта</span><input class="pf-input" id="pfCur" type="text" maxlength="6" placeholder="€"></label>
             </div>
             <button type="button" class="pf-btn" onclick="pfSaveProfile()">💾 Зберегти</button>
-        </div>
-        <div class="settings-section">
-            <h3>Поточний маршрут</h3>
-            <div class="pf-cur" id="pfCurrent"></div>
-            <label class="pf-field" style="margin-top:12px"><span>Назва для збереження</span><input class="pf-input" id="pfRouteName" type="text" maxlength="80" placeholder="Назва маршруту"></label>
-            <button type="button" class="pf-btn blue" id="pfSaveRouteBtn" onclick="pfSaveRoute()">📁 Зберегти маршрут у каталог</button>
         </div>
         <div class="settings-section">
             <h3 id="pfRoutesHead">📁 Збережені маршрути</h3>
@@ -566,6 +582,7 @@
         <div class="list-head" id="listHead">
             <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Вибрати всі">
             <span class="lh-count" id="listCount"></span>
+            <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
             <label class="return-toggle" id="returnToggle" title="Побудувати зворотний маршрут до першої вибраної точки"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)"><span>Повернутися на старт</span></label>
         </div>
     </div>
@@ -578,7 +595,7 @@
             <h1>📍 Додати місце</h1>
             <div class="top-controls desktop-only">
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
-                <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route Google Map</a><span class="route-parts"></span>
+                <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route Google Map</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування">⚙</button>
             </div>
         </div>
@@ -971,7 +988,23 @@
         const ca = document.querySelector('.content-area');
         const top = document.querySelector('.sticky-top');
         if (!ca || !top) return;
-        let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0;
+        let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0, anim = 0;
+        const stopAnim = () => { if (anim) { cancelAnimationFrame(anim); anim = 0; } };
+        // Повільне вирівнювання з м'яким стартом і м'яким гальмуванням (easeInOut) — замість різкого браузерного smooth-скролу
+        const glide = (to) => {
+            stopAnim();
+            const from = ca.scrollTop, dist = to - from;
+            if (Math.abs(dist) < 1) return;
+            const dur = Math.min(1100, Math.max(520, Math.abs(dist) * 6)), t0 = performance.now();
+            const ease = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+            const step = now => {
+                const k = Math.min(1, (now - t0) / dur);
+                selfUntil = Date.now() + 250;                  // власну анімацію не вважаємо новим жестом
+                ca.scrollTop = from + dist * ease(k);
+                anim = k < 1 ? requestAnimationFrame(step) : 0;
+            };
+            anim = requestAnimationFrame(step);
+        };
         const settle = () => {
             const o = origin; origin = null;                                   // жест завершено
             if (finger || reorderingNow || o === null) return;
@@ -988,8 +1021,7 @@
                 const hidden = limit - rc.top;                  // скільки картки сховано під смугою
                 let dir = net > 2 ? 1 : net < -2 ? -1 : (hidden > rc.height / 2 ? 1 : -1);   // руху майже не було — до ближчого краю
                 const delta = dir > 0 ? (rc.bottom - limit) : -hidden;
-                selfUntil = Date.now() + 700;                   // власний плавний скрол не вважаємо новим жестом
-                ca.scrollTo({ top: Math.max(0, ca.scrollTop + delta), behavior: 'smooth' });
+                glide(Math.max(0, ca.scrollTop + delta));
                 break;
             }
         };
@@ -1000,7 +1032,8 @@
             prev = ca.scrollTop;
             later();
         }, { passive: true });
-        const down = () => { finger = true; clearTimeout(timer); if (origin === null) origin = ca.scrollTop; };
+        const down = () => { finger = true; stopAnim(); clearTimeout(timer); if (origin === null) origin = ca.scrollTop; };
+        ca.addEventListener('wheel', stopAnim, { passive: true });
         const up = () => { finger = false; later(); };
         ca.addEventListener('touchstart', down, { passive: true });
         ca.addEventListener('touchend', up, { passive: true });
@@ -2212,20 +2245,6 @@
     function pfRender() {
         const p = pfFormValues();
         const cons = pfNum(p.cons), price = pfNum(p.price);
-        const sel = pfSelected();
-        const eff = sel.length + (startFromMe && startSnap ? 1 : 0);
-        const has = routeTotals && eff >= 2;
-        const box = pf$('pfCurrent'), btn = pf$('pfSaveRouteBtn');
-        if (has) {
-            const f = pfFuel(routeTotals.distance, cons, price);
-            box.innerHTML = '<div><b>' + sel.length + '</b> точок · ' + (routeTotals.estimated ? '≈ ' : '') + '<b>' + esc(fmtKm(routeTotals.distance)) + '</b> · ' + esc(fmtTime(routeTotals.duration)) + '</div>' +
-                '<div>' + esc(pfFuelText(f, p.cur)) + (f && !isFinite(f.cost) ? ' <span class="pf-muted">(вкажіть ціну палива)</span>' : '') + '</div>' +
-                (routeTotals.estimated ? '<div class="pf-muted">≈ орієнтовно: точний маршрут ще вираховується</div>' : '');
-            btn.disabled = false;
-        } else {
-            box.innerHTML = '<span class="pf-muted">Позначте галочками щонайменше 2 місця — тут з\'являться відстань, час і вартість палива.</span>';
-            btn.disabled = true;
-        }
         // каталог
         const list = pfRoutesLoad();
         pf$('pfRoutesHead').textContent = '📁 Збережені маршрути' + (list.length ? ' (' + list.length + ')' : '');
@@ -2242,11 +2261,22 @@
                 '<button type="button" class="del" title="Видалити" aria-label="Видалити" onclick="pfRouteAct(\'del\',\'' + esc(r.id) + '\')">🗑</button></div></div>';
         }).join('') : '<div class="pf-empty">Ще немає збережених маршрутів</div>';
     }
-    function pfSaveRoute() {
+    // Збереження: кнопка 💾 (список, карта) -> діалог із назвою -> запис у каталог
+    function openSaveRoute() {
         const sel = pfSelected();
         const eff = sel.length + (startFromMe && startSnap ? 1 : 0);
         if (!routeTotals || eff < 2) { toast('Спочатку позначте щонайменше 2 місця'); return; }
-        const name = pf$('pfRouteName').value.trim() || pfDefaultName() || 'Маршрут';
+        closeCtx();
+        pf$('srmName').value = pfDefaultName();
+        pf$('srmMeta').textContent = sel.length + ' точок · ' + (routeTotals.estimated ? '≈ ' : '') + fmtKm(routeTotals.distance) + ' · ' + fmtTime(routeTotals.duration);
+        pf$('saveRouteModal').classList.add('open');
+        setTimeout(() => { const i = pf$('srmName'); i.focus(); i.select(); }, 50);
+    }
+    function closeSaveRoute() { pf$('saveRouteModal').classList.remove('open'); }
+    function confirmSaveRoute() {
+        const sel = pfSelected();
+        if (!routeTotals || sel.length < 1) { closeSaveRoute(); return; }
+        const name = pf$('srmName').value.trim() || pfDefaultName() || 'Маршрут';
         const list = pfRoutesLoad();
         list.unshift({
             id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -2255,10 +2285,16 @@
             dist: routeTotals.distance, dur: routeTotals.duration, est: !!routeTotals.estimated
         });
         if (!pfRoutesSave(list)) return;
-        pf$('pfRouteName').value = '';
-        pfRender();
-        toast('📁 Маршрут збережено');
+        closeSaveRoute();
+        toast('📁 Маршрут «' + name + '» збережено');
     }
+    document.addEventListener('keydown', e => {
+        const m = document.getElementById('saveRouteModal');
+        if (!m || !m.classList.contains('open')) return;
+        if (e.key === 'Enter') { e.preventDefault(); confirmSaveRoute(); }
+        else if (e.key === 'Escape') closeSaveRoute();
+    });
+    document.addEventListener('pointerdown', e => { if (e.target && e.target.id === 'saveRouteModal') closeSaveRoute(); });
     function pfRouteAct(kind, id) {
         const list = pfRoutesLoad();
         const i = list.findIndex(r => r.id === id);
@@ -2296,8 +2332,6 @@
         closeCtx();
         const p = pfLoad();
         pf$('pfName').value = p.name; pf$('pfCons').value = p.cons; pf$('pfPrice').value = p.price; pf$('pfCur').value = p.cur;
-        pf$('pfRouteName').value = '';
-        pf$('pfRouteName').placeholder = pfDefaultName() || 'Назва маршруту';
         pfRefreshHeader(p); pfRender();
         document.body.classList.add('profile-open');
         const pg = pf$('profilePage'); if (pg) pg.scrollTop = 0;
@@ -2315,7 +2349,9 @@
         const n = places.filter(p => p.selected).length;
         const eff = n + (startFromMe && startSnap ? 1 : 0);                   // точки маршруту (разом із моєю позицією)
         const rt = document.getElementById('returnToggle');
-        if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none';        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
+        if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none';
+        const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
+        document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         if (!n) { el.style.display = 'none'; el.textContent = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const tm = (routeTotals && eff >= 2)
