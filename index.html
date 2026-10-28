@@ -542,10 +542,15 @@
             transform-origin: center;
         }
         @media (max-width: 700px) {
-            .mobile-header { gap: 4px; }
-            .mobile-controls { gap: 5px; }
+            .mobile-header { gap: 4px; padding: 6px 6px; flex-wrap: nowrap; }
+            .mh-left { display: flex; align-items: center; gap: 4px; flex: 0 1 auto; min-width: 0; }
+            .mobile-title { font-size: clamp(9px, 2.8vw, 12px); white-space: nowrap; letter-spacing: -0.35px; }
+            .mobile-controls { gap: 3px; flex-wrap: nowrap; flex: 0 0 auto; }
+            .mobile-controls .btn-profile { width: 38px; height: 38px; }
             .mobile-controls .btn-map-open,
-            .mobile-controls #gmapsLink { font-size: 1.3em !important; }
+            .mobile-controls #gmapsLink { font-size: 1.05em !important; padding: 6px 5px !important; white-space: nowrap; }
+            .mobile-controls .btn-save-file[aria-label="Налаштування"] { width: 38px !important; height: 38px !important; min-width: 38px; }
+            .mobile-controls .btn-save-file[aria-label="Налаштування"] .gear-w { font-size: 34px; }
         }
 
     </style>
@@ -2670,8 +2675,8 @@
         const b = await r.blob();
         return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
     }
-    // Експорт ділиться на файли із запасом: не більше 23 MiB: mymaps-РРРР-ММ-ДД-1.json, -2.json … і віддається всі разом
-    const EXPORT_PART_MAX = 23 * 1024 * 1024;
+    // Жорсткий ліміт кожного файлу — 24 000 000 байтів, щоб гарантовано бути нижче 25 МБ.
+    const EXPORT_PART_MAX = 24_000_000;
     async function deliverFiles(files) {                  // files: [{ blob, name }]
         try {
             if (isCoarse() && typeof File === 'function' && navigator.canShare && navigator.share) {
@@ -2705,28 +2710,59 @@
                 const s = JSON.stringify({ id: p.id, order: items.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), media });
                 items.push({ s, size: new Blob([s]).size });
             }
-            // групуємо за розміром (запас 64 КБ на службові поля)
-            const limit = EXPORT_PART_MAX - 64 * 1024;
-            const groups = []; let cur = [], curSize = 0, oversize = 0;
-            for (const it of items) {
-                if (cur.length && curSize + it.size + 1 > limit) { groups.push(cur); cur = []; curSize = 0; }
-                cur.push(it.s); curSize += it.size + 1;
-                if (it.size > limit) oversize++;
-            }
-            if (cur.length || !groups.length) groups.push(cur);
+            // Пакуємо картки послідовно, перевіряючи фактичний розмір у байтах усього JSON-файлу.
+            // Якщо додавання картки перевищує ліміт, вона переноситься в наступний пакет.
             const d = new Date(), pad = n => String(n).padStart(2, '0');
             const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-            const when = d.toISOString(), N = groups.length, w = String(N).length;
-            const files = groups.map((g, k) => ({
-                blob: new Blob([
-                    `{"format":"maps-places","version":2,"part":${k + 1},"parts":${N},"exportedAt":${JSON.stringify(when)},"places":[`,
-                    g.join(','),
-                    `],"deleted":${JSON.stringify(k === 0 ? deletedIds : [])}}`
-                ], { type: 'application/json' }),
-                name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json`
-            }));
-            if (N > 1) toast(`Експорт: ${N} файлів (до 25 МБ кожен)`);
-            if (oversize) toast(`⚠ ${oversize} місць перевищують ліміт одного файлу. Перевірте фото цих місць.`);
+            const when = d.toISOString();
+            const makeBlob = (g, part, total) => new Blob([
+                `{"format":"maps-places","version":2,"part":${part},"parts":${total},"exportedAt":${JSON.stringify(when)},"places":[`,
+                g.map(it => it.s).join(','),
+                `],"deleted":${JSON.stringify(part === 1 ? deletedIds : [])}}`
+            ], { type: 'application/json' });
+            const groups = [];
+            let cur = [];
+            for (const it of items) {
+                const candidate = cur.concat(it);
+                // Перевірка повного JSON, а не лише суми розмірів карток.
+                if (candidate.length && makeBlob(candidate, groups.length + 1, 999).size > EXPORT_PART_MAX) {
+                    if (!cur.length) {
+                        throw new Error(`Картка «${it.s ? JSON.parse(it.s).name : 'без назви'}» сама перевищує 24 МБ. Зменште/видаліть частину її фото або відео й повторіть експорт.`);
+                    }
+                    groups.push(cur);
+                    cur = [it];
+                    if (makeBlob(cur, groups.length + 1, 999).size > EXPORT_PART_MAX) {
+                        throw new Error(`Картка «${JSON.parse(it.s).name}» сама перевищує 24 МБ. Зменште/видаліть частину її фото або відео й повторіть експорт.`);
+                    }
+                } else {
+                    cur = candidate;
+                }
+            }
+            if (cur.length || !groups.length) groups.push(cur);
+            // Фінальна перевірка вже з точною кількістю частин; якщо ліміт перевищено,
+            // остання картка переноситься в наступний пакет і перевірка повторюється.
+            let changed = true;
+            while (changed) {
+                changed = false;
+                const total = groups.length;
+                for (let i = 0; i < groups.length; i++) {
+                    if (makeBlob(groups[i], i + 1, total).size > EXPORT_PART_MAX) {
+                        if (groups[i].length <= 1) throw new Error(`Одна картка у частині ${i + 1} перевищує 24 МБ. Зменште/видаліть частину її фото або відео.`);
+                        const moved = groups[i].pop();
+                        if (i + 1 === groups.length) groups.push([]);
+                        groups[i + 1].unshift(moved);
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+            const N = groups.length, w = String(N).length;
+            const files = groups.map((g, k) => {
+                const blob = makeBlob(g, k + 1, N);
+                if (blob.size > EXPORT_PART_MAX) throw new Error(`Не вдалося вкласти частину ${k + 1} у ліміт 24 МБ.`);
+                return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
+            });
+            if (N > 1) toast(`Експорт: ${N} файлів (кожен менше 25 МБ)`);
             await deliverFiles(files);
         } catch (err) { console.error(err); alert('Не вдалося підготувати файл обміну: ' + err.message); }
     }
