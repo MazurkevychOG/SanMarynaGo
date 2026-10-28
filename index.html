@@ -290,11 +290,13 @@
         .fab-add.editing { border-color: #e74c3c; background: #fff; }
 
         /* ===== Карта: маршрут, GPS, назад до місць ===== */
-        .route-label { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; background: #fff; color: #1a56c4; border: 2px solid #4285F4; border-radius: 12px; padding: 2px 8px; font-size: 13px; font-weight: 700; box-shadow: 0 1px 5px rgba(0,0,0,.3); pointer-events: none; }
+        .route-label { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; background: #fff; color: #1a56c4; border: 3px solid #4285F4; border-radius: 24px; padding: 4px 16px; font-size: 26px; font-weight: 700; box-shadow: 0 1px 5px rgba(0,0,0,.3); pointer-events: none; }
         .route-label.est { color: #b35c00; border-color: #e67e22; }
-        .route-summary { background: rgba(255,255,255,.95); border-radius: 10px; padding: 6px 12px; font-size: 15px; box-shadow: 0 1px 6px rgba(0,0,0,.3); line-height: 1.3; }
+        .route-summary { background: rgba(255,255,255,.95); border-radius: 14px; padding: 8px 16px; font-size: 30px; box-shadow: 0 1px 6px rgba(0,0,0,.3); line-height: 1.3; }
         .route-summary small { display: block; font-size: 11px; color: #718096; }
         .gps-dot { width: 20px; height: 20px; border-radius: 50%; background: #2ecc71; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(46,204,113,.45), 0 2px 6px rgba(0,0,0,.4); }
+        .map-name-tip { font-size: 15px; font-weight: 700; color: #2d3748; padding: 4px 10px; border-radius: 8px; pointer-events: none; }
+        .map-reset a { width: 34px; height: 34px; line-height: 34px; font-size: 20px; font-weight: 700; text-align: center; color: #e74c3c !important; cursor: pointer; display: block; text-decoration: none; }
         .btn-map-close { width: auto !important; padding: 0 14px !important; font-size: 14px !important; background: #4285F4 !important; }
     
         /* ===== Допоміжні стилі ===== */
@@ -505,10 +507,10 @@
         <span class="map-bar-title">🗺 Карта</span>
         <div class="map-bar-actions">
             <a id="gmapsLinkMap" class="link-btn btn-export" href="#" target="_blank">Маршрут</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
-            <button class="btn-map-close" onclick="closeMobileMap()">☰ Місця</button>
+            <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
-    <div class="map-hint-m">Тап по точці — вибрати/зняти · довге натискання — меню (додати місце) · два пальці: рух, масштаб, поворот · зелена точка — ви</div>
+    <div class="map-hint-m">Тап по точці — показати/сховати назву · утримання точки — вибрати/зняти з маршруту · довге натискання по карті — меню (додати місце) · ⟲ — скинути всі точки · два пальці: рух, масштаб, поворот · зелена точка — ви</div>
 </div>
 <div id="settingsPage" class="settings-page" role="dialog" aria-label="Налаштування">
     <div class="settings-box">
@@ -566,8 +568,8 @@
         <div class="mobile-header">
         <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
         <span class="mobile-title">📍 SanMarynaGo</span></div>
-        <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 Карта</button>
-            <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 Маршрут</a><span class="route-parts"></span>
+        <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 map</button>
+            <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 routes</a><span class="route-parts"></span>
             <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування">⚙</button>
         </div>
     </div>
@@ -631,7 +633,7 @@
             </div>
         </div>
     </div>
-    <div class="map-hint" id="mapHint">Клік по точці — вибрати/зняти · правий клік (довге натискання) — меню · тачпад: два пальці — рух, щипок — масштаб · поворот: два пальці або Shift+перетягнути · зелена точка — ви (GPS)</div>
+    <div class="map-hint" id="mapHint">Клік по точці — показати/сховати назву · утримання точки — вибрати/зняти з маршруту · правий клік — меню · ⟲ — скинути всі точки · тачпад: два пальці — рух, щипок — масштаб · поворот: два пальці або Shift+перетягнути · зелена точка — ви (GPS)</div>
 
 <div id="albaniaMap"></div></div>
 
@@ -2824,6 +2826,7 @@
 
         setupWheelAndGestures(el);
         addLocateControl();
+        addResetControl();
         startGps();
         map.attributionControl.addAttribution('Назви населених пунктів © OpenStreetMap (Nominatim)');
         setupContextAndLongPress(el);
@@ -2941,6 +2944,38 @@
         }
     }
 
+    // ----- Назви на карті (тап — показати, ще тап — сховати), утримання — вибір точки, кнопка скидання -----
+    const shownNames = new Set();
+    let markerHoldAt = 0;
+    function holdToggle(i) {
+        const p = places[i]; if (!p) return;
+        markerHoldAt = Date.now();
+        try { if (navigator.vibrate) navigator.vibrate(16); } catch (e) { }
+        const on = !p.selected;
+        togglePlace(i);
+        toast(on ? '✔ Вибрано: ' + p.name : '✖ Знято з маршруту: ' + p.name);
+    }
+    function resetAllPoints() {
+        const had = places.some(p => p.selected);
+        shownNames.clear();
+        if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); render(); toast('⟲ Усі точки скинуто'); }
+        else { updateMapMarkers(); toast('Немає вибраних точок'); }
+    }
+    function addResetControl() {
+        const Ctl = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd() {
+                const box = L.DomUtil.create('div', 'leaflet-bar map-reset');
+                const a = L.DomUtil.create('a', '', box);
+                a.href = '#'; a.textContent = '⟲'; a.title = 'Скинути всі точки'; a.setAttribute('role', 'button'); a.setAttribute('aria-label', 'Скинути всі точки');
+                L.DomEvent.disableClickPropagation(box);
+                L.DomEvent.on(a, 'click', ev => { L.DomEvent.stop(ev); resetAllPoints(); });
+                return box;
+            }
+        });
+        new Ctl().addTo(map);
+    }
+
     // ----- Контекстне меню та довге натискання -----
     function setupContextAndLongPress(el) {
         el.addEventListener('contextmenu', e => e.preventDefault());
@@ -2959,7 +2994,7 @@
                 const icon = start.target.closest('.leaflet-marker-icon');
                 const d = icon && icon.querySelector('[data-idx]');
                 if (icon && !d) return;                                   // зелений маркер нового місця
-                if (d) return openMarkerMenu(Number(d.dataset.idx), start.x, start.y);
+                if (d) return holdToggle(Number(d.dataset.idx));
                 openMapMenu(map.mouseEventToLatLng({ clientX: start.x, clientY: start.y }), start.x, start.y);
             }, 550);
         }, { passive: true });
@@ -3154,17 +3189,17 @@
         routeData.legs.forEach((leg, i) => {
             if (leg.skip || !leg.geom.length) return;
             const text = (routeData.estimated ? '≈ ' : '') + fmtTime(leg.duration) + ' · ' + fmtKm(leg.distance);
-            const w = Math.max(70, text.length * 7.4 + 18), h = 26;
+            const w = Math.max(140, text.length * 14.8 + 38), h = 52;
             const px = leg.geom.map(g => map.latLngToContainerPoint(g));
             const dest = px[px.length - 1];
             let total = 0;
             for (let k = 1; k < px.length; k++) total += Math.hypot(px[k].x - px[k - 1].x, px[k].y - px[k - 1].y);
             const cands = [];
-            for (const B0 of [46, 72, 102, 138, 180, 230, 290, 360]) {           // вздовж лінії, від пункту призначення вглиб відрізка
+            for (const B0 of [92, 144, 204, 276, 360, 460, 580, 720]) {           // вздовж лінії, від пункту призначення вглиб відрізка
                 const at = pointBack(px, Math.min(B0, total * 0.9));
-                for (const o of [0, 1, -1, 2, -2]) cands.push({ cx: at.x + at.nx * o * (h / 2 + 9), cy: at.y + at.ny * o * (h / 2 + 9) });
+                for (const o of [0, 1, -1, 2, -2]) cands.push({ cx: at.x + at.nx * o * (h / 2 + 12), cy: at.y + at.ny * o * (h / 2 + 12) });
             }
-            for (const rho of [62, 88, 120, 160, 210, 270]) {                     // і навколо пункту призначення, коли на лінії тісно
+            for (const rho of [90, 130, 180, 240, 320, 420]) {                     // і навколо пункту призначення, коли на лінії тісно
                 for (let a0 = 0; a0 < 20; a0++) {
                     const ang = a0 / 20 * Math.PI * 2;
                     cands.push({ cx: dest.x + Math.cos(ang) * (rho + w / 2 - 20), cy: dest.y + Math.sin(ang) * (rho + h / 2 - 12) });
@@ -3278,13 +3313,33 @@
                 iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2]
             });
             const mk = L.marker(c, { icon, keyboard: false, zIndexOffset: p.selected ? 500 : 0 });
-            mk.bindTooltip(esc(p.name), { permanent: false, direction: 'top', offset: [0, -sz / 2] });
-            mk.on('click', () => { if (Date.now() - lastCtxOpen < 700) return; togglePlace(i); });
+            const tipOpts = { permanent: true, interactive: false, direction: 'top', offset: [0, -sz / 2], className: 'map-name-tip' };
+            if (shownNames.has(p.id)) mk.bindTooltip(esc(p.name), tipOpts);
+            // коротке натискання: показати назву й залишити; наступне — сховати
+            mk.on('click', () => {
+                if (Date.now() - lastCtxOpen < 700 || Date.now() - markerHoldAt < 700) return;
+                if (shownNames.has(p.id)) { shownNames.delete(p.id); mk.unbindTooltip(); }
+                else { shownNames.add(p.id); mk.bindTooltip(esc(p.name), tipOpts); }
+            });
+            // правий клік мишею — меню (на телефоні утримання = вибір, меню там не відкривається)
             mk.on('contextmenu', (ev) => {
                 L.DomEvent.preventDefault(ev.originalEvent);
+                if (isCoarse()) return;
                 openMarkerMenu(i, ev.originalEvent.clientX, ev.originalEvent.clientY);
             });
             mk.addTo(markersLayer);
+            // утримання лівої кнопки миші на точці — вибір / зняття (на дотику це робить таймер у setupContextAndLongPress)
+            const mel = mk.getElement && mk.getElement();
+            if (mel) {
+                let ht = null;
+                const stop = () => { if (ht) { clearTimeout(ht); ht = null; } };
+                mel.addEventListener('pointerdown', e => {
+                    stop();
+                    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+                    ht = setTimeout(() => { ht = null; holdToggle(i); }, 500);
+                });
+                ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => mel.addEventListener(t, stop));
+            }
         });
     }
 
