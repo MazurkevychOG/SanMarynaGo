@@ -252,6 +252,9 @@
         .search-inner input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 18px; height: 100%; padding: 0; -webkit-appearance: none; appearance: none; }
         .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: none; }
         .search-clear.show { display: inline-flex; }
+        .search-inner input:not(:placeholder-shown) ~ .search-clear { display: inline-flex; }   /* хрестик з'являється, щойно в полі є хоч 1 символ (працює і без JS) */
+        .search-clear { position: relative; z-index: 2; width: 38px; height: 38px; }
+        .search-clear svg { display: block; pointer-events: none; }
         /* Список зупиняється так, що перша картка стає рівно під сірою смугою (висота смуги — у --sticky-h) */
         .content-area { scroll-padding-top: var(--sticky-h, 0px); }
         /* Смуга прокрутки справа — втричі товща за стандартну (телефон: ~4px → 12px; комп'ютер: ~8px → 24px) */
@@ -495,7 +498,7 @@
             <div class="search-inner">
                 <span class="search-ico">🔍</span>
                 <input type="search" id="searchInput" placeholder="Пошук місця (від 3 символів)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
-                <button type="button" id="searchClear" class="search-clear" aria-label="Стерти">✕</button>
+                <button type="button" id="searchClear" class="search-clear" aria-label="Стерти"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6L18 18M18 6L6 18" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button>
             </div>
             <div class="search-info" id="searchInfo"></div>
         </div>
@@ -942,6 +945,53 @@
         ca.addEventListener('touchcancel', up, { passive: true });
         ca.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') down(); }, true);
         ca.addEventListener('pointerup', e => { if (e.pointerType === 'mouse') up(); }, true);
+    })();
+
+    // Швидкий «кидок» пальцем прокручує далеко: до ~10 карток за раз (рідна інерція браузера давала лише 2–3)
+    (function initFling() {
+        const ca = document.querySelector('.content-area');
+        if (!ca) return;
+        let samples = [], raf = 0, active = false, horizontal = false, startX = 0, startY = 0;
+        const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+        ca.addEventListener('touchstart', e => {
+            stop();
+            if (e.touches.length !== 1) { active = false; return; }
+            const t = e.touches[0];
+            active = !(e.target.closest && e.target.closest('.swipe-actions, .drag-handle'));
+            startX = t.clientX; startY = t.clientY; horizontal = false;
+            samples = [{ t: performance.now(), y: t.clientY }];
+        }, { passive: true });
+        ca.addEventListener('touchmove', e => {
+            if (!active || !e.touches.length) return;
+            const t = e.touches[0], now = performance.now();
+            if (!horizontal && Math.abs(t.clientX - startX) > 10 && Math.abs(t.clientX - startX) > Math.abs(t.clientY - startY)) horizontal = true;
+            samples.push({ t: now, y: t.clientY });
+            while (samples.length > 2 && now - samples[0].t > 120) samples.shift();
+        }, { passive: true });
+        ca.addEventListener('touchcancel', () => { active = false; }, { passive: true });
+        ca.addEventListener('touchend', () => {
+            if (!active || horizontal || reorderingNow || samples.length < 2) return;
+            const a = samples[0], b = samples[samples.length - 1], dt = b.t - a.t;
+            if (dt < 8 || performance.now() - b.t > 80) return;           // палець зупинився перед відпусканням — це не кидок
+            const v = (a.y - b.y) / dt;                                   // px/мс; додатне — список їде вниз
+            if (Math.abs(v) < 1.1) return;                                // звичайна прокрутка лишається рідною
+            const row = document.querySelector('#placesTable .place-row');
+            const rowH = (row && row.offsetHeight) || 150;
+            const dist = Math.min(10 * rowH, Math.abs(v) * 650) * Math.sign(v);
+            const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
+            const to = Math.max(0, Math.min(max, from + dist));
+            if (Math.abs(to - from) < 40) return;
+            const dur = Math.min(1600, 500 + Math.abs(to - from) * 0.55), t0 = performance.now();
+            stop();
+            const step = now => {
+                const k = Math.min(1, (now - t0) / dur);
+                ca.scrollTop = from + (to - from) * (1 - Math.pow(1 - k, 3));
+                raf = k < 1 ? requestAnimationFrame(step) : 0;
+            };
+            raf = requestAnimationFrame(step);
+        }, { passive: true });
+        ca.addEventListener('wheel', stop, { passive: true });
+        ca.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') stop(); }, true);
     })();
 
     // ===== Перетягування (миша + дотик, через Pointer Events) =====
@@ -2537,6 +2587,14 @@
         map.attributionControl.addAttribution('Назви населених пунктів © OpenStreetMap (Nominatim)');
         setupContextAndLongPress(el);
         map.on('movestart zoomstart', closeCtx);
+        // Під час щипка/колеса маршрут перемальовується на КОЖНОМУ кадрі за поточним дробовим масштабом
+        // (не покладаємось на CSS-трансформ SVG, який зі swipe-обертанням карти не встигає за жестом)
+        map.on('zoom', () => {
+            try { if (routeLine && routeLine._renderer && routeLine._renderer._reset) routeLine._renderer._reset(); } catch (e) { }
+            applyRouteWeight();
+        });
+        map.on('zoomanim', (e) => applyRouteWeight(e.zoom));                // анімація кнопок +/−, подвійний тап
+        map.on('zoomend moveend', () => { applyRouteWeight(); setTimeout(applyRouteWeight, 0); });   // після скидання SVG-трансформу
         map.on('zoomend rotate', () => layoutRouteLabels());      // підписи перерозміщуються під новий масштаб/поворот
 
         updateMapMarkers();
@@ -2796,7 +2854,7 @@
     let routeData = null, routeLabelLayer = null;
     function clearRoute() {
         if (routeLayer && map) map.removeLayer(routeLayer);
-        routeLayer = null; routeLabelLayer = null; routeData = null;
+        routeLayer = null; routeLabelLayer = null; routeData = null; routeLine = null;
         if (routeCtl && map) map.removeControl(routeCtl);
         routeCtl = null;
     }
@@ -2892,13 +2950,32 @@
             }).addTo(routeLabelLayer);
         });
     }
+    // ----- Товщина лінії маршруту росте разом із масштабом карти (як дороги на плитках) -----
+    let routeLine = null, routeLineEst = false;
+    const ROUTE_W_REF_ZOOM = 14, ROUTE_W_REF = 7, ROUTE_W_STEP = 1.45, ROUTE_W_MIN = 4, ROUTE_W_MAX = 36;
+    function routeWidthAt(z) {
+        return Math.max(ROUTE_W_MIN, Math.min(ROUTE_W_MAX, ROUTE_W_REF * Math.pow(ROUTE_W_STEP, z - ROUTE_W_REF_ZOOM)));
+    }
+    // targetZoom — масштаб, до якого йде жест/анімація. Під час щипка Leaflet масштабує весь SVG трансформом,
+    // тому ширину ділимо на поточний коефіцієнт трансформу — на екрані виходить рівно routeWidthAt(targetZoom).
+    function applyRouteWeight(targetZoom) {
+        if (!map || !routeLine) return;
+        const z = (typeof targetZoom === 'number') ? targetZoom : map.getZoom();
+        const rend = routeLine._renderer;
+        let k = 1;
+        if (rend && typeof rend._zoom === 'number') k = map.getZoomScale(z, rend._zoom) || 1;
+        const w = routeWidthAt(z) / k;
+        routeLine.setStyle(routeLineEst ? { weight: w, dashArray: (w * 2) + ' ' + (w * 2) } : { weight: w });
+    }
     function drawRoute(r, pts, skipLast) {
         if (!map) return;
         clearRoute();
         routeLayer = L.layerGroup().addTo(map);
-        L.polyline(r.geometry, r.estimated
+        routeLine = L.polyline(r.geometry, r.estimated
             ? { color: '#e67e22', weight: 4, opacity: 0.85, dashArray: '8 8' }
             : { color: '#4285F4', weight: 5, opacity: 0.85 }).addTo(routeLayer);
+        routeLineEst = !!r.estimated;
+        applyRouteWeight();
         const geoms = legGeometries(r, pts);
         let totalD = 0, totalT = 0;
         routeData = {
