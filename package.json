@@ -1,8 +1,8 @@
 {
-  "name": "maps",
+  "name": "SanMarynaGO",
   "version": "1.0.0",
   "private": true,
-  "description": "MyMaps — статичний сайт із каталогом місць (data/) та скриптами для їх створення й перевірки",
+  "description": "SanMarynaGO — статичний сайт із каталогом місць (data/) та скриптами для їх створення й перевірки",
   "type": "module",
   "engines": {
     "node": ">=18"
