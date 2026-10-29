@@ -1103,6 +1103,30 @@
         if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(syncStickyOffset); if (mh) ro.observe(mh); if (stt) ro.observe(stt); }
     })();
 
+    // ===== Спільне для дотягування й «кидка» =====
+    // snapScrollTarget: куди має зупинитись прокрутка, щоб жодна картка не була наполовину під верхньою смугою.
+    // T — бажана позиція прокрутки, dir — напрямок руху (+1 вниз, −1 вгору): дотягуємо завжди в той бік, куди їдемо.
+    const scrollCtl = { flinging: false };
+    function snapScrollTarget(ca, T, dir) {
+        const max = ca.scrollHeight - ca.clientHeight;
+        const top = document.querySelector('.sticky-top');
+        T = Math.max(0, Math.min(max, T));
+        if (!top || T <= 0 || T >= max - 4) return T;                  // край списку — не чіпаємо
+        const caTop = ca.getBoundingClientRect().top;
+        const lim = top.getBoundingClientRect().bottom - caTop;         // нижня межа смуги відносно області прокрутки
+        const rows = document.getElementById('placesTable').children;
+        for (const r of rows) {
+            if (r.classList.contains('hidden-by-search')) continue;
+            const rc = r.getBoundingClientRect();
+            const rt = rc.top - caTop + ca.scrollTop - T, rb = rt + rc.height;   // де була б картка при прокрутці T
+            if (rb <= lim + 1) continue;                                  // вже повністю під смугою
+            if (rt >= lim - 1) break;                                     // ця й усі нижче — видно повністю
+            const t2 = dir > 0 ? T + (rb - lim) : T - (lim - rt);
+            return Math.max(0, Math.min(max, t2));
+        }
+        return T;
+    }
+
     // Коли прокрутка зупинилась, а верхня смуга (шапка, пошук, заголовок списку) перекриває частину картки — дотягуємо В ТОЙ БІК, куди ви прокручували:
     // вниз — картка, що ховалась, їде під смугу повністю, і рівно під смугою стає наступна; вгору — картка висувається з-під смуги повністю.
     // Напрямок = загальний рух від початку жесту до зупинки (а не остання мікро-подія), тож проти руху дотягування не відбувається.
@@ -1112,6 +1136,7 @@
         const top = document.querySelector('.sticky-top');
         if (!ca || !top) return;
         let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0, anim = 0;
+        let vel = 0, lastTop = ca.scrollTop, lastTs = performance.now(), lastTouchEnd = 0;   // швидкість прокрутки (px/мс) — для випереджального дотягування
         const stopAnim = () => { if (anim) { cancelAnimationFrame(anim); anim = 0; } };
         // Плавне дотягування: м'який старт з нульової швидкості, далі швидкість поступово й безперервно згасає (критично загальмована «пружина»),
         // без різкого розгону посередині й без різкої зупинки наприкінці.
@@ -1130,9 +1155,38 @@
             };
             anim = requestAnimationFrame(step);
         };
+        // Випереджальне дотягування: поки картка ще їде по інерції, але вже сповільнилась — передбачаємо, де вона зупиниться,
+        // і підхоплюємо рух З ТІЄЮ САМОЮ швидкістю (експоненційне згасання), тож перехід безшовний, без зупинки й нового старту.
+        const PRED_TAU = 320, V_START = 0.6, V_MIN = 0.08;      // мс, px/мс
+        const glideFromMotion = (to, v0) => {
+            stopAnim();
+            const from = ca.scrollTop, dist = to - from, spd = Math.abs(v0);
+            if (Math.abs(dist) < 1 || spd < 0.01) return;
+            const NORM = 1 - Math.exp(-4.6), tau = Math.abs(dist) / (NORM * spd), dur = tau * 4.6, t0 = performance.now();
+            const step = now => {
+                const t = now - t0, k = Math.min(1, t / dur);
+                selfUntil = Date.now() + 250;
+                ca.scrollTop = k >= 1 ? to : from + dist * (1 - Math.exp(-t / tau)) / NORM;
+                anim = k < 1 ? requestAnimationFrame(step) : 0;
+            };
+            anim = requestAnimationFrame(step);
+        };
+        const predict = () => {
+            if (anim || finger || reorderingNow || scrollCtl.flinging) return;
+            if (performance.now() - lastTouchEnd > 5000) return;          // лише інерція після пальця
+            const sp = Math.abs(vel);
+            if (sp > V_START || sp < V_MIN) return;
+            const dir = vel > 0 ? 1 : -1, cur = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
+            const P = cur + vel * PRED_TAU;                               // де зупинилась би картка сама
+            if (P <= 0 || P >= max - 4) return;                           // біля країв нічого не дотягуємо
+            const T = snapScrollTarget(ca, P, dir);
+            if ((T - cur) * dir < 4) return;
+            clearTimeout(timer); origin = null;
+            glideFromMotion(T, vel);
+        };
         const settle = () => {
             const o = origin; origin = null;                                   // жест завершено
-            if (finger || reorderingNow || o === null) return;
+            if (anim || finger || reorderingNow || o === null) return;
             if (ca.scrollTop + ca.clientHeight >= ca.scrollHeight - 4) return; // кінець списку — не чіпаємо
             if (ca.scrollTop <= 0) return;
             const net = ca.scrollTop - o;
@@ -1152,14 +1206,18 @@
         };
         const later = () => { clearTimeout(timer); timer = setTimeout(settle, 160); };
         ca.addEventListener('scroll', () => {
-            if (Date.now() < selfUntil) { prev = ca.scrollTop; return; }
+            const now = performance.now(), dt = now - lastTs, y = ca.scrollTop;
+            if (dt > 0 && dt < 120) vel = vel * 0.4 + ((y - lastTop) / dt) * 0.6; else vel = 0;   // згладжена швидкість
+            lastTop = y; lastTs = now;
+            if (Date.now() < selfUntil) { prev = y; return; }
             if (origin === null) origin = prev;                // початок нового жесту: звідки рушили
-            prev = ca.scrollTop;
+            prev = y;
             later();
+            predict();
         }, { passive: true });
         const down = () => { finger = true; stopAnim(); clearTimeout(timer); if (origin === null) origin = ca.scrollTop; };
         ca.addEventListener('wheel', stopAnim, { passive: true });
-        const up = () => { finger = false; later(); };
+        const up = () => { finger = false; lastTouchEnd = performance.now(); later(); };
         ca.addEventListener('touchstart', down, { passive: true });
         ca.addEventListener('touchend', up, { passive: true });
         ca.addEventListener('touchcancel', up, { passive: true });
@@ -1172,7 +1230,7 @@
         const ca = document.querySelector('.content-area');
         if (!ca) return;
         let samples = [], raf = 0, active = false, horizontal = false, startX = 0, startY = 0;
-        const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } };
+        const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } scrollCtl.flinging = false; };
         ca.addEventListener('touchstart', e => {
             stop();
             if (e.touches.length !== 1) { active = false; return; }
@@ -1199,14 +1257,15 @@
             const rowH = (row && row.offsetHeight) || 150;
             const dist = Math.min(10 * rowH, Math.abs(v) * 650) * Math.sign(v);
             const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
-            const to = Math.max(0, Math.min(max, from + dist));
+            const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));   // одразу зупиняємось рівно на краю картки
             if (Math.abs(to - from) < 40) return;
             const dur = Math.min(1600, 500 + Math.abs(to - from) * 0.55), t0 = performance.now();
             stop();
+            scrollCtl.flinging = true;
             const step = now => {
                 const k = Math.min(1, (now - t0) / dur);
                 ca.scrollTop = from + (to - from) * (1 - Math.pow(1 - k, 3));
-                raf = k < 1 ? requestAnimationFrame(step) : 0;
+                if (k < 1) raf = requestAnimationFrame(step); else { raf = 0; scrollCtl.flinging = false; }
             };
             raf = requestAnimationFrame(step);
         }, { passive: true });
