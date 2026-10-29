@@ -250,7 +250,7 @@
         .search-bar.open { height: 84px; border-bottom-width: 1px; }
         .search-inner { display: flex; align-items: center; gap: 8px; margin: 10px 12px 2px; padding: 0 6px 0 12px; height: 46px; background: #f1f3f5; border-radius: 23px; }
         .search-inner input { flex: 1; min-width: 0; border: none; background: transparent; outline: none; font-size: 18px; height: 100%; padding: 0; -webkit-appearance: none; appearance: none; }
-        .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: none; }
+        .search-clear { width: 34px; height: 34px; padding: 0; border-radius: 50%; background: #a0aec0; color: #fff; font-size: 18px; line-height: 1; justify-content: center; flex: none; display: inline-flex; }   /* кнопка завжди в кінці рядка */
         .search-clear.show { display: inline-flex; }
         .search-inner input:not(:placeholder-shown) ~ .search-clear { display: inline-flex; }   /* хрестик з'являється, щойно в полі є хоч 1 символ (працює і без JS) */
         .search-clear { position: relative; z-index: 2; width: 38px; height: 38px; }
@@ -1121,7 +1121,7 @@
             stopAnim();
             const from = ca.scrollTop, dist = to - from;
             if (Math.abs(dist) < 1) return;
-            const dur = Math.min(1500, Math.max(800, 600 + Math.abs(dist) * 5)), t0 = performance.now();
+            const dur = Math.min(3000, Math.max(1600, 1200 + Math.abs(dist) * 10)), t0 = performance.now();   // удвічі повільніше
             const step = now => {
                 const k = Math.min(1, (now - t0) / dur);
                 selfUntil = Date.now() + 250;                  // власну анімацію не вважаємо новим жестом
@@ -2195,18 +2195,8 @@
     function mapsmePointUrl(lat, lng, name) {
         return 'mapsme://map?ll=' + Number(lat).toFixed(6) + ',' + Number(lng).toFixed(6) + '&n=' + encodeURIComponent(name || '');
     }
-    // Відкрити Maps.me; якщо програма не відгукнулась (сторінка лишилась на екрані) — підказка
-    function openMapsme(url) {
-        let left = false;
-        const onHide = () => { if (document.hidden) left = true; };
-        document.addEventListener('visibilitychange', onHide);
-        window.addEventListener('pagehide', onHide, { once: true });
-        setTimeout(() => {
-            document.removeEventListener('visibilitychange', onHide);
-            if (!left) toast('Maps.me не відкрився — перевірте, чи встановлено програму');
-        }, 1800);
-        window.location.href = url;
-    }
+    // Відкрити Maps.me одразу, без жодних повідомлень
+    function openMapsme(url) { window.location.href = url; }
     let _navPts = [];
     function openNavPick() {
         const links = buildRouteLinks();
@@ -2216,7 +2206,7 @@
         const legs = Math.max(0, _navPts.length - 1);
         document.getElementById('navPickMeta').textContent = _navPts.length + ' точок у маршруті';
         document.getElementById('navGoogleSub').textContent = links.length > 1 ? 'Маршрут довгий — відкриється частинами (' + links.length + ')' : 'Весь маршрут з усіма зупинками';
-        document.getElementById('navMapsmeSub').textContent = legs <= 1 ? 'Відкриє маршрут у програмі' : 'Без проміжних зупинок — по ділянках (' + legs + ')';
+        document.getElementById('navMapsmeSub').textContent = legs <= 1 ? 'Одразу побудує маршрут' : 'Одразу побудує маршрут від першої до останньої точки (Maps.me не приймає проміжні)';
         document.getElementById('navMapsmeBtn').style.display = legs >= 1 ? '' : 'none';
         document.getElementById('navPickParts').innerHTML = '';
         document.getElementById('navPickModal').classList.add('open');
@@ -2232,11 +2222,14 @@
             box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
             return;
         }
-        const pts = _navPts, legs = pts.length - 1;
-        if (legs <= 1) { closeNavPick(); openMapsme(mapsmeLegUrl(pts[0], pts[1])); return; }
-        box.innerHTML = '<div class="nav-sub-title">Maps.me — оберіть ділянку маршруту:</div><div class="nav-sub">' +
-            pts.slice(0, -1).map((a, k) => '<button type="button" data-k="' + k + '">' + (k + 1) + ' → ' + (k + 2) + '</button>').join('') + '</div>';
-        box.querySelectorAll('button').forEach(b => b.onclick = () => { const k = +b.dataset.k; openMapsme(mapsmeLegUrl(pts[k], pts[k + 1])); });
+        const pts = _navPts.slice();
+        if (pts.length > 2) {                               // круговий маршрут: фініш = старт — беремо передостанню точку
+            const f = pts[0].ll, l = pts[pts.length - 1].ll;
+            if (f[0] === l[0] && f[1] === l[1]) pts.pop();
+        }
+        if (pts.length < 2) return;
+        closeNavPick();
+        openMapsme(mapsmeLegUrl(pts[0], pts[pts.length - 1]));   // відкриваємо додаток і одразу будуємо маршрут
     }
     document.getElementById('navPickModal').addEventListener('click', e => { if (e.target.id === 'navPickModal') closeNavPick(); });
 
@@ -2731,7 +2724,10 @@
         input.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSearch(); input.blur(); } });
         input.addEventListener('blur', () => { setTimeout(() => { if (!input.value && document.activeElement !== input) closeSearch(); }, 200); });
         clr.addEventListener('pointerdown', e => e.preventDefault());           // не відбираємо фокус у поля
-        clr.addEventListener('click', () => { input.value = ''; applySearch(); input.focus(); });
+        clr.addEventListener('click', () => {
+            if (input.value) { input.value = ''; applySearch(); input.focus(); }   // є текст — стираємо все
+            else { closeSearch(); input.blur(); }                                  // порожньо — ховаємо рядок пошуку
+        });
 
         // Свайп вниз, коли список уже на самому верху
         let startY = null, pulling = false, wheelAcc = 0;
