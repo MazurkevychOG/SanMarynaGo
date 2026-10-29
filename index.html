@@ -445,6 +445,30 @@
         .load-retry { margin-top: 14px; background: #4285F4; padding: 12px 20px; font-size: 16px; border-radius: 10px; }
         .set-note { font-size: 14px; color: #5a6b7d; line-height: 1.45; margin: 0 0 12px; }
 
+
+        /* ===== Назва додатку + збережене ім'я під нею ===== */
+        .app-brand { display: flex; flex-direction: column; justify-content: center; min-width: 0; line-height: 1.15; }
+        .app-brand .mobile-title, .app-brand .app-brand-title { font-size: 17px; font-weight: 800; color: #2c3e50; white-space: nowrap; letter-spacing: -0.2px; }
+        .app-user { font-size: 12px; font-weight: 600; color: #718096; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .app-user[hidden] { display: none; }
+        .app-brand-desk { margin-bottom: 8px; }
+        .app-brand-desk .app-brand-title { font-size: 20px; }
+        .app-brand-desk .app-user { font-size: 13px; }
+        @media (max-width: 700px) {
+            .app-brand .mobile-title { font-size: clamp(11px, 3.6vw, 15px); letter-spacing: -0.3px; }
+            .app-user { font-size: clamp(9px, 2.8vw, 11px); }
+            .mh-left { flex: 1 1 auto; }
+        }
+        /* ===== Вибір програми для маршруту ===== */
+        #navPickModal { display: none; position: fixed; inset: 0; z-index: 3550; background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 16px; }
+        #navPickModal.open { display: flex; }
+        .nav-opt { display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; margin-top: 10px; padding: 14px; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; color: #fff; cursor: pointer; text-align: left; }
+        .nav-opt small { display: block; font-weight: 500; font-size: 12px; opacity: .9; }
+        .nav-opt.g { background: #4285F4; }
+        .nav-opt.m { background: #1fa463; }
+        .nav-sub { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .nav-sub button { flex: 1 1 calc(50% - 6px); padding: 10px 6px; border: 1px solid #cbd5e0; border-radius: 8px; background: #f7fafc; color: #2d3748; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .nav-sub-title { margin-top: 12px; font-size: 13px; color: #718096; }
         /* ===== Особистий кабінет ===== */
         .mh-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
         .btn-profile { flex: none; width: 36px; height: 36px; padding: 0; border: none; border-radius: 50%; background: #4285F4; color: #fff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,.25); }
@@ -616,6 +640,16 @@
         <div class="srm-acts"><button type="button" onclick="closeStopDlg()">Скасувати</button><button type="button" onclick="clearStopDlg()">Очистити</button><button type="button" class="ok" onclick="saveStopDlg()">OK</button></div>
     </div>
 </div>
+<div id="navPickModal" role="dialog" aria-label="Де побудувати маршрут">
+    <div class="srm-box">
+        <h3>🧭 Де побудувати маршрут?</h3>
+        <div class="srm-meta" id="navPickMeta"></div>
+        <button type="button" class="nav-opt g" id="navGoogleBtn" onclick="navPickGo('google')"><span>🗺</span><span>Google Maps<small id="navGoogleSub">Весь маршрут з усіма зупинками</small></span></button>
+        <button type="button" class="nav-opt m" id="navMapsmeBtn" onclick="navPickGo('mapsme')"><span>📍</span><span>Maps.me<small id="navMapsmeSub"></small></span></button>
+        <div id="navPickParts"></div>
+        <div class="srm-acts"><button type="button" onclick="closeNavPick()">Скасувати</button></div>
+    </div>
+</div>
 <div id="saveRouteModal" role="dialog" aria-label="Зберегти маршрут">
     <div class="srm-box">
         <h3>💾 Зберегти маршрут</h3>
@@ -652,7 +686,7 @@
     <div class="sticky-top">
         <div class="mobile-header">
         <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
-        <span class="mobile-title">📍 SanMarynaGO</span></div>
+        <div class="app-brand"><span class="mobile-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div></div>
         <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 map</button>
             <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 routes</a><span class="route-parts"></span>
             <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
@@ -678,11 +712,12 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner">
+        <div class="app-brand app-brand-desk"><span class="app-brand-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div>
         <div class="header-top">
             <h1>📍 Додати місце</h1>
             <div class="top-controls desktop-only">
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
-                <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route Google Map</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+                <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
         </div>
@@ -2139,6 +2174,72 @@
         return links;
     }
 
+
+    // ===== Вибір, де будувати маршрут: Google Maps або Maps.me =====
+    // Google Maps приймає до 11 точок в одному посиланні (довші маршрути діляться на частини).
+    // Maps.me через зовнішнє посилання вміє лише «звідки → куди» без проміжних зупинок, тому для маршруту
+    // з кількох точок пропонуємо будувати його ділянками: 1→2, 2→3 …
+    function navRoutePoints() {
+        const sel = places.filter(p => p.selected);
+        const shouldReturn = document.getElementById('returnToStart')?.checked || document.getElementById('returnToStartDesktop')?.checked || false;
+        const pts = sel.map(p => { const c = parseCoords(p.coords); return c ? { ll: c, name: p.name || '' } : null; }).filter(Boolean);
+        if (startFromMe && startSnap) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'Моя позиція' });
+        if (shouldReturn && pts.length >= 2) pts.push(pts[0]);
+        return pts;
+    }
+    function mapsmeLegUrl(a, b) {
+        const f = c => Number(c).toFixed(6);
+        return 'mapsme://route?sll=' + f(a.ll[0]) + ',' + f(a.ll[1]) + '&saddr=' + encodeURIComponent(a.name || 'Старт') +
+            '&dll=' + f(b.ll[0]) + ',' + f(b.ll[1]) + '&daddr=' + encodeURIComponent(b.name || 'Фініш') + '&type=vehicle';
+    }
+    function mapsmePointUrl(lat, lng, name) {
+        return 'mapsme://map?ll=' + Number(lat).toFixed(6) + ',' + Number(lng).toFixed(6) + '&n=' + encodeURIComponent(name || '');
+    }
+    // Відкрити Maps.me; якщо програма не відгукнулась (сторінка лишилась на екрані) — підказка
+    function openMapsme(url) {
+        let left = false;
+        const onHide = () => { if (document.hidden) left = true; };
+        document.addEventListener('visibilitychange', onHide);
+        window.addEventListener('pagehide', onHide, { once: true });
+        setTimeout(() => {
+            document.removeEventListener('visibilitychange', onHide);
+            if (!left) toast('Maps.me не відкрився — перевірте, чи встановлено програму');
+        }, 1800);
+        window.location.href = url;
+    }
+    let _navPts = [];
+    function openNavPick() {
+        const links = buildRouteLinks();
+        if (!links.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        closeCtx();
+        _navPts = navRoutePoints();
+        const legs = Math.max(0, _navPts.length - 1);
+        document.getElementById('navPickMeta').textContent = _navPts.length + ' точок у маршруті';
+        document.getElementById('navGoogleSub').textContent = links.length > 1 ? 'Маршрут довгий — відкриється частинами (' + links.length + ')' : 'Весь маршрут з усіма зупинками';
+        document.getElementById('navMapsmeSub').textContent = legs <= 1 ? 'Відкриє маршрут у програмі' : 'Без проміжних зупинок — по ділянках (' + legs + ')';
+        document.getElementById('navMapsmeBtn').style.display = legs >= 1 ? '' : 'none';
+        document.getElementById('navPickParts').innerHTML = '';
+        document.getElementById('navPickModal').classList.add('open');
+    }
+    function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); }
+    function navPickGo(kind) {
+        const box = document.getElementById('navPickParts');
+        if (kind === 'google') {
+            const links = buildRouteLinks();
+            if (links.length <= 1) { closeNavPick(); openUrl(links[0]); return; }
+            box.innerHTML = '<div class="nav-sub-title">Google Maps — оберіть частину маршруту:</div><div class="nav-sub">' +
+                links.map((u, k) => '<button type="button" data-u="' + k + '">Частина ' + (k + 1) + '</button>').join('') + '</div>';
+            box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
+            return;
+        }
+        const pts = _navPts, legs = pts.length - 1;
+        if (legs <= 1) { closeNavPick(); openMapsme(mapsmeLegUrl(pts[0], pts[1])); return; }
+        box.innerHTML = '<div class="nav-sub-title">Maps.me — оберіть ділянку маршруту:</div><div class="nav-sub">' +
+            pts.slice(0, -1).map((a, k) => '<button type="button" data-k="' + k + '">' + (k + 1) + ' → ' + (k + 2) + '</button>').join('') + '</div>';
+        box.querySelectorAll('button').forEach(b => b.onclick = () => { const k = +b.dataset.k; openMapsme(mapsmeLegUrl(pts[k], pts[k + 1])); });
+    }
+    document.getElementById('navPickModal').addEventListener('click', e => { if (e.target.id === 'navPickModal') closeNavPick(); });
+
     function updateLinks() {
         scheduleRoute();
         const links = buildRouteLinks();
@@ -2149,7 +2250,9 @@
             el.href = href;
             el.title = links.length > 1 ? 'Маршрут задовгий для одного посилання — відкриється частина 1' : '';
             el.onclick = (e) => {
-                if (href === '#') { e.preventDefault(); alert('Спочатку позначте галочками місця для маршруту'); }
+                e.preventDefault();
+                if (href === '#') { alert('Спочатку позначте галочками місця для маршруту'); return; }
+                openNavPick();                       // Google Maps чи Maps.me
             };
         });
         document.querySelectorAll('.route-parts').forEach(box => {
@@ -2369,6 +2472,7 @@
         pf$('pfTitle').textContent = p.name ? p.name : 'Особистий кабінет';
         pf$('pfSub').textContent = p.name ? 'Особистий кабінет' : '';
         document.querySelectorAll('.btn-profile').forEach(b => { b.title = p.name ? 'Особистий кабінет — ' + p.name : 'Особистий кабінет'; });
+        document.querySelectorAll('.app-user').forEach(el => { el.textContent = p.name || ''; el.hidden = !p.name; });   // ім'я під назвою додатку
     }
     function pfSaveProfile() {
         const p = pfFormValues();
@@ -3006,7 +3110,8 @@
             { label: '➕ Додати місце тут', action: () => addPlaceAt(ll) },
             { label: '📋 Копіювати координати', action: () => copyText(cs) },
             { label: '🗺 Відкрити в Google Maps', action: () => openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cs)) },
-            { label: '🧭 Маршрут сюди (Google Maps)', action: () => openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') }
+            { label: '🧭 Маршрут сюди (Google Maps)', action: () => openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') },
+            { label: '📍 Відкрити в Maps.me', action: () => openMapsme(mapsmePointUrl(ll.lat, ll.lng, '')) }
         ]);
     }
     function openMarkerMenu(i, x, y) {
@@ -3015,6 +3120,7 @@
             { label: p.selected ? '☐ Зняти вибір' : '☑ Вибрати для маршруту', action: () => togglePlace(i) },
             { label: '✎ Редагувати', action: () => handleEdit(i) },
             { label: '🗺 Відкрити в Google Maps', action: () => openUrl(gUrl(p)) },
+            { label: '📍 Відкрити в Maps.me', action: () => { const c = parseCoords(p.coords); if (c) openMapsme(mapsmePointUrl(c[0], c[1], p.name)); } },
             { label: '✕ Видалити', danger: true, action: () => handleDelete(i) }
         ]);
     }
