@@ -1078,17 +1078,19 @@
         if (!ca || !top) return;
         let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0, anim = 0;
         const stopAnim = () => { if (anim) { cancelAnimationFrame(anim); anim = 0; } };
-        // Повільне вирівнювання з м'яким стартом і м'яким гальмуванням (easeInOut) — замість різкого браузерного smooth-скролу
+        // Плавне дотягування: м'який старт з нульової швидкості, далі швидкість поступово й безперервно згасає (критично загальмована «пружина»),
+        // без різкого розгону посередині й без різкої зупинки наприкінці.
+        const GLIDE_A = 6.5, GLIDE_END = 1 - (1 + GLIDE_A) * Math.exp(-GLIDE_A);
+        const glideEase = k => (1 - (1 + GLIDE_A * k) * Math.exp(-GLIDE_A * k)) / GLIDE_END;
         const glide = (to) => {
             stopAnim();
             const from = ca.scrollTop, dist = to - from;
             if (Math.abs(dist) < 1) return;
-            const dur = Math.min(1100, Math.max(520, Math.abs(dist) * 6)), t0 = performance.now();
-            const ease = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+            const dur = Math.min(1500, Math.max(800, 600 + Math.abs(dist) * 5)), t0 = performance.now();
             const step = now => {
                 const k = Math.min(1, (now - t0) / dur);
                 selfUntil = Date.now() + 250;                  // власну анімацію не вважаємо новим жестом
-                ca.scrollTop = from + dist * ease(k);
+                ca.scrollTop = from + dist * glideEase(k);
                 anim = k < 1 ? requestAnimationFrame(step) : 0;
             };
             anim = requestAnimationFrame(step);
