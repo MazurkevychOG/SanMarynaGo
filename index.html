@@ -32,6 +32,14 @@
         .start-toggle { background: #f0f4f8; padding: 6px 10px; border-radius: 6px; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; color: #4a5568; }
 
         .form-container { display: flex; flex-direction: column; gap: 8px; }
+        /* Комп'ютер: форма картки схована, відкривається кнопкою ＋ (або при редагуванні картки / кліку по карті) */
+        .desk-add { display: none; width: 36px; height: 36px; padding: 0; border: none; border-radius: 50%; background: #2ecc71; color: #fff; font-size: 26px; line-height: 1; cursor: pointer; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: transform .25s ease, background .25s ease; flex: none; }
+        .desk-add.editing { background: #e74c3c; transform: rotate(45deg); }
+        @media (min-width: 701px) {
+            .desk-add { display: inline-flex; }
+            .form-container { display: none; }
+            body.form-open .form-container { display: flex; }
+        }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .input-wrapper { display: flex; flex-direction: column; gap: 4px; }
         label { font-size: 9px; color: #a0aec0; font-weight: bold; text-transform: uppercase; }
@@ -716,6 +724,7 @@
         <div class="header-top">
             <h1>📍 Додати місце</h1>
             <div class="top-controls desktop-only">
+                <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Додати місце" aria-label="Додати місце">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
@@ -1956,7 +1965,14 @@
     // Вікно редагування «проявляється» при відкритті й «розчиняється» при закритті
     // (на телефоні — виїжджає панель; на комп'ютері панель постійна, тож проявляється вміст форми).
     function toggleMobileForm(force) {
-        if (window.innerWidth > 700) return;
+        if (window.innerWidth > 700) {                        // комп'ютер: показати/сховати форму картки
+            const open = typeof force === 'boolean' ? force : !document.body.classList.contains('form-open');
+            const was = document.body.classList.contains('form-open');
+            document.body.classList.toggle('form-open', open);
+            const b = document.getElementById('deskAddBtn'); if (b) b.classList.toggle('editing', open);
+            if (open && !was) fxForm();
+            return;
+        }
         const sb = document.getElementById('sidebar');
         const fab = document.getElementById('fabBtn');
         const isOpen = sb.classList.contains('open') && !sb.classList.contains('closing');
@@ -1982,7 +1998,7 @@
         el.classList.remove('fx-in'); void el.offsetWidth; el.classList.add('fx-in');
     }
     function closeFormDissolve() {                        // закрити з розчиненням, а поля очистити вже після нього
-        if (window.innerWidth > 700) { clearForm(); fxForm(); return; }
+        if (window.innerWidth > 700) { clearForm(); toggleMobileForm(false); return; }
         const sb = document.getElementById('sidebar');
         sb._clearPending = true;
         toggleMobileForm(false);
@@ -1990,6 +2006,11 @@
     }
     // Після перетягування кнопки не відкриваємо форму (клік, що йде слідом за відпусканням)
     let fabDragMoved = false;
+    function deskAddClick() {                              // кнопка ＋ на комп'ютері: відкрити порожню форму або закрити її
+        if (document.body.classList.contains('form-open')) { closeFormDissolve(); return; }
+        clearForm(); toggleMobileForm(true);
+        setTimeout(() => { try { document.getElementById('placeName').focus({ preventScroll: true }); } catch (e) { } }, 60);
+    }
     function fabClick() { if (fabDragMoved) { fabDragMoved = false; return; } finishPendingClose(); toggleMobileForm(); }
 
     // ===== Плаваюча кнопка «Додати місце»: утримуй і перетягуй, відпустив — лишається на новому місці =====
@@ -2248,8 +2269,10 @@
     }
     function mapsmeLegUrl(a, b) {
         const f = c => Number(c).toFixed(6);
-        return 'mapsme://route?sll=' + f(a.ll[0]) + ',' + f(a.ll[1]) + '&saddr=' + encodeURIComponent(a.name || 'Старт') +
-            '&dll=' + f(b.ll[0]) + ',' + f(b.ll[1]) + '&daddr=' + encodeURIComponent(b.name || 'Фініш') + '&type=vehicle';
+        // Maps.me надійніше розбирає прості назви: лише латиниця/цифри, інакше «Start»/«Finish» (кирилиця в посиланні могла ламати побудову маршруту)
+        const nm = (n, d) => { const t = String(n || '').replace(/[^A-Za-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 30); return encodeURIComponent(t || d); };
+        return 'mapsme://route?sll=' + f(a.ll[0]) + ',' + f(a.ll[1]) + '&saddr=' + nm(a.name, 'Start') +
+            '&dll=' + f(b.ll[0]) + ',' + f(b.ll[1]) + '&daddr=' + nm(b.name, 'Finish') + '&type=vehicle';
     }
     function mapsmePointUrl(lat, lng, name) {
         return 'mapsme://map?ll=' + Number(lat).toFixed(6) + ',' + Number(lng).toFixed(6) + '&n=' + encodeURIComponent(name || '');
@@ -2479,8 +2502,44 @@
     }
     function openSettings() { closeCtx(); refreshLocalInfo(); refreshAppVersion(); document.body.classList.add('settings-open'); }
     function closeSettings() { document.body.classList.remove('settings-open'); }
+
+    // ===== Оновлення самого додатку з обходом кешу =====
+    // Завантажуємо index.html з Cache-Control: no-store, порівнюємо відбиток із попереднім і, якщо файл змінився, перезавантажуємось
+    // з унікальним параметром (кеш браузера й іконки «На екран Додому» обходиться). Без інтернету — тихо працюємо з тим, що є.
+    const APP_HASH_KEY = 'app_html_hash';
+    let _lastAppCheck = 0;
+    function hashText(t) { let h = 2166136261; for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36) + '.' + t.length; }
+    function appBusy() {
+        return document.body.classList.contains('form-open') || document.getElementById('sidebar').classList.contains('open') ||
+            !!(document.getElementById('placeName') && document.getElementById('placeName').value);
+    }
+    async function checkAppUpdate(manual) {
+        if (!manual && navigator.onLine === false) return false;
+        _lastAppCheck = Date.now();
+        try {
+            const base = location.href.split('#')[0].split('?')[0];
+            const r = await fetch(base + '?_=' + Date.now(), { cache: 'no-store' });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            const h = hashText(await r.text());
+            let prev = null; try { prev = localStorage.getItem(APP_HASH_KEY); } catch (e) { }
+            if (prev && prev !== h) {
+                if (!manual && appBusy()) { toast('Вийшла нова версія — оновиться при наступному відкритті'); return false; }
+                try { localStorage.setItem(APP_HASH_KEY, h); } catch (e) { }
+                toast('Знайдено нову версію — оновлюю…');
+                setTimeout(() => location.replace(base + '?v=' + Date.now()), 500);
+                return true;
+            }
+            if (!prev) { try { localStorage.setItem(APP_HASH_KEY, h); } catch (e) { } }
+        } catch (e) { if (manual) toast('Немає зв’язку — працюю з локальною версією'); }
+        return false;
+    }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - _lastAppCheck > 30000) checkAppUpdate(false); });
+    // Офлайн-режим: service worker (файл sw.js поруч з index.html) — спершу мережа (свіжа версія з GitHub), без інтернету — кеш
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+        window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker:', err)); });
+    }
     function settingsAction(kind) {
-        if (kind === 'update') updateFromCatalog();
+        if (kind === 'update') checkAppUpdate(true).then(reloading => { if (!reloading) updateFromCatalog(); });
         else if (kind === 'export') exportData();
         else if (kind === 'import') document.getElementById('importFile').click();
     }
@@ -3928,6 +3987,7 @@
         stateReady = true;
     }
     init();
+    checkAppUpdate(false);
 </script>
 </body>
 </html>
