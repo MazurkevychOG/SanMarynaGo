@@ -1,0 +1,33 @@
+name: Нове місце
+description: Запропонувати нове місце для каталогу
+title: "Нове місце: "
+labels: ["place"]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Назва
+    validations:
+      required: true
+  - type: input
+    id: coords
+    attributes:
+      label: Координати
+      description: "Наприклад: 41.047, 19.496 — або Plus Code, або градуси"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Тип місця
+      description: Повний перелік типів — у data/types.json
+      multiple: true
+      options: [Пляж, Ресторан / кафе, Винарня, Екстрім, Історія та замки, Природа, Житло, Інше]
+  - type: textarea
+    id: desc
+    attributes:
+      label: Опис / нотатки
+  - type: input
+    id: url
+    attributes:
+      label: Посилання Google Maps

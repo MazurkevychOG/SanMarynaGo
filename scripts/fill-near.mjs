@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-// Необов'язково: заповнює поле near (найближче селище/місто) через Nominatim (OpenStreetMap), не частіше 1 запиту/с.
-//   npm run fill-near            — лише картки без near
+// Необов'язково: заповнює поле near (найближче селище/місто) і country (країна англійською) через Nominatim (OpenStreetMap), не частіше 1 запиту/с.
+//   npm run fill-near            — лише картки без near або без country
 //   npm run fill-near -- --all   — усі картки;  --dry — нічого не записувати
 import { parseArgs } from './lib/cli.mjs';
 import { loadAll, writeJson, placePath, today, writeIndex } from './lib/places.mjs';
+import { countryNameEn } from './lib/common.mjs';
 
 const a = parseArgs(process.argv.slice(2));
 const all = loadAll();
-const todo = all.filter(p => a.flags.has('all') || !p.near);
+const todo = all.filter(p => a.flags.has('all') || !p.near || !p.country);
 console.log(`Карток для запиту: ${todo.length}`);
 let done = 0;
 for (const p of todo) {
@@ -17,8 +18,12 @@ for (const p of todo) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const d = await r.json(), ad = d.address || {};
         const name = d.error ? '' : (ad.village || ad.town || ad.city || ad.hamlet || ad.suburb || ad.municipality || ad.city_district || ad.county || '');
-        console.log(`${p.id}: ${name || '—'}`);
-        if (name && !a.flags.has('dry') && name !== p.near) { p.near = name; p.updated = today(); writeJson(placePath(p.id), p); done++; }
+        const country = d.error ? '' : (ad.country_code ? countryNameEn(ad.country_code) : '') || ad.country || '';
+        console.log(`${p.id}: ${name || '—'}${country ? ' · ' + country : ''}`);
+        let ch = false;
+        if (name && name !== p.near) { p.near = name; ch = true; }
+        if (country && country !== p.country) { p.country = country; ch = true; }
+        if (ch && !a.flags.has('dry')) { p.updated = today(); writeJson(placePath(p.id), p); done++; }
     } catch (e) { console.error(`${p.id}: ${e.message}`); }
     await new Promise(r => setTimeout(r, 1100));
 }

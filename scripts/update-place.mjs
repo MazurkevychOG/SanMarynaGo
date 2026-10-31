@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 // Зміна наявної картки: оновлюються лише вказані поля, решта лишається без змін; `updated` виставляється автоматично.
-//   npm run update-place -- <id> [--name ..] [--coords ..] [--desc ..] [--url ..] [--category ..] [--near ..]
+//   npm run update-place -- <id> [--name ..] [--coords ..] [--desc ..] [--url ..] [--near ..] [--country ..] [--types a,b]
 //       [--add-photo файл]… [--remove-photo NN]… [--at N | --after <id> | --first | --last] [--json патч.json]
 // Порожнє значення очищає поле:  --desc ""  --near ""
 import fs from 'node:fs';
 import { parseArgs } from './lib/cli.mjs';
+import { readTypes } from './lib/common.mjs';
 import { loadAll, coordsFrom, addPhotos, removePhoto, resolveInsertIndex, renumber, writeJson, placePath, today, writeIndex } from './lib/places.mjs';
 
 const a = parseArgs(process.argv.slice(2));
@@ -25,6 +26,13 @@ try {
     if (has('url') || 'gmapsUrl' in patch) place.gmapsUrl = String(val('url', 'gmapsUrl') ?? '');
     if (has('near')) { const v = String(val('near') ?? ''); if (v) place.near = v; else delete place.near; }
     if (has('category')) place.category = String(val('category') ?? '') || null;
+    if (has('country')) { const v = String(val('country') ?? '').trim(); if (v) place.country = v; else delete place.country; }
+    if (has('types')) {
+        const raw = val('types'), tl = (Array.isArray(raw) ? raw : String(raw ?? '').split(',')).map(x => String(x).trim()).filter(Boolean);
+        const known = new Set(readTypes().map(t => t.id)), bad = tl.filter(t => !known.has(t));
+        if (bad.length) throw new Error(`невідомі типи: ${bad.join(', ')} (доступні: ${[...known].join(', ') || '—'})`);
+        if (tl.length) place.types = [...new Set(tl)]; else delete place.types;
+    }
     for (const n of a['remove-photo'] || []) removePhoto(place, Number(n));
     if (a['add-photo']) await addPhotos(place, a['add-photo']);
     if (reorder) {

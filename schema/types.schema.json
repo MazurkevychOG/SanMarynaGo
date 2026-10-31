@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "types.schema.json",
+  "title": "Довідник типів місць (data/types.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "types"],
+  "properties": {
+    "version": { "type": "integer", "minimum": 1 },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 40, "description": "Стабільний ідентифікатор (латиниця, цифри, дефіси); на нього посилаються картки." },
+          "name": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Назва, яку бачить користувач (можна змінювати на сайті)." },
+          "icon": { "type": "string", "maxLength": 8, "description": "Необов'язковий значок (емодзі)." }
+        }
+      }
+    }
+  }
+}

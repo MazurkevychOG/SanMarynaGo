@@ -1,0 +1,53 @@
+name: Імпорт файлів обміну з inbox/
+
+# Як це працює: у папку inbox/ завантажуєте файл(и) .json, які створює сайт («⚙ → Export»).
+# Робот по черзі (за назвою файлів) імпортує їх у data/, перебудовує індекси, перевіряє каталог,
+# видаляє оброблені файли з inbox/ і комітить результат. Сайт підхоплює нові дані кнопкою Update.
+on:
+  push:
+    branches: [main]
+    paths: ['inbox/*.json']
+  workflow_dispatch:           # можна запустити вручну: Actions → «Імпорт файлів обміну» → Run workflow
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-inbox
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      - name: Імпорт файлів з inbox/
+        run: |
+          shopt -s nullglob
+          files=(inbox/*.json)
+          if [ ${#files[@]} -eq 0 ]; then echo "У inbox/ немає .json файлів — нічого імпортувати."; exit 0; fi
+          # «natural sort»: ...-2.json іде перед ...-10.json, частини експорту (…-1, …-2, …) обробляються по порядку
+          for f in $(printf '%s\n' "${files[@]}" | sort -V); do
+            echo "::group::$f"
+            node scripts/import-bundle.mjs "$f"
+            echo "::endgroup::"
+          done
+          npm run build-index
+          npm run validate
+
+      - name: Прибрати оброблені файли й закомітити
+        run: |
+          rm -f inbox/*.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Змін немає."; else
+            git commit -m "Імпорт файлів обміну з inbox/"
+            git push
+          fi

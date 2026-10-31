@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "user.schema.json",
+  "title": "Особистий кабінет (data/users/<id>.json)",
+  "description": "Дані кабінету користувача: паливо, збережені маршрути, налаштування екрана. Увага: якщо репозиторій публічний, ці файли теж публічні.",
+  "type": "object",
+  "required": ["id", "name"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 48, "description": "Транслітерована назва; збігається з назвою файлу." },
+    "name": { "type": "string", "minLength": 1, "maxLength": 40, "description": "Ім'я, яке користувач вводить при вході (регістр не важливий)." },
+    "cons": { "type": "string", "maxLength": 12, "description": "Витрата палива, л/100 км." },
+    "price": { "type": "string", "maxLength": 12, "description": "Ціна палива за літр." },
+    "cur": { "type": "string", "maxLength": 12, "description": "Валюта." },
+    "routes": {
+      "type": "array",
+      "description": "Збережені маршрути: {id, name, ids[] (id місць), ts, dist, dur, est, ret}.",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "ids"],
+        "properties": {
+          "id": { "type": "string" }, "name": { "type": "string" }, "ids": { "type": "array", "items": { "type": "string" } },
+          "ts": { "type": "number" }, "dist": { "type": "number" }, "dur": { "type": "number" }, "est": { "type": "boolean" }, "ret": { "type": "boolean" }
+        }
+      }
+    },
+    "deletedRoutes": { "type": "array", "items": { "type": "string" }, "description": "id маршрутів, видалених на сайті (щоб вони не повернулися при об'єднанні)." },
+    "settings": {
+      "type": "object",
+      "description": "Налаштування екрана: fab {fx, fy} — положення плаваючої кнопки «Додати місце» (частки 0…1 від доступної площі), theme — light | dark.",
+      "properties": {
+        "fab": { "type": "object", "properties": { "fx": { "type": "number", "minimum": 0, "maximum": 1 }, "fy": { "type": "number", "minimum": 0, "maximum": 1 } } },
+        "theme": { "type": "string", "enum": ["light", "dark"] }
+      }
+    },
+    "updated": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+  }
+}

@@ -2,7 +2,7 @@
 // Створення нової картки.
 //   інтерактивно:  npm run add-place
 //   з аргументів:  npm run add-place -- --name "Назва" --coords "41.047, 19.496" [--desc ".."] [--url https://..] [--category ..]
-//                  [--near "Селище"] [--photo a.jpg --photo b.jpg] [--position auto|end|start|N|after:<id>] [--id slug]
+//                  [--near "Селище"] [--country Albania] [--types beach,nature] [--photo a.jpg --photo b.jpg] [--position auto|end|start|N|after:<id>] [--id slug]
 //   з JSON:        npm run add-place -- --json нове.json   (об'єкт або масив об'єктів із тими самими полями)
 import fs from 'node:fs';
 import readline from 'node:readline/promises';
@@ -18,7 +18,8 @@ async function interactive() {
     spec.desc = await ask('Опис (нотатки)');
     spec.gmapsUrl = await ask('Посилання Google Maps (необов\'язково)');
     spec.near = await ask('Найближче селище/місто (необов\'язково)');
-    spec.category = await ask('Категорія (необов\'язково)') || null;
+    spec.country = await ask('Країна англійською (необов\'язково)');
+    spec.types = await ask('Типи через кому — id з data/types.json (необов\'язково)');
     const ph = await ask('Шляхи до фото/відео через кому (необов\'язково)');
     spec.photos = ph ? ph.split(',').map(s => s.trim()).filter(Boolean) : [];
     spec.position = parsePos(await ask('Позиція: auto / end / start / номер / after:<id>', 'auto'));
@@ -27,7 +28,7 @@ async function interactive() {
 }
 let specs;
 if (a.json) { const j = JSON.parse(fs.readFileSync(a.json, 'utf8')); specs = Array.isArray(j) ? j : [j]; }
-else if (a.name) specs = [{ name: a.name, coords: a.coords, lat: a.lat, lng: a.lng, desc: a.desc, gmapsUrl: a.url, near: a.near, category: a.category, photos: a.photo || [], id: a.id, position: parsePos(a.position) }];
+else if (a.name) specs = [{ name: a.name, coords: a.coords, lat: a.lat, lng: a.lng, desc: a.desc, gmapsUrl: a.url, near: a.near, country: a.country, types: a.types, category: a.category, photos: a.photo || [], id: a.id, position: parsePos(a.position) }];
 else if (process.stdin.isTTY) specs = await interactive();
 else { console.error('Потрібні --name і --coords (або --json файл, або інтерактивний режим у терміналі).'); process.exit(2); }
 

@@ -1,7 +1,7 @@
 // Операції над каталогом: додавання/оновлення карток, порядок, фото
 import fs from 'node:fs';
 import path from 'node:path';
-import { PHOTOS, DATA, readAllPlaces, stripMeta, writeJson, placePath, today, round7, parseCoords, slugify, uniqueSlug, haversine, processImage, nn, relData, writeIndex, MAX_FILE_BYTES } from './common.mjs';
+import { readTypes, PHOTOS, DATA, readAllPlaces, stripMeta, writeJson, placePath, today, round7, parseCoords, slugify, uniqueSlug, haversine, processImage, nn, relData, writeIndex, MAX_FILE_BYTES } from './common.mjs';
 
 export function loadAll() { return readAllPlaces().map(stripMeta); }
 
@@ -63,6 +63,9 @@ export async function createPlace(spec) {
     if (taken.has(id)) throw new Error(`Картка з id «${id}» вже існує (використайте update-place)`);
     const place = { id, order: 0, name: String(spec.name).trim(), lat, lng, desc: spec.desc || '', gmapsUrl: spec.gmapsUrl || spec.url || '' };
     if (spec.near) place.near = String(spec.near);
+    if (spec.country) place.country = String(spec.country).trim();
+    const tl = (Array.isArray(spec.types) ? spec.types : String(spec.types || '').split(',')).map(x => String(x).trim()).filter(Boolean);
+    if (tl.length) { const known = new Set(readTypes().map(t => t.id)); const bad = tl.filter(t => !known.has(t)); if (bad.length) throw new Error(`невідомі типи: ${bad.join(', ')} (доступні: ${[...known].join(', ') || '—'})`); place.types = [...new Set(tl)]; }
     place.category = spec.category || null;
     place.media = [];
     place.updated = today();

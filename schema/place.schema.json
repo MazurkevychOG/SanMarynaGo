@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "place.schema.json",
   "title": "Картка місця (data/places/<id>.json)",
-  "description": "Схему виведено з реального коду index.html: поля name, coords(→lat/lng), desc, gmapsUrl, media[], near. Службові поля інтерфейсу (selected, dataId) у каталог не потрапляють.",
+  "description": "Схему виведено з реального коду index.html: поля name, coords(→lat/lng), desc, gmapsUrl, media[], near, country, types[], aliases[]. Службові поля інтерфейсу (selected, dirty) у каталог не потрапляють.",
   "type": "object",
   "additionalProperties": false,
   "required": ["id", "order", "name", "lat", "lng", "updated"],
@@ -15,7 +15,19 @@
     "desc": { "type": "string", "maxLength": 2000, "description": "Нотатки (простий текст). Може бути порожнім." },
     "gmapsUrl": { "type": "string", "pattern": "^$|^https?://", "description": "Власне посилання Google Maps; порожнє — сайт відкриє карту за координатами." },
     "near": { "type": "string", "maxLength": 120, "description": "Найближче селище/місто (необов'язково; можна заповнити скриптом fill-near)." },
-    "category": { "type": ["string", "null"], "maxLength": 60, "description": "Категорія (поки не використовується сайтом; null — не задано)." },
+    "category": { "type": ["string", "null"], "maxLength": 60, "description": "Застаріле поле (замінене на types). Сайт його не використовує; лишилось для сумісності." },
+    "country": { "type": "string", "maxLength": 80, "description": "Країна англійською мовою (Albania, Greece…). Сайт визначає її за координатами; можна заповнити скриптом fill-near." },
+    "types": {
+      "type": "array",
+      "description": "Типи місця — id із data/types.json (пляж, ресторан, екстрім…). Одне місце може мати кілька типів.",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 40 }
+    },
+    "aliases": {
+      "type": "array",
+      "maxItems": 8,
+      "description": "Інші id цієї картки (наприклад, id, який вона мала на сайті до першого імпорту). За ними сайт впізнає картку й не створює дубль.",
+      "items": { "type": "string", "maxLength": 64 }
+    },
     "media": {
       "type": "array",
       "description": "Фото й відео картки в порядку показу. Шляхи — відносно теки data/.",

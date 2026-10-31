@@ -9,6 +9,9 @@ export const PLACES = path.join(DATA, 'places');
 export const PHOTOS = path.join(DATA, 'photos');
 export const INDEX = path.join(DATA, 'index.json');
 export const SCHEMA = path.join(ROOT, 'schema', 'place.schema.json');
+export const TYPES_FILE = path.join(DATA, 'types.json');          // довідник типів місць (пляж, ресторан, екстрім …)
+export const USERS = path.join(DATA, 'users');                      // дані особистих кабінетів: users/<id>.json + users/index.json
+export const USERS_INDEX = path.join(USERS, 'index.json');
 
 export const MAX_FILE_BYTES = 25 * 1024 * 1024;   // жоден файл у data/ не більший за 25 МБ
 export const MAIN_MAX_SIDE = 1600, THUMB_MAX_SIDE = 320;
@@ -99,6 +102,8 @@ export function indexEntry(p) {
     const firstImg = media.find(m => m.type === 'image' && m.thumb);
     const e = { id: p.id, order: p.order, name: p.name, lat: p.lat, lng: p.lng, category: p.category ?? null, desc: p.desc || '' };
     if (p.near) e.near = p.near;
+    if (p.country) e.country = p.country;
+    if (p.types && p.types.length) e.types = p.types;
     e.gmapsUrl = p.gmapsUrl || '';
     e.thumb = firstImg ? firstImg.thumb : null;
     e.photos = media.length;
@@ -112,8 +117,47 @@ export function buildIndexObject(places) {
 export function writeIndex(places) {
     const next = JSON.stringify(buildIndexObject(places), null, 2) + '\n';
     const prev = fs.existsSync(INDEX) ? fs.readFileSync(INDEX, 'utf8') : null;
-    if (prev !== next) { fs.mkdirSync(DATA, { recursive: true }); fs.writeFileSync(INDEX, next); return true; }
+    let changed = false;
+    if (prev !== next) { fs.mkdirSync(DATA, { recursive: true }); fs.writeFileSync(INDEX, next); changed = true; }
+    if (writeUsersIndex()) changed = true;                         // індекс користувачів тримаємо синхронним разом із index.json
+    return changed;
+}
+
+// ---------- типи місць (data/types.json) ----------
+export function readTypes() {
+    if (!fs.existsSync(TYPES_FILE)) return [];
+    const j = readJson(TYPES_FILE);
+    return Array.isArray(j.types) ? j.types : [];
+}
+export function writeTypes(list) {
+    const next = JSON.stringify({ version: 1, types: list }, null, 2) + '\n';
+    const prev = fs.existsSync(TYPES_FILE) ? fs.readFileSync(TYPES_FILE, 'utf8') : null;
+    if (prev !== next) { fs.mkdirSync(DATA, { recursive: true }); fs.writeFileSync(TYPES_FILE, next); return true; }
     return false;
+}
+export const normName = s => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+
+// ---------- користувачі (data/users/*.json) ----------
+export const userIdFor = name => { const s = slugify(name); return s === 'place' ? 'user' : s; };
+export function listUsers() {
+    if (!fs.existsSync(USERS)) return [];
+    return fs.readdirSync(USERS).filter(f => f.endsWith('.json') && f !== 'index.json').sort().map(f => ({ ...readJson(path.join(USERS, f)), __file: f }));
+}
+export function usersIndexObject(users = listUsers()) {
+    const list = users.map(u => ({ id: u.id, name: u.name, updated: u.updated })).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+    return { version: 1, count: list.length, users: list };
+}
+export function writeUsersIndex() {
+    if (!fs.existsSync(USERS) && !listUsers().length) return false;     // користувачів ще немає — теку не створюємо
+    const next = JSON.stringify(usersIndexObject(), null, 2) + '\n';
+    const prev = fs.existsSync(USERS_INDEX) ? fs.readFileSync(USERS_INDEX, 'utf8') : null;
+    if (prev !== next) { fs.mkdirSync(USERS, { recursive: true }); fs.writeFileSync(USERS_INDEX, next); return true; }
+    return false;
+}
+
+// Англійська назва країни за кодом ISO 3166-1 (Intl є в Node 18+; якщо повного ICU немає — повертаємо null)
+export function countryNameEn(code) {
+    try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(String(code).toUpperCase()) || null; } catch { return null; }
 }
 
 // ---------- фото (sharp підключається лише тут) ----------
