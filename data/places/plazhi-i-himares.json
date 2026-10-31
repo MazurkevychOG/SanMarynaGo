@@ -5,7 +5,7 @@
   "lat": 40.1008123,
   "lng": 19.7456809,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/2KA31rASvYwkJ1aD6?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 138904
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "beach"
+  ],
+  "near": "Хімара"
 }

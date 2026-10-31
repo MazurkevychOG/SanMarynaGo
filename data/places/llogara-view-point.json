@@ -5,7 +5,7 @@
   "lat": 40.1894877,
   "lng": 19.6000919,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/XjCoFZfnBCATEwym7?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 47462
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "nature"
+  ],
+  "near": "Palasë"
 }

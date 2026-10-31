@@ -5,7 +5,7 @@
   "lat": 40.0622157,
   "lng": 19.790746,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.google.com/?q=The%20Castle%20of%20Porto%20Palermo,%20Ali%20Pasha%20Tepelena%20Fortress,%20Porto%20Palermo&ftid=0x135b25f1dc24a0e7:0x8da49d7e3bc5f316&entry=gps&shh=CAE&lucs=,94297699,100826475,94231188,94280568,100821555,47071704,94218641,94282134,100835699,94286869,100820247,100822504,100838877,121816461&g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 104562
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Qeparo i Sipërm"
 }

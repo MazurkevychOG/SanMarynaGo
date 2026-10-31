@@ -5,7 +5,7 @@
   "lat": 39.9236423,
   "lng": 20.1924637,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/bYyW1CjxTAhrwBn38?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 360712
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "nature"
+  ],
+  "near": "Muzinë"
 }

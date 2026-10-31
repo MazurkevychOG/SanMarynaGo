@@ -5,15 +5,38 @@
   "lat": 40.135637,
   "lng": 19.647457,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
   "category": null,
   "media": [
+    {
+      "type": "image",
+      "file": "photos/plyazh-dhermi/02.webp",
+      "thumb": "photos/plyazh-dhermi/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 151176,
+      "srcSha256": "86f087b44ebd52e7b3b7023f806044960461acad1348e3c7ad6dd8f325c60662"
+    },
     {
       "type": "video",
       "file": "photos/plyazh-dhermi/01.mp4",
       "mime": "video/mp4",
       "bytes": 1836141
+    },
+    {
+      "type": "image",
+      "file": "photos/plyazh-dhermi/03.webp",
+      "thumb": "photos/plyazh-dhermi/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 404296,
+      "srcSha256": "ee6279953d556582c79b3e536f64aa05683d23fedad905b9e6c848eb587fa73c"
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "beach"
+  ],
+  "near": "Dhërmi"
 }

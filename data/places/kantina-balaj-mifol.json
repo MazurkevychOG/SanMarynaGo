@@ -5,7 +5,7 @@
   "lat": 40.5963295,
   "lng": 19.483349,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/XVZ2suFnkKSnNc2N8?g_st=ic",
   "category": null,
   "media": [
     {
@@ -15,7 +15,57 @@
       "width": 1215,
       "height": 663,
       "bytes": 160658
+    },
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/02.webp",
+      "thumb": "photos/kantina-balaj-mifol/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 304042,
+      "srcSha256": "5a2b96c5005796c0cef3c3c232e0d5d3b667a9706f31fb7c8dc3118e7a16c6e3"
+    },
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/03.webp",
+      "thumb": "photos/kantina-balaj-mifol/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 278118,
+      "srcSha256": "12bb056c0d3edc6b8e804698ec96f55b5d7576b28844126f1812d4c466b33ec1"
+    },
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/04.webp",
+      "thumb": "photos/kantina-balaj-mifol/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 290232,
+      "srcSha256": "7740131fd7353370e16caa438c8201fd23ee58a019ee7bd1313789d6b17f29c7"
+    },
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/05.webp",
+      "thumb": "photos/kantina-balaj-mifol/05_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 271766,
+      "srcSha256": "738bb3d590955f65553cbe1bff0ffc49a9a8a9fc5a0bd87ec1afbad06a348e58"
+    },
+    {
+      "type": "image",
+      "file": "photos/kantina-balaj-mifol/06.webp",
+      "thumb": "photos/kantina-balaj-mifol/06_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 261368,
+      "srcSha256": "594ded3f1bd2fb9c0661407e0d5570a88fa55974dc4ae0ee2f30886860519feb"
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "winery"
+  ],
+  "near": "Mifol"
 }

@@ -5,7 +5,7 @@
   "lat": 40.4241,
   "lng": 19.493856,
   "desc": "Current",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/GEvPZwVLZ32QeakT7?g_st=ic",
   "category": null,
   "media": [
     {
@@ -15,7 +15,48 @@
       "width": 747,
       "height": 857,
       "bytes": 114276
+    },
+    {
+      "type": "image",
+      "file": "photos/home-vlore-joanna/02.webp",
+      "thumb": "photos/home-vlore-joanna/02_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 65198,
+      "srcSha256": "f446929c4816aaace8368f4f59a157fbe32e59f615c7ebe2a4210b014461e318"
+    },
+    {
+      "type": "image",
+      "file": "photos/home-vlore-joanna/03.webp",
+      "thumb": "photos/home-vlore-joanna/03_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 80504,
+      "srcSha256": "0551ef385ab8d6970c95a39d24d4fad0db5c4d0a58b1261279443ccabe6e32ca"
+    },
+    {
+      "type": "image",
+      "file": "photos/home-vlore-joanna/04.webp",
+      "thumb": "photos/home-vlore-joanna/04_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 214488,
+      "srcSha256": "2372db17a68635e9f8a4dfe57e8cdf4f0f6ed611937688527bdc6590f2800a97"
+    },
+    {
+      "type": "image",
+      "file": "photos/home-vlore-joanna/05.webp",
+      "thumb": "photos/home-vlore-joanna/05_thumb.webp",
+      "width": 960,
+      "height": 1280,
+      "bytes": 60184,
+      "srcSha256": "56eeca08dd2aba40c8560c0a2c14092dc7cb984b131e00d025972af3a932de25"
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "stay"
+  ],
+  "near": "Вльора"
 }

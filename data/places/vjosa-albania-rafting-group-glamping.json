@@ -1,0 +1,29 @@
+{
+  "id": "vjosa-albania-rafting-group-glamping",
+  "order": 30,
+  "name": "Vjosa Albania Rafting Group Glamping",
+  "lat": 40.224062,
+  "lng": 19.373812,
+  "desc": "",
+  "gmapsUrl": "https://maps.app.goo.gl/76tLw25Fasd7mi6f6?g_st=ic",
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/vjosa-albania-rafting-group-glamping/01.webp",
+      "thumb": "photos/vjosa-albania-rafting-group-glamping/01_thumb.webp",
+      "width": 1320,
+      "height": 1586,
+      "bytes": 363016,
+      "srcSha256": "175e2d63542470bfad42b4922805da0ec329db1bb1a5f2dd48b2069d1c6add60"
+    }
+  ],
+  "updated": "2026-10-28",
+  "aliases": [
+    "pmvm4wjbiki5k7"
+  ],
+  "country": "Albania",
+  "types": [
+    "extreme",
+    "stay"
+  ]
+}

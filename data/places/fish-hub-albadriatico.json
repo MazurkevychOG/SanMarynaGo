@@ -5,8 +5,32 @@
   "lat": 40.2955308,
   "lng": 19.4882518,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
   "category": null,
-  "media": [],
-  "updated": "2026-10-16"
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/fish-hub-albadriatico/01.webp",
+      "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 281612,
+      "srcSha256": "263ab9da96979b231de2ab02a75a83286dbc8744d83095ad0d5a990894e49142"
+    },
+    {
+      "type": "image",
+      "file": "photos/fish-hub-albadriatico/02.webp",
+      "thumb": "photos/fish-hub-albadriatico/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 219388,
+      "srcSha256": "d4dde4faa004caec7beb13d7d18bf3e6c9ed3811e5987dccc6c4d0cd6808ae23"
+    }
+  ],
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "restaurant"
+  ],
+  "near": "Орікум"
 }

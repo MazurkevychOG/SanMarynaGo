@@ -5,7 +5,7 @@
   "lat": 40.72134,
   "lng": 19.4710887,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/MqyUjpcYpUKuxLzL6?g_st=ic",
   "category": null,
   "media": [
     {
@@ -23,7 +23,48 @@
       "width": 940,
       "height": 733,
       "bytes": 306504
+    },
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/03.webp",
+      "thumb": "photos/apollonia-pojan/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 374562,
+      "srcSha256": "e6956d5ff63cbe4438d88aae659dd8676bcb1e3103fa4adfe4d82ea9e9e62224"
+    },
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/04.webp",
+      "thumb": "photos/apollonia-pojan/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 354318,
+      "srcSha256": "8f331b98edcc3a22915e300e6036d43b59511808bba9209cc9a643cbced2c29c"
+    },
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/05.webp",
+      "thumb": "photos/apollonia-pojan/05_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 367178,
+      "srcSha256": "b827dbc417bb3cb65bd83d75ccb0097bba8668f1e7c8091ed2fa3a9bdd02fa35"
+    },
+    {
+      "type": "image",
+      "file": "photos/apollonia-pojan/06.webp",
+      "thumb": "photos/apollonia-pojan/06_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 270362,
+      "srcSha256": "711d457a761f381365ad49f0632f30d089ecf5ffd0ce41d42bff232d05c92d94"
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Kryegjatë"
 }

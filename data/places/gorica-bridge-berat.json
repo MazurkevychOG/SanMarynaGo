@@ -5,7 +5,7 @@
   "lat": 40.7032111,
   "lng": 19.9446481,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/ofcvFN4N2zLKuCZS9?g_st=ic",
   "category": null,
   "media": [
     {
@@ -25,5 +25,10 @@
       "bytes": 101338
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Uznovë"
 }

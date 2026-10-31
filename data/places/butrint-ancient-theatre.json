@@ -5,7 +5,7 @@
   "lat": 39.7455936,
   "lng": 20.0204852,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/Dhs81dHUyxiJmBzt9?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 302580
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Shëndellia"
 }

@@ -5,7 +5,7 @@
   "lat": 40.0727906,
   "lng": 20.1392199,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/JSDY51PrMUEuKQB56?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 255894
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Гірокастра"
 }

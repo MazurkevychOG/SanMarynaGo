@@ -5,7 +5,7 @@
   "lat": 40.387768,
   "lng": 19.605723,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/m164mAzR67RxzU5s8?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 58152
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "winery"
+  ],
+  "near": "Mavrovë"
 }

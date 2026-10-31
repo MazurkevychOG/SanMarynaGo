@@ -1,0 +1,57 @@
+{
+  "id": "gjipe-beach",
+  "order": 29,
+  "name": "Gjipe beach",
+  "lat": 40.126937,
+  "lng": 19.670437,
+  "desc": "",
+  "gmapsUrl": "https://maps.app.goo.gl/pm13HkD3uDDF8vsd8?g_st=ic",
+  "near": "Ilias",
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/gjipe-beach/01.webp",
+      "thumb": "photos/gjipe-beach/01_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 351754,
+      "srcSha256": "ff5f05a3b24b04fb0e95031fb000c9479d0f0bdcaf5bd9adb392cd216b5dd2bd"
+    },
+    {
+      "type": "image",
+      "file": "photos/gjipe-beach/02.webp",
+      "thumb": "photos/gjipe-beach/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 384770,
+      "srcSha256": "26094782261c63daaad3a187637ad3cd07f840a04a9882ebbfbfec97fb9ee918"
+    },
+    {
+      "type": "image",
+      "file": "photos/gjipe-beach/03.webp",
+      "thumb": "photos/gjipe-beach/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 342834,
+      "srcSha256": "4309e2de6cccd30a2fcea09cce11ffeaa59d58112de4fa03694cade1291f391e"
+    },
+    {
+      "type": "image",
+      "file": "photos/gjipe-beach/04.webp",
+      "thumb": "photos/gjipe-beach/04_thumb.webp",
+      "width": 788,
+      "height": 1400,
+      "bytes": 381742,
+      "srcSha256": "a3400915fa291c9c24778e7e35052a70de5315ed6a1fd998981780fc41edf2b9"
+    }
+  ],
+  "updated": "2026-10-28",
+  "aliases": [
+    "pmvldpvf9d5399"
+  ],
+  "country": "Albania",
+  "types": [
+    "beach",
+    "nature"
+  ]
+}

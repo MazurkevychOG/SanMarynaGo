@@ -5,7 +5,7 @@
   "lat": 40.2668864,
   "lng": 19.6718241,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,7 @@
       "bytes": 289968
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "near": "Brataj"
 }

@@ -5,7 +5,7 @@
   "lat": 41.0471305,
   "lng": 19.4962406,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
   "category": null,
   "media": [
     {
@@ -23,7 +23,20 @@
       "width": 1165,
       "height": 580,
       "bytes": 73328
+    },
+    {
+      "type": "image",
+      "file": "photos/fortress-of-bashtove/03.webp",
+      "thumb": "photos/fortress-of-bashtove/03_thumb.webp",
+      "width": 1257,
+      "height": 607,
+      "bytes": 177320
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "history"
+  ],
+  "near": "Vilë-Ballaj"
 }

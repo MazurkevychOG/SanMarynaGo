@@ -5,7 +5,7 @@
   "lat": 40.1439622,
   "lng": 19.6340581,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/NgT84z3YNZjPrKHo6?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 77998
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "restaurant"
+  ],
+  "near": "Drimadhë"
 }

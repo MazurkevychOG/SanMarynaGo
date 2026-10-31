@@ -5,7 +5,7 @@
   "lat": 40.3038256,
   "lng": 19.6524006,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,7 @@
       "bytes": 344214
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "near": "Lepenicë"
 }

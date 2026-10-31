@@ -5,8 +5,38 @@
   "lat": 40.3274774,
   "lng": 19.5110889,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
   "category": null,
-  "media": [],
-  "updated": "2026-10-16"
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/arbri-olive-oil/01.webp",
+      "thumb": "photos/arbri-olive-oil/01_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 159584,
+      "srcSha256": "62c0e20c57d6211a92a3845d6498b4e2febf0f466bae0b63d69c9ab966e64fca"
+    },
+    {
+      "type": "image",
+      "file": "photos/arbri-olive-oil/02.webp",
+      "thumb": "photos/arbri-olive-oil/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 165716,
+      "srcSha256": "9b1662d23a6e46d0c5c68922179a07fd759cfc8a080275872ca49096dd291377"
+    },
+    {
+      "type": "image",
+      "file": "photos/arbri-olive-oil/03.webp",
+      "thumb": "photos/arbri-olive-oil/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 190782,
+      "srcSha256": "acbd8b713090375c21a116234bad58831636d906a7b7d3759b63cda1aad5de7b"
+    }
+  ],
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "near": "Tragjas"
 }

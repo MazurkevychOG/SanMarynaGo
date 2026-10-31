@@ -5,7 +5,7 @@
   "lat": 40.1442433,
   "lng": 20.4425384,
   "desc": "",
-  "gmapsUrl": "",
+  "gmapsUrl": "https://maps.app.goo.gl/EFjXUNTCHSsxih2a8?g_st=ic",
   "category": null,
   "media": [
     {
@@ -17,5 +17,10 @@
       "bytes": 104104
     }
   ],
-  "updated": "2026-10-16"
+  "updated": "2026-10-28",
+  "country": "Albania",
+  "types": [
+    "nature"
+  ],
+  "near": "Strëmbec"
 }
