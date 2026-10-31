@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "count": 28,
+  "count": 30,
   "places": [
     {
       "id": "home-vlore-joanna",
@@ -10,10 +10,15 @@
       "lng": 19.493856,
       "category": null,
       "desc": "Current",
-      "gmapsUrl": "",
+      "near": "Вльора",
+      "country": "Albania",
+      "types": [
+        "stay"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/GEvPZwVLZ32QeakT7?g_st=ic",
       "thumb": "photos/home-vlore-joanna/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-16"
+      "photos": 5,
+      "updated": "2026-10-28"
     },
     {
       "id": "ullinj-serdit-mucias",
@@ -23,10 +28,15 @@
       "lng": 19.5000843,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Remas",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/YxYgAcGk6qLqhPBZ7?g_st=ic",
       "thumb": "photos/ullinj-serdit-mucias/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "fortress-of-bashtove",
@@ -36,10 +46,15 @@
       "lng": 19.4962406,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Vilë-Ballaj",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
       "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
-      "photos": 2,
-      "updated": "2026-10-16"
+      "photos": 3,
+      "updated": "2026-10-28"
     },
     {
       "id": "kantina-balaj-mifol",
@@ -49,10 +64,15 @@
       "lng": 19.483349,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Mifol",
+      "country": "Albania",
+      "types": [
+        "winery"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/XVZ2suFnkKSnNc2N8?g_st=ic",
       "thumb": "photos/kantina-balaj-mifol/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-16"
+      "photos": 6,
+      "updated": "2026-10-28"
     },
     {
       "id": "apollonia-pojan",
@@ -62,10 +82,15 @@
       "lng": 19.4710887,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Kryegjatë",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/MqyUjpcYpUKuxLzL6?g_st=ic",
       "thumb": "photos/apollonia-pojan/01_thumb.webp",
-      "photos": 2,
-      "updated": "2026-10-16"
+      "photos": 6,
+      "updated": "2026-10-28"
     },
     {
       "id": "gorica-bridge-berat",
@@ -75,10 +100,15 @@
       "lng": 19.9446481,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Uznovë",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/ofcvFN4N2zLKuCZS9?g_st=ic",
       "thumb": "photos/gorica-bridge-berat/01_thumb.webp",
       "photos": 2,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
@@ -88,10 +118,12 @@
       "lng": 19.6524006,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Lepenicë",
+      "country": "Albania",
+      "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
       "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "bridge-of-brataj",
@@ -101,10 +133,12 @@
       "lng": 19.6718241,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Brataj",
+      "country": "Albania",
+      "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
       "thumb": "photos/bridge-of-brataj/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
@@ -114,10 +148,15 @@
       "lng": 19.605723,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Mavrovë",
+      "country": "Albania",
+      "types": [
+        "winery"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/m164mAzR67RxzU5s8?g_st=ic",
       "thumb": "photos/wine-cellar-kantina-eneo-kote/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "argjiro-winery-gjirokaster",
@@ -127,10 +166,15 @@
       "lng": 20.1501935,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Arshi Lengo",
+      "country": "Albania",
+      "types": [
+        "winery"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/DTenKLZa6SrF8jb26?g_st=ic",
       "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "gjirokaster-castle",
@@ -140,10 +184,15 @@
       "lng": 20.1392199,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Гірокастра",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/JSDY51PrMUEuKQB56?g_st=ic",
       "thumb": "photos/gjirokaster-castle/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "ile-bridge-kutal",
@@ -153,10 +202,12 @@
       "lng": 20.3232416,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Bual",
+      "country": "Albania",
+      "gmapsUrl": "https://maps.app.goo.gl/E3EFwYwmmE5RadyS9?g_st=ic",
       "thumb": "photos/ile-bridge-kutal/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "langarica-canyon",
@@ -166,10 +217,15 @@
       "lng": 20.4383168,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Ogdunan",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/T5hARBJk2hsGM5Xa7?g_st=ic",
       "thumb": "photos/langarica-canyon/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "sopot-waterfall",
@@ -179,10 +235,15 @@
       "lng": 20.4425384,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Strëmbec",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/EFjXUNTCHSsxih2a8?g_st=ic",
       "thumb": "photos/sopot-waterfall/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "blue-eye",
@@ -192,10 +253,15 @@
       "lng": 20.1924637,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Muzinë",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/bYyW1CjxTAhrwBn38?g_st=ic",
       "thumb": "photos/blue-eye/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "mesopotam-restaurant",
@@ -205,10 +271,15 @@
       "lng": 20.1028693,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Mesopotam",
+      "country": "Albania",
+      "types": [
+        "restaurant"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/diRGVZAdcJ3MMnpX6?g_st=ic",
       "thumb": "photos/mesopotam-restaurant/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "saranda-embankment",
@@ -218,10 +289,12 @@
       "lng": 20.0104313,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Gjashtë",
+      "country": "Albania",
+      "gmapsUrl": "https://maps.app.goo.gl/qnAnL9zAtadoDL1z5?g_st=ic",
       "thumb": "photos/saranda-embankment/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "bora-bora-beach-ksamil",
@@ -231,10 +304,15 @@
       "lng": 19.9984411,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Ксаміл",
+      "country": "Albania",
+      "types": [
+        "beach"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/LYVhvJeKjX3BqHr28?g_st=ic",
       "thumb": "photos/bora-bora-beach-ksamil/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "butrint-ancient-theatre",
@@ -244,10 +322,15 @@
       "lng": 20.0204852,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Shëndellia",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/Dhs81dHUyxiJmBzt9?g_st=ic",
       "thumb": "photos/butrint-ancient-theatre/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "the-castle-of-porto-palermo",
@@ -257,10 +340,15 @@
       "lng": 19.790746,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Qeparo i Sipërm",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.google.com/?q=The%20Castle%20of%20Porto%20Palermo,%20Ali%20Pasha%20Tepelena%20Fortress,%20Porto%20Palermo&ftid=0x135b25f1dc24a0e7:0x8da49d7e3bc5f316&entry=gps&shh=CAE&lucs=,94297699,100826475,94231188,94280568,100821555,47071704,94218641,94282134,100835699,94286869,100820247,100822504,100838877,121816461&g_st=ic",
       "thumb": "photos/the-castle-of-porto-palermo/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "plazhi-i-himares",
@@ -270,10 +358,15 @@
       "lng": 19.7456809,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Хімара",
+      "country": "Albania",
+      "types": [
+        "beach"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/2KA31rASvYwkJ1aD6?g_st=ic",
       "thumb": "photos/plazhi-i-himares/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "lucianos-fork-dhermi",
@@ -283,10 +376,15 @@
       "lng": 19.6340581,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Drimadhë",
+      "country": "Albania",
+      "types": [
+        "restaurant"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/NgT84z3YNZjPrKHo6?g_st=ic",
       "thumb": "photos/lucianos-fork-dhermi/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "abeille-restaurant",
@@ -296,10 +394,15 @@
       "lng": 19.8151497,
       "category": null,
       "desc": "ресторан в горах",
+      "near": "Kuç",
+      "country": "Albania",
+      "types": [
+        "restaurant"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/mv7MvqYbRNroeGXo7",
       "thumb": "photos/abeille-restaurant/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-22"
     },
     {
       "id": "llogara-view-point",
@@ -309,10 +412,15 @@
       "lng": 19.6000919,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Palasë",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/XjCoFZfnBCATEwym7?g_st=ic",
       "thumb": "photos/llogara-view-point/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
@@ -322,10 +430,15 @@
       "lng": 20.4319674,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
+      "near": "Ogdunan",
+      "country": "Albania",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/qyZ9sy7mK4W78xNB7?g_st=ic",
       "thumb": "photos/llixhat-e-benjes-thermal-baths/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-16"
+      "updated": "2026-10-28"
     },
     {
       "id": "plyazh-dhermi",
@@ -335,10 +448,15 @@
       "lng": 19.647457,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
-      "thumb": null,
-      "photos": 1,
-      "updated": "2026-10-16"
+      "near": "Dhërmi",
+      "country": "Albania",
+      "types": [
+        "beach"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
+      "thumb": "photos/plyazh-dhermi/02_thumb.webp",
+      "photos": 3,
+      "updated": "2026-10-28"
     },
     {
       "id": "arbri-olive-oil",
@@ -348,10 +466,12 @@
       "lng": 19.5110889,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
-      "thumb": null,
-      "photos": 0,
-      "updated": "2026-10-16"
+      "near": "Tragjas",
+      "country": "Albania",
+      "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
+      "thumb": "photos/arbri-olive-oil/01_thumb.webp",
+      "photos": 3,
+      "updated": "2026-10-28"
     },
     {
       "id": "fish-hub-albadriatico",
@@ -361,10 +481,52 @@
       "lng": 19.4882518,
       "category": null,
       "desc": "",
-      "gmapsUrl": "",
-      "thumb": null,
-      "photos": 0,
-      "updated": "2026-10-16"
+      "near": "Орікум",
+      "country": "Albania",
+      "types": [
+        "restaurant"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
+      "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
+      "photos": 2,
+      "updated": "2026-10-28"
+    },
+    {
+      "id": "gjipe-beach",
+      "order": 29,
+      "name": "Gjipe beach",
+      "lat": 40.126937,
+      "lng": 19.670437,
+      "category": null,
+      "desc": "",
+      "near": "Ilias",
+      "country": "Albania",
+      "types": [
+        "beach",
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/pm13HkD3uDDF8vsd8?g_st=ic",
+      "thumb": "photos/gjipe-beach/01_thumb.webp",
+      "photos": 4,
+      "updated": "2026-10-28"
+    },
+    {
+      "id": "vjosa-albania-rafting-group-glamping",
+      "order": 30,
+      "name": "Vjosa Albania Rafting Group Glamping",
+      "lat": 40.224062,
+      "lng": 19.373812,
+      "category": null,
+      "desc": "",
+      "country": "Albania",
+      "types": [
+        "extreme",
+        "stay"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/76tLw25Fasd7mi6f6?g_st=ic",
+      "thumb": "photos/vjosa-albania-rafting-group-glamping/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-10-28"
     }
   ]
 }
