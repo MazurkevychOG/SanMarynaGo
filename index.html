@@ -517,6 +517,15 @@
         .pf-out { border: none; background: #fde8e8; color: #c0392b; padding: 10px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; flex: none; }
         #pfLoggedIn[hidden], #pfLoggedOut[hidden] { display: none; }
         .mdl-open .fab-add { visibility: hidden; }
+        @media (max-width: 700px) {
+            .app-brand-desk, .header-top { display: none; }                 /* у формі картки на телефоні заголовки не потрібні — місце для сердець */
+            .sidebar { max-height: 93dvh; }                                  /* панель форми майже на весь екран */
+            .stamp-wrap { padding: 2px 0 0; }
+            .stamp-wrap img { width: min(100%, 220px, 27dvh); }              /* серця зменшуються на низьких екранах, щоб поміститись */
+            .sidebar-inner { gap: 6px; padding-bottom: 12px; }
+            .tchip { padding: 5px 10px; font-size: 13px; }
+            .form-container { gap: 6px; }
+        }
         /* ===== Очікування (Update): змійка ===== */
         .wait-ov { position: fixed; inset: 0; z-index: 4000; display: none; align-items: center; justify-content: center; background: rgba(10,15,25,.55); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); padding: 16px; }
         .wait-ov.show { display: flex; }
@@ -899,7 +908,7 @@
             <div id="pfLoggedOut">
                 <label class="pf-field"><span>Ім'я користувача</span><input class="pf-input" id="pfLoginName" type="text" maxlength="40" autocomplete="username" autocapitalize="words" enterkeyhint="go" placeholder="Введіть ім'я"></label>
                 <button type="button" class="pf-btn blue" id="pfLoginBtn" onclick="pfLogin()">Увійти</button>
-                <div class="set-note" style="margin:10px 0 0">Якщо таке ім'я є в базі (GitHub), підтягнуться ваші дані: паливо, маршрути, налаштування екрана. Якщо ні — буде створено нового користувача.</div>
+                <div class="set-note" style="margin:10px 0 0">Користувачі зберігаються лише в цьому браузері. Якщо ім'я вже є — відкриються його дані (паливо, маршрути, налаштування екрана), якщо ні — буде створено нового користувача.</div>
             </div>
         </div>
         <div class="settings-section">
@@ -2549,7 +2558,7 @@
     function mapsmeLegUrl(a, b) {
         const f = c => Number(c).toFixed(6);
         // Maps.me надійніше розбирає прості назви: лише латиниця/цифри, інакше «Start»/«Finish» (кирилиця в посиланні могла ламати побудову маршруту)
-        const nm = (n, d) => { const t = String(n || '').replace(/[^A-Za-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 30); return encodeURIComponent(t || d); };
+        const nm = (n, d) => { const t = String(n || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 30); return encodeURIComponent(t || d); };
         return 'mapsme://route?sll=' + f(a.ll[0]) + ',' + f(a.ll[1]) + '&saddr=' + nm(a.name, 'Start') +
             '&dll=' + f(b.ll[0]) + ',' + f(b.ll[1]) + '&daddr=' + nm(b.name, 'Finish') + '&type=vehicle';
     }
@@ -2585,7 +2594,7 @@
         document.getElementById('navPickModal').classList.add('open');
     }
     function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); }
-    async function navPickGo(kind) {
+    function navPickGo(kind) {
         const box = document.getElementById('navPickParts');
         if (kind === 'google') {
             const links = buildRouteLinks();
@@ -2595,11 +2604,17 @@
             box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
             return;
         }
-        // Maps.me: лише дві точки — де ви зараз → найближча до вас точка маршруту
+        // Maps.me: лише дві точки — де ви зараз → найближча до вас точка маршруту.
+        // Позицію визначено заздалегідь (при відкритті вікна), тому перехід у Maps.me виконується СИНХРОННО в межах натискання:
+        // після очікування (await) iOS міг блокувати відкриття іншої програми, і маршрут не будувався.
         const targets = navTargets();
         if (!targets.length) return;
-        let pos = null;
-        try { pos = await Promise.race([_posPromise || warmPosition(), new Promise(r => setTimeout(() => r(null), 4000))]); } catch (e) { }
+        const ready = (startFromMe && startSnap) ? { c: [startSnap[0], startSnap[1]] } : (_posCache && Date.now() - _posCache.t < 300000 ? _posCache : null);
+        if (ready) { goMapsme(ready, targets); return; }
+        toast('Визначаю ваше місце…');
+        Promise.race([_posPromise || warmPosition(), new Promise(r => setTimeout(() => r(null), 5000))]).then(pos => goMapsme(pos, targets));
+    }
+    function goMapsme(pos, targets) {
         let from, list = targets;
         if (pos) from = { ll: pos.c, name: '' };
         else if (targets.length >= 2) { from = targets[0]; list = targets.slice(1); toast('Не вдалося визначити ваше місце — будую від першої точки до найближчої'); }
@@ -2776,7 +2791,6 @@
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
             mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
-            { const u = await pullCurrentUserFromDb(); if (u) toast('Оновлено дані користувача ' + u); }
             sync();
             touchVersion();
             toast(added || enriched || merged
@@ -4557,9 +4571,10 @@
         updateFilterBadge();
     })();
 
-    // ===== Користувачі: кілька кабінетів на пристрої + підтягування даних із репозиторію (data/users/) =====
-    // Увійти під ім'ям, яке вже є в базі, — підтягуються паливо, збережені маршрути й налаштування екрана. «Вийти» — і можна
-    // зайти під іншим ім'ям або створити нове. У базу дані потрапляють разом з експортом (⚙ → Export) — так само, як і місця.
+    // ===== Користувачі: кілька кабінетів у цьому браузері =====
+    // Дані кабінету (паливо, маршрути, налаштування екрана) беруться ТІЛЬКИ з браузера й не підтягуються з GitHub.
+    // Ім'я вже є в цьому браузері — входимо; немає — створюємо нового. «Вийти» — і можна зайти під іншим ім'ям.
+    // Копія кабінетів потрапляє у файл обміну (⚙ → Експорт) лише як резервна: сайт її назад не читає.
     const USERS_KEY = 'cab_users', CUR_USER_KEY = 'cab_user', ANON = '_anon';
     const newUserRec = (id, name) => ({ id, name: name || '', cons: '', price: '', cur: '€', routes: [], deletedRoutes: [], settings: {}, ts: 0 });
     let _usersMem = null;
@@ -4586,17 +4601,6 @@
     function userGetFab() { const f = (curRec().settings || {}).fab; return f && isFinite(f.fx) && isFinite(f.fy) ? f : null; }
     function userSaveFab(fx, fy) { const r = curRec(); r.settings = { ...(r.settings || {}), fab: { fx: +fx.toFixed(4), fy: +fy.toFixed(4) } }; touchUser(r); }
 
-    async function fetchDbUser(name) {                      // запис користувача з data/users/ або null; помилка — якщо немає зв'язку
-        const r = await fetch(DATA_BASE + 'users/index.json', { cache: 'no-cache' });
-        if (r.status === 404) return null;
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const idx = await r.json(), key = userKey(name), slug = slugName(name);
-        const e = (idx.users || []).find(u => u.id === slug || userKey(u.name) === key);
-        if (!e) return null;
-        const rr = await fetch(DATA_BASE + 'users/' + encodeURIComponent(e.id) + '.json', { cache: 'no-cache' });
-        if (!rr.ok) throw new Error('HTTP ' + rr.status);
-        return await rr.json();
-    }
     function mergeUserRec(loc, db) {                        // збагачення, а не заміна: маршрути об'єднуються, нові значення беруться з того, що новіше
         const out = { ...loc };
         const dbTs = Date.parse(db.updated || '') || 0;
@@ -4615,21 +4619,6 @@
         if (!out.name) out.name = db.name || '';
         return out;
     }
-    async function pullCurrentUserFromDb() {                // при Update: оновити дані поточного користувача з бази
-        const id = curUserId();
-        if (!id) return null;
-        try {
-            const rec = curRec(), db = await fetchDbUser(rec.name);
-            if (!db) return null;
-            const before = JSON.stringify([rec.cons, rec.price, rec.cur, rec.routes, rec.settings]);
-            const m = usersAll(); m[id] = { ...mergeUserRec(rec, db), id };
-            const after = JSON.stringify([m[id].cons, m[id].price, m[id].cur, m[id].routes, m[id].settings]);
-            usersPersist();
-            if (before === after) return null;
-            applyUserSettings(); pfRender();
-            return m[id].name;
-        } catch (e) { return null; }
-    }
     let _loginBusy = false;
     async function pfLogin() {
         if (_loginBusy) return;
@@ -4638,20 +4627,15 @@
         _loginBusy = true; pf$('pfLoginBtn').disabled = true;
         try {
             const m = usersAll(), key = userKey(name);
-            let id = Object.keys(m).find(k => k !== ANON && userKey(m[k].name) === key) || null, db = null, offline = false, msg;
-            try { db = await fetchDbUser(name); } catch (e) { offline = true; }
-            if (db) {                                       // є в базі — підтягуємо дані
-                id = id || slugName(db.name || name);
-                m[id] = { ...mergeUserRec(m[id] || newUserRec(id, db.name || name), db), id };
-                msg = 'Вітаю, ' + m[id].name + '! Дані підтягнуто з бази';
-            } else if (id) {
-                msg = 'Вхід: ' + m[id].name + (offline ? ' (немає зв’язку з базою — локальні дані)' : '');
+            let id = Object.keys(m).find(k => k !== ANON && userKey(m[k].name) === key) || null, msg;
+            if (id) {                                       // такий користувач уже є в цьому браузері — просто входимо
+                msg = 'Вхід: ' + m[id].name;
             } else {                                        // нового користувача створюємо; дані, введені до входу, переходять до нього
                 id = slugName(name); let n = 2; while (m[id]) id = slugName(name) + '-' + (n++);
                 const rec = newUserRec(id, name), an = m[ANON];
                 if (an) { rec.cons = an.cons || ''; rec.price = an.price || ''; rec.cur = an.cur || '€'; rec.routes = (an.routes || []).slice(); rec.settings = { ...(an.settings || {}) }; m[ANON] = newUserRec(ANON, ''); }
                 m[id] = rec;
-                msg = 'Створено нового користувача ' + name + (offline ? ' (база недоступна — буде в ній після експорту)' : '');
+                msg = 'Створено нового користувача ' + name;
             }
             m[id].ts = Date.now();
             try { localStorage.setItem(CUR_USER_KEY, id); } catch (e) { }
