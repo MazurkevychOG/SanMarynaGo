@@ -15,9 +15,42 @@
       "width": 570,
       "height": 932,
       "bytes": 89140
+    },
+    {
+      "type": "image",
+      "file": "photos/saranda-embankment/02.webp",
+      "thumb": "photos/saranda-embankment/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 196744,
+      "srcSha256": "8a831f4bc8baa575fe280dca051fb97450126803bbb8c743fcf072b346dae29d"
+    },
+    {
+      "type": "image",
+      "file": "photos/saranda-embankment/03.webp",
+      "thumb": "photos/saranda-embankment/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 293782,
+      "srcSha256": "42d292e8eea875698274a2b73e9ad3a86b20d5bab9421cb2c2ee8fe88f57778e"
+    },
+    {
+      "type": "image",
+      "file": "photos/saranda-embankment/04.webp",
+      "thumb": "photos/saranda-embankment/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 225582,
+      "srcSha256": "9a3cfa1e3b4a0450d1d386c5621f4b2052d0a706da242477ccd713a11867878a"
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
-  "near": "Gjashtë"
+  "near": "Gjashtë",
+  "types": [
+    "prohulyanka",
+    "stay",
+    "restaurant",
+    "beach"
+  ]
 }

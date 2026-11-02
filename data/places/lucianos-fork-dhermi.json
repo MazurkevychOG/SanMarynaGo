@@ -17,10 +17,11 @@
       "bytes": 77998
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
   "types": [
-    "restaurant"
+    "restaurant",
+    "beach"
   ],
   "near": "Drimadhë"
 }

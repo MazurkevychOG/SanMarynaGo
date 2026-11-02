@@ -17,10 +17,11 @@
       "bytes": 191112
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
   "types": [
-    "beach"
+    "beach",
+    "restaurant"
   ],
   "near": "Ксаміл"
 }

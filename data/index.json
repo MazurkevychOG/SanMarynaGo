@@ -304,10 +304,16 @@
       "desc": "",
       "near": "Gjashtë",
       "country": "Albania",
+      "types": [
+        "prohulyanka",
+        "stay",
+        "restaurant",
+        "beach"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/qnAnL9zAtadoDL1z5?g_st=ic",
       "thumb": "photos/saranda-embankment/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "photos": 4,
+      "updated": "2026-11-01"
     },
     {
       "id": "bora-bora-beach-ksamil",
@@ -320,12 +326,13 @@
       "near": "Ксаміл",
       "country": "Albania",
       "types": [
-        "beach"
+        "beach",
+        "restaurant"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/LYVhvJeKjX3BqHr28?g_st=ic",
       "thumb": "photos/bora-bora-beach-ksamil/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "butrint-ancient-theatre",
@@ -338,12 +345,14 @@
       "near": "Shëndellia",
       "country": "Albania",
       "types": [
-        "history"
+        "history",
+        "prohulyanka",
+        "nature"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/Dhs81dHUyxiJmBzt9?g_st=ic",
       "thumb": "photos/butrint-ancient-theatre/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "the-castle-of-porto-palermo",
@@ -374,12 +383,13 @@
       "near": "Хімара",
       "country": "Albania",
       "types": [
-        "beach"
+        "beach",
+        "restaurant"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/2KA31rASvYwkJ1aD6?g_st=ic",
       "thumb": "photos/plazhi-i-himares/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "lucianos-fork-dhermi",
@@ -392,12 +402,13 @@
       "near": "Drimadhë",
       "country": "Albania",
       "types": [
-        "restaurant"
+        "restaurant",
+        "beach"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/NgT84z3YNZjPrKHo6?g_st=ic",
       "thumb": "photos/lucianos-fork-dhermi/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "abeille-restaurant",
@@ -410,12 +421,13 @@
       "near": "Kuç",
       "country": "Albania",
       "types": [
-        "restaurant"
+        "restaurant",
+        "nature"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/mv7MvqYbRNroeGXo7",
       "thumb": "photos/abeille-restaurant/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-22"
+      "updated": "2026-11-01"
     },
     {
       "id": "llogara-view-point",
@@ -428,12 +440,13 @@
       "near": "Palasë",
       "country": "Albania",
       "types": [
-        "nature"
+        "nature",
+        "extreme"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/XjCoFZfnBCATEwym7?g_st=ic",
       "thumb": "photos/llogara-view-point/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
