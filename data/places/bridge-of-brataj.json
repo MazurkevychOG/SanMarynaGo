@@ -15,9 +15,40 @@
       "width": 1167,
       "height": 617,
       "bytes": 289968
+    },
+    {
+      "type": "image",
+      "file": "photos/bridge-of-brataj/02.webp",
+      "thumb": "photos/bridge-of-brataj/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 369978,
+      "srcSha256": "b445d4ecd3bcbc479041bd955ae26d46646cdf395f3d94a79d4c81d3f4773fda"
+    },
+    {
+      "type": "image",
+      "file": "photos/bridge-of-brataj/03.webp",
+      "thumb": "photos/bridge-of-brataj/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 397726,
+      "srcSha256": "1194a117bc144bbf11d913caa36096b302d7e0f617ca71ea5acfc921a4b00d7f"
+    },
+    {
+      "type": "image",
+      "file": "photos/bridge-of-brataj/04.webp",
+      "thumb": "photos/bridge-of-brataj/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 368416,
+      "srcSha256": "101caef3dfe19424a8ce75950443c98d356c2ce8cb6f97b270b8b8b917978241"
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
-  "near": "Brataj"
+  "near": "Brataj",
+  "types": [
+    "nature",
+    "extreme"
+  ]
 }

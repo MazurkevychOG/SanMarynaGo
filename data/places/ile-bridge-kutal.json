@@ -17,7 +17,10 @@
       "bytes": 198268
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
-  "near": "Bual"
+  "near": "Bual",
+  "types": [
+    "extreme"
+  ]
 }

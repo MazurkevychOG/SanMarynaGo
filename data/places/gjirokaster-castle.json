@@ -17,10 +17,11 @@
       "bytes": 255894
     }
   ],
-  "updated": "2026-10-28",
+  "updated": "2026-11-01",
   "country": "Albania",
   "types": [
-    "history"
+    "history",
+    "extreme"
   ],
   "near": "Гірокастра"
 }

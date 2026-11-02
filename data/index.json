@@ -120,10 +120,13 @@
       "desc": "",
       "near": "Lepenicë",
       "country": "Albania",
+      "types": [
+        "extreme"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
       "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "bridge-of-brataj",
@@ -135,10 +138,14 @@
       "desc": "",
       "near": "Brataj",
       "country": "Albania",
+      "types": [
+        "nature",
+        "extreme"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
       "thumb": "photos/bridge-of-brataj/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "photos": 4,
+      "updated": "2026-11-01"
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
@@ -187,12 +194,13 @@
       "near": "Гірокастра",
       "country": "Albania",
       "types": [
-        "history"
+        "history",
+        "extreme"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/JSDY51PrMUEuKQB56?g_st=ic",
       "thumb": "photos/gjirokaster-castle/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "ile-bridge-kutal",
@@ -204,10 +212,13 @@
       "desc": "",
       "near": "Bual",
       "country": "Albania",
+      "types": [
+        "extreme"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/E3EFwYwmmE5RadyS9?g_st=ic",
       "thumb": "photos/ile-bridge-kutal/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "langarica-canyon",
@@ -220,12 +231,13 @@
       "near": "Ogdunan",
       "country": "Albania",
       "types": [
-        "nature"
+        "nature",
+        "extreme"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/T5hARBJk2hsGM5Xa7?g_st=ic",
       "thumb": "photos/langarica-canyon/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "sopot-waterfall",
