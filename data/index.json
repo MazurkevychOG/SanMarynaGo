@@ -21,22 +21,23 @@
       "updated": "2026-10-28"
     },
     {
-      "id": "ullinj-serdit-mucias",
+      "id": "chickn-fork",
       "order": 2,
-      "name": "Ullinj serdit (Muçias)",
-      "lat": 40.8963827,
-      "lng": 19.5000843,
+      "name": "Chick’n Fork",
+      "lat": 40.437937,
+      "lng": 19.495687,
       "category": null,
       "desc": "",
-      "near": "Remas",
+      "near": "Вльора",
       "country": "Albania",
       "types": [
-        "nature"
+        "restaurant",
+        "beach"
       ],
-      "gmapsUrl": "https://maps.app.goo.gl/YxYgAcGk6qLqhPBZ7?g_st=ic",
-      "thumb": "photos/ullinj-serdit-mucias/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "gmapsUrl": "https://maps.app.goo.gl/QRnn8iGjxkcgsVyv7?g_st=ic",
+      "thumb": "photos/chickn-fork/01_thumb.webp",
+      "photos": 2,
+      "updated": "2026-11-01"
     },
     {
       "id": "fortress-of-bashtove",

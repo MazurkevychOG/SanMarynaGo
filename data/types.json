@@ -35,6 +35,14 @@
       "id": "stay",
       "name": "Житло",
       "icon": "🏠"
+    },
+    {
+      "id": "prohulyanka",
+      "name": "Прогулянка"
+    },
+    {
+      "id": "food",
+      "name": "Food"
     }
   ]
 }

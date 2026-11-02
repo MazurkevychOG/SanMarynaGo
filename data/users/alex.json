@@ -1,0 +1,33 @@
+{
+  "id": "alex",
+  "name": "Alex",
+  "cons": "10",
+  "price": "69",
+  "cur": "Lek",
+  "routes": [
+    {
+      "id": "mvrxxmbt4bf2",
+      "name": "Надя",
+      "ts": 1793181445193,
+      "ids": [
+        "home-vlore-joanna",
+        "argjiro-winery-gjirokaster",
+        "langarica-canyon",
+        "saranda-embankment",
+        "llixhat-e-benjes-thermal-baths"
+      ],
+      "ret": true,
+      "dist": 576146.5,
+      "dur": 40419,
+      "est": false
+    }
+  ],
+  "settings": {
+    "theme": "dark",
+    "fab": {
+      "fx": 0.9808,
+      "fy": 0.8918
+    }
+  },
+  "updated": "2026-11-01"
+}

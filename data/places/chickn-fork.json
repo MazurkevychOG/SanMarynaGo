@@ -1,0 +1,39 @@
+{
+  "id": "chickn-fork",
+  "order": 2,
+  "name": "Chick’n Fork",
+  "lat": 40.437937,
+  "lng": 19.495687,
+  "desc": "",
+  "gmapsUrl": "https://maps.app.goo.gl/QRnn8iGjxkcgsVyv7?g_st=ic",
+  "near": "Вльора",
+  "country": "Albania",
+  "types": [
+    "restaurant",
+    "beach"
+  ],
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/chickn-fork/01.webp",
+      "thumb": "photos/chickn-fork/01_thumb.webp",
+      "width": 1013,
+      "height": 570,
+      "bytes": 90078,
+      "srcSha256": "118b04f508427e58f4d00184d72b7e56fb779c8fa85ab59587a08440e0b60b0a"
+    },
+    {
+      "type": "image",
+      "file": "photos/chickn-fork/02.webp",
+      "thumb": "photos/chickn-fork/02_thumb.webp",
+      "width": 1305,
+      "height": 1600,
+      "bytes": 296964,
+      "srcSha256": "e3b5d0bc6c384db38d5706b7b644b4324223362fab3718c813410bec9190c4bb"
+    }
+  ],
+  "updated": "2026-11-01",
+  "aliases": [
+    "pmvxmrlw7k07wb"
+  ]
+}
