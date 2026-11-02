@@ -369,7 +369,7 @@
         .c-drag .drag-handle.num { justify-content: flex-start; font-size: 17px; font-weight: 700; padding-left: 1px; }
         .cell-photo-img { width: 176px; height: 176px; }
         .c-chk input, .list-head #mainToggle { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin: 0; border: 2px solid #9aa5b1; border-radius: 7px; background-color: #fff; background-position: center; background-repeat: no-repeat; background-size: contain; cursor: pointer; }
-        .c-chk input:checked, .list-head #mainToggle:checked { border-color: transparent; background-color: transparent; background-size: 122%; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e74c3c' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>"); animation: heartPop .28s ease; }
+        .c-chk input:checked, .list-head #mainToggle:checked { border-color: transparent; background-color: transparent; background-size: 112%; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e74c3c' fill-opacity='.14' stroke='%23e74c3c' stroke-width='1.9' stroke-linejoin='round' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>"); animation: heartPop .28s ease; }
         @keyframes heartPop { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
         /* форма редагування: кола з відбитками без обводки і без підписів */
         .action-buttons .finger-btn { border: none; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
@@ -517,6 +517,10 @@
         .pf-out { border: none; background: #fde8e8; color: #c0392b; padding: 10px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; flex: none; }
         #pfLoggedIn[hidden], #pfLoggedOut[hidden] { display: none; }
         .mdl-open .fab-add { visibility: hidden; }
+        .btn-profile { position: relative; }
+        .btn-profile .offline-ic { position: absolute; right: -5px; bottom: -5px; width: 21px; height: 21px; padding: 3px; margin: 0; box-sizing: border-box; border-radius: 50%; background: #fff; color: #e67e22; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
+        .top-controls .btn-profile .offline-ic { width: 18px; height: 18px; padding: 2px; right: -4px; bottom: -4px; }
+        .offline-ic[hidden] { display: none; }
         /* ===== Спідометр (GPS): індикатор у списку й повноекранний екран ===== */
         .spd-pill { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 38px; padding: 0 11px 0 9px; border: none; border-radius: 10px; background: #10151c; color: #fff; font-size: 20px; font-weight: 800; line-height: 1; cursor: pointer; font-variant-numeric: tabular-nums; -webkit-tap-highlight-color: transparent; }
         .spd-pill .v { min-width: 2ch; text-align: right; }
@@ -849,7 +853,6 @@
         <div class="flt-sec"><div class="flt-lab">Тип місця</div><div class="flt-chips" id="fltTypes"></div></div>
         <div class="flt-sec"><div class="flt-lab">Час у дорозі, хв</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_tMin" placeholder="від" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_tMax" placeholder="до" autocomplete="off"></div></div>
         <div class="flt-sec"><div class="flt-lab">Відстань, км</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_dMin" placeholder="від" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_dMax" placeholder="до" autocomplete="off"></div></div>
-        <div class="srm-meta" id="fltRef"></div>
         <div class="srm-meta flt-info" id="fltInfo"></div>
         <div class="srm-acts"><button type="button" onclick="resetFilter()">Скинути</button><button type="button" class="ok" onclick="closeFilter()">Готово</button></div>
     </div>
@@ -965,7 +968,7 @@
 <div class="content-area" id="contentArea">
     <div class="sticky-top">
         <div class="mobile-header">
-        <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
+        <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
         <div class="app-brand"><span class="mobile-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div></div>
         <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 map</button>
             <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 routes</a><span class="route-parts"></span>
@@ -999,7 +1002,7 @@
             <h1>📍 Додати місце</h1>
             <div class="top-controls desktop-only">
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Додати місце" aria-label="Додати місце">＋</button>
-                <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></button>
+                <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
@@ -1194,8 +1197,6 @@
             initRowReorder(row, i, tbody);
             initSwipe(row);
         });
-        const mt = document.getElementById('mainToggle');
-        if (mt) mt.checked = places.length > 0 && places.every(p => p.selected);
         applySearch();
         updateListCount();
         updateLinks();
@@ -2542,9 +2543,16 @@
         sync();
     }
     function handleMainToggle(src) {
-        const vis = matchIdx();
-        (vis || places.map((p, i) => i)).forEach(i => { places[i].selected = src.checked; });
+        if (!src.checked) places.forEach(p => { p.selected = false; });                     // зняти ВСІ (разом із тими, що приховані пошуком чи фільтром)
+        else (matchIdx() || places.map((p, i) => i)).forEach(i => { places[i].selected = true; });   // вибрати всі видимі
         persistSelection(); render();
+    }
+    function syncMainToggle() {                                                              // стан чекбокса рахуємо за ВИДИМИМИ картками
+        const mt = document.getElementById('mainToggle');
+        if (!mt) return;
+        const vis = matchIdx(), scope = vis ? vis.map(i => places[i]) : places;
+        mt.checked = scope.length > 0 ? scope.every(p => p.selected) : places.some(p => p.selected);
+        mt.title = mt.checked ? 'Зняти всі' : 'Вибрати всі';
     }
     function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); render(); }
     function sync() { places.forEach((p, i) => { p.order = i + 1; }); recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }   // order перераховується для ВСІХ карток
@@ -2559,6 +2567,8 @@
         const shouldReturn = document.getElementById('returnToStart')?.checked || document.getElementById('returnToStartDesktop')?.checked || false;
         const clean = c => c.replace(/\s+/g, '');
         const pts = sel.map(p => clean(p.coords));
+        // одна вибрана точка → маршрут від поточного місця: origin не вказуємо, Google бере ваше місцезнаходження сам
+        if (pts.length === 1 && !(startFromMe && startSnap)) return ['https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(pts[0]) + '&travelmode=driving'];
         if (startFromMe && startSnap) pts.unshift(startSnap[0].toFixed(6) + ',' + startSnap[1].toFixed(6));
         if (shouldReturn && pts.length >= 2) pts.push(pts[0]);        // назад — на початок маршруту (мою позицію або першу вибрану точку)
         const STEP = 10, links = [];
@@ -2620,8 +2630,9 @@
         _navPts = navRoutePoints();
         _posPromise = warmPosition();                       // визначаємо позицію заздалегідь, щоб Maps.me відкрився одразу після натискання
         const n = navTargets().length;
-        document.getElementById('navPickMeta').textContent = _navPts.length + ' точок у маршруті';
-        document.getElementById('navGoogleSub').textContent = links.length > 1 ? 'Маршрут довгий — відкриється частинами (' + links.length + ')' : 'Весь маршрут з усіма зупинками';
+        const oneSel = places.filter(p => p.selected);
+        document.getElementById('navPickMeta').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'Від вашого місця до «' + (oneSel[0].name || '') + '»' : _navPts.length + ' точок у маршруті';
+        document.getElementById('navGoogleSub').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'Від вашого поточного місця' : links.length > 1 ? 'Маршрут довгий — відкриється частинами (' + links.length + ')' : 'Весь маршрут з усіма зупинками';
         document.getElementById('navMapsmeSub').textContent = 'Маршрут із двох точок: від вас до найближчої точки маршруту';
         document.getElementById('navMapsmeBtn').style.display = n >= 1 ? '' : 'none';
         document.getElementById('navPickParts').innerHTML = '';
@@ -2661,6 +2672,7 @@
     document.getElementById('navPickModal').addEventListener('click', e => { if (e.target.id === 'navPickModal') closeNavPick(); });
 
     function updateLinks() {
+        if (stateReady && !(startFromMe && startSnap) && places.filter(p => p.selected).length === 1) { try { startGps(); } catch (e) { } }   // одна точка — потрібна поточна позиція
         scheduleRoute();
         const links = buildRouteLinks();
         const href = links[0] || '#';
@@ -3149,7 +3161,7 @@
         const el = document.getElementById('listCount');
         if (!el) return;
         const n = places.filter(p => p.selected).length;
-        const eff = n + (startFromMe && startSnap ? 1 : 0);                   // точки маршруту (разом із моєю позицією)
+        const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));   // точки маршруту (разом із моєю позицією)
         const rt = document.getElementById('returnToggle');
         if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none';
         const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
@@ -3216,6 +3228,7 @@
         const info = document.getElementById('searchInfo');
         if (info) info.textContent = set ? ((filterActive() ? 'Показано: ' : 'Знайдено: ') + m.length + ' з ' + places.length) : (raw ? 'Введіть щонайменше 3 символи' : '');
         updateFilterBadge();
+        syncMainToggle();
         const clr = document.getElementById('searchClear');
         if (clr) clr.classList.toggle('show', !!searchQuery());
         updateListCount();
@@ -4014,7 +4027,7 @@
             startFromMe
                 ? { label: '✖ Не починати маршрут звідси', action: () => setStartFromMe(false) }
                 : { label: '🚩 Почати маршрут звідси', action: () => setStartFromMe(true) },
-            { label: '↻ Оновити мою позицію' + (startFromMe ? ' як старт' : ''), action: () => { startGps(); if (startFromMe) setStartFromMe(true); else if (lastGps && map) map.setView(lastGps.ll, Math.max(map.getZoom(), 15)); } }
+            { label: '↻ Оновити мою позицію' + (startFromMe ? ' як старт' : ''), action: () => { autoStart = null; startGps(); updateLinks(); if (startFromMe) setStartFromMe(true); else if (lastGps && map) map.setView(lastGps.ll, Math.max(map.getZoom(), 15)); } }
         ]);
     }
     function startGps() {
@@ -4023,6 +4036,8 @@
             const ll = [pos.coords.latitude, pos.coords.longitude];
             lastGps = { ll, acc: pos.coords.accuracy };
             speedoFeed(pos);                                       // спідометр користується цим самим потоком
+            if (!_fltGps) { _fltGps = true; if (hasMetricFilter()) applySearch(); }   // перша GPS-позиція: перерахувати фільтр за часом/відстанню від мене
+            if (!autoStart && !(startFromMe && startSnap) && places.filter(p => p.selected).length === 1) updateLinks();   // вибрана одна точка, а позиція з'явилась пізніше — будуємо від неї
             if (!map) return;
             if (!gpsMarker) {
                 gpsMarker = L.marker(ll, { icon: gpsIcon(), interactive: true, keyboard: false, zIndexOffset: 900 }).addTo(map);
@@ -4034,6 +4049,16 @@
             }
         }, err => { console.warn('GPS:', err && err.message); speedoError(err); }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
     }
+
+    // ===== Офлайн-режим: значок біля назви, коли немає інтернету =====
+    function updateOfflineIcon() {
+        const off = navigator.onLine === false;
+        document.querySelectorAll('.offline-ic').forEach(e => { if (off) e.removeAttribute('hidden'); else e.setAttribute('hidden', ''); });   // SVG не має властивості hidden
+        document.documentElement.classList.toggle('is-offline', off);
+    }
+    window.addEventListener('offline', () => { updateOfflineIcon(); toast('Немає інтернету — працюю офлайн'); });
+    window.addEventListener('online', () => { updateOfflineIcon(); toast('Інтернет відновлено'); });
+    updateOfflineIcon();
 
     // ===== Спідометр (GPS) =====
     // Швидкість береться з уже наявного GPS-потоку (startGps → єдиний watchPosition): другої підписки немає.
@@ -4185,9 +4210,17 @@
         return 2 * R * Math.asin(Math.sqrt(x));
     }
     let startFromMe = false, startSnap = null;               // старт маршруту від поточного місцезнаходження (вибирається на карті)
+    let autoStart = null;                                    // «звідки» для маршруту до ОДНІЄЇ вибраної точки: знімок GPS на момент вибору
+    function singleStart() {                                 // → [lat, lng] або null
+        const n = places.filter(p => p.selected && parseCoords(p.coords)).length;
+        if (n !== 1 || (startFromMe && startSnap)) { autoStart = null; return null; }
+        if (!autoStart && lastGps) autoStart = lastGps.ll.slice();
+        return autoStart;
+    }
     function routePoints() {
         const pts = places.filter(p => p.selected).map(p => parseCoords(p.coords)).filter(Boolean);
         if (startFromMe && startSnap) pts.unshift(startSnap);
+        else { const a = singleStart(); if (a) pts.unshift(a); }          // одна точка: від поточного місця до неї
         const ret = (document.getElementById('returnToStart') && document.getElementById('returnToStart').checked) ||
                     (document.getElementById('returnToStartDesktop') && document.getElementById('returnToStartDesktop').checked);
         if (ret && pts.length >= 2) pts.push(pts[0]);
@@ -4644,11 +4677,13 @@
         return n;
     }
     const filterActive = () => filterCount() > 0;
-    // Точка відліку для часу й відстані: моя позиція (якщо ввімкнено старт від мене) → перше вибране місце → перше місце списку
+    // Точка відліку для часу й відстані: моя позиція (GPS), поки її немає — перше місце списку.
+    // Вона НЕ залежить від вибраних карток, тому набір карток під фільтром не «стрибає», коли ви їх вибираєте чи знімаєте.
+    let _fltGps = false;
+    const hasMetricFilter = () => isFinite(fnum(flt.tMin)) || isFinite(fnum(flt.tMax)) || isFinite(fnum(flt.dMin)) || isFinite(fnum(flt.dMax));
     function filterRef() {
         if (startFromMe && startSnap) return { c: startSnap, label: 'моя позиція' };
-        const sel = places.find(p => p.selected && parseCoords(p.coords));
-        if (sel) return { c: parseCoords(sel.coords), label: sel.name };
+        if (lastGps) return { c: lastGps.ll, label: 'моя позиція' };
         const f = places.find(p => parseCoords(p.coords));
         return f ? { c: parseCoords(f.coords), label: f.name } : null;
     }
@@ -4689,8 +4724,6 @@
         const hasNone = places.some(p => !(p.types || []).length);
         document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabel(t), flt.types.includes(t.id))).join('') + (hasNone ? chip('t', '__none__', 'без типу', flt.types.includes('__none__')) : '') || '<span class="tm-empty">Типів ще немає</span>';
         ['tMin', 'tMax', 'dMin', 'dMax'].forEach(k => { document.getElementById('flt_' + k).value = flt[k]; });
-        const ref = filterRef();
-        document.getElementById('fltRef').textContent = ref ? 'Відлік від: ' + ref.label + ' · орієнтовно: по прямій ×1,3, 50 км/год' : 'Немає точки відліку';
         document.querySelectorAll('#filterModal .tchip').forEach(b => b.onclick = () => {
             const arr = b.dataset.k === 'c' ? flt.countries : flt.types, v = b.dataset.v, i = arr.indexOf(v);
             if (i >= 0) arr.splice(i, 1); else arr.push(v);
@@ -4698,7 +4731,7 @@
         });
         updateFilterInfo();
     }
-    function onFilterChange() { saveFilter(); applySearch(); updateFilterInfo(); }
+    function onFilterChange() { saveFilter(); if (hasMetricFilter()) { try { startGps(); } catch (e) { } } applySearch(); updateFilterInfo(); }   // час/відстань рахуються від мене — потрібен GPS
     function updateFilterInfo() {
         const m = matchIdx();
         document.getElementById('fltInfo').textContent = filterActive() ? 'Показано ' + (m ? m.length : places.length) + ' з ' + places.length : 'Фільтр вимкнено — показано всі місця (' + places.length + ')';
@@ -4714,6 +4747,7 @@
         const t = document.getElementById('typesModal');
         if (t) t.addEventListener('click', e => { if (e.target === t) closeTypes(); });
         updateFilterBadge();
+        syncMainToggle();
     })();
 
     // ===== Користувачі: кілька кабінетів у цьому браузері =====
