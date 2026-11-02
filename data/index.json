@@ -433,12 +433,13 @@
       "near": "Ogdunan",
       "country": "Albania",
       "types": [
-        "nature"
+        "nature",
+        "extreme"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/qyZ9sy7mK4W78xNB7?g_st=ic",
       "thumb": "photos/llixhat-e-benjes-thermal-baths/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "photos": 5,
+      "updated": "2026-11-01"
     },
     {
       "id": "plyazh-dhermi",
