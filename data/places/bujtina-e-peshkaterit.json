@@ -1,0 +1,38 @@
+{
+  "id": "bujtina-e-peshkaterit",
+  "order": 28,
+  "name": "Bujtina e peshkaterit",
+  "lat": 40.361562,
+  "lng": 19.480187,
+  "desc": "",
+  "gmapsUrl": "https://maps.app.goo.gl/kPyKfR9szQJzVffx8?g_st=ic",
+  "near": "Radhimë",
+  "country": "Albania",
+  "types": [
+    "restaurant"
+  ],
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/bujtina-e-peshkaterit/01.webp",
+      "thumb": "photos/bujtina-e-peshkaterit/01_thumb.webp",
+      "width": 1320,
+      "height": 1484,
+      "bytes": 133600,
+      "srcSha256": "69095f916f29b6c4f347d5761ace3bf9f49e335de1ed49888dda4cb8f21e93aa"
+    },
+    {
+      "type": "image",
+      "file": "photos/bujtina-e-peshkaterit/02.webp",
+      "thumb": "photos/bujtina-e-peshkaterit/02_thumb.webp",
+      "width": 1320,
+      "height": 728,
+      "bytes": 154004,
+      "srcSha256": "3b5a274be96214bee6a761fb71d23000cc5f63775c318cda160b9f40c104ab34"
+    }
+  ],
+  "updated": "2026-11-01",
+  "aliases": [
+    "pmvxzbhwgg7fq5"
+  ]
+}

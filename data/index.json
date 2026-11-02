@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "count": 30,
+  "count": 31,
   "places": [
     {
       "id": "home-vlore-joanna",
@@ -443,7 +443,7 @@
     {
       "id": "plyazh-dhermi",
       "order": 26,
-      "name": "Пляж Dhermi",
+      "name": "Beach Dhermi",
       "lat": 40.135637,
       "lng": 19.647457,
       "category": null,
@@ -456,7 +456,7 @@
       "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
       "thumb": "photos/plyazh-dhermi/02_thumb.webp",
       "photos": 3,
-      "updated": "2026-10-28"
+      "updated": "2026-11-01"
     },
     {
       "id": "arbri-olive-oil",
@@ -474,8 +474,26 @@
       "updated": "2026-10-28"
     },
     {
-      "id": "fish-hub-albadriatico",
+      "id": "bujtina-e-peshkaterit",
       "order": 28,
+      "name": "Bujtina e peshkaterit",
+      "lat": 40.361562,
+      "lng": 19.480187,
+      "category": null,
+      "desc": "",
+      "near": "Radhimë",
+      "country": "Albania",
+      "types": [
+        "restaurant"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/kPyKfR9szQJzVffx8?g_st=ic",
+      "thumb": "photos/bujtina-e-peshkaterit/01_thumb.webp",
+      "photos": 2,
+      "updated": "2026-11-01"
+    },
+    {
+      "id": "fish-hub-albadriatico",
+      "order": 29,
       "name": "Fish HUB AlbAdriatico",
       "lat": 40.2955308,
       "lng": 19.4882518,
@@ -493,7 +511,7 @@
     },
     {
       "id": "gjipe-beach",
-      "order": 29,
+      "order": 30,
       "name": "Gjipe beach",
       "lat": 40.126937,
       "lng": 19.670437,
@@ -512,7 +530,7 @@
     },
     {
       "id": "vjosa-albania-rafting-group-glamping",
-      "order": 30,
+      "order": 31,
       "name": "Vjosa Albania Rafting Group Glamping",
       "lat": 40.224062,
       "lng": 19.373812,
