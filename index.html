@@ -147,7 +147,7 @@
             .mobile-header { display: flex; }
         }
     
-        /* ===== Карта: оверлей на телефоні, меню, підказки ===== */
+        /* ===== Карта: накладка на телефоні, меню, підказки ===== */
         #albaniaMap { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         .map-hint { font-size: 11px; color: #718096; padding: 5px 12px; background: #f8f9fa; border-top: 2px solid #eaeaea; flex-shrink: 0; }
         #mapOverlay { display: none; position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 150; background: #fff; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); }
@@ -371,7 +371,7 @@
         .c-chk input, .list-head #mainToggle { -webkit-appearance: none; appearance: none; width: 30px; height: 30px; margin: 0; border: 2px solid #9aa5b1; border-radius: 7px; background-color: #fff; background-position: center; background-repeat: no-repeat; background-size: contain; cursor: pointer; }
         .c-chk input:checked, .list-head #mainToggle:checked { border-color: transparent; background-color: transparent; background-size: 112%; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e74c3c' fill-opacity='.14' stroke='%23e74c3c' stroke-width='1.9' stroke-linejoin='round' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/></svg>"); animation: heartPop .28s ease; }
         @keyframes heartPop { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
-        /* форма редагування: кола з відбитками без обводки і без підписів */
+        /* форма редагування: кола з відбитками без контуру і без підписів */
         .action-buttons .finger-btn { border: none; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
         @media (max-width: 700px) {
             :root { --lw: 46px; --pw: 132px; }
@@ -381,7 +381,7 @@
             .cell-photo-img { width: 126px; height: 126px; }
         }
 
-        /* ===== Серце-штамп у формі, вікно «проявляється/розчиняється», без обводки кіл ===== */
+        /* ===== Серце-штамп у формі, вікно «проявляється/розчиняється», без контуру кіл ===== */
         .finger-green, .finger-red { border: none !important; }
         .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
         .input-wide, #mediaEditArea { grid-column: 1 / -1; }
@@ -833,7 +833,7 @@
             <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
-    <div class="map-hint-m">Тап по точці — показати/сховати назву · утримання точки — вибрати/зняти з маршруту · довге натискання по карті — меню (додати місце) · ⟲ — скинути всі точки · два пальці: рух, масштаб, поворот · зелена точка — ви</div>
+    <div class="map-hint-m">Дотик до точки — показати/сховати назву · утримання точки — вибрати/зняти з маршруту · довге натискання по карті — меню (додати місце) · ⟲ — скинути всі точки · два пальці: рух, масштаб, поворот · зелена точка — ви</div>
 </div>
 <div id="speedoScreen" class="spd-screen" role="dialog" aria-modal="true" aria-label="Спідометр" aria-hidden="true">
     <button type="button" class="spd-close" id="speedoClose" onclick="closeSpeedo()" aria-label="Закрити спідометр">✕</button>
@@ -1388,7 +1388,7 @@
             const nx = Math.max(-w - 24, Math.min(0, base + dx));
             applyRow(row, nx);
         });
-        const settleIfNeeded = () => {                       // тап під час анімації зупиняв картку на півдорозі — тепер доводимо її до стану спокою
+        const settleIfNeeded = () => {                       // дотик під час анімації зупиняв картку на півдорозі — тепер доводимо її до стану спокою
             if (row._raf) return;
             const w = width(), x = row._x || 0;
             const openX = -w - 24; // додатковий зсув, щоб картка повністю відкривала ліве коло
@@ -1409,7 +1409,7 @@
         };
         content.addEventListener('pointerup', end);
         content.addEventListener('pointercancel', end);
-        // Після свайпу або коли рядок відкритий — тап по вмісту лише закриває рядок, не «клікає» по посиланню/фото
+        // Після свайпу або коли рядок відкритий — дотик до вмісту лише закриває рядок, не «клікає» по посиланню/фото
         content.addEventListener('click', e => {
             if (Date.now() - (row._swipedAt || 0) < 350) { e.preventDefault(); e.stopPropagation(); return; }
             if (row.classList.contains('open')) { e.preventDefault(); e.stopPropagation(); closeOpenRow(); }
@@ -1674,7 +1674,7 @@
         const onMove = (ev) => {
             lx = ev.clientX; ly = ev.clientY;
             if (!moved) {
-                if (Math.hypot(lx - sx, ly - sy) < 5) return;   // це ще тап, а не перетягування
+                if (Math.hypot(lx - sx, ly - sy) < 5) return;   // це ще дотик, а не перетягування
                 moved = true;
                 el.classList.add('is-dragging');
                 ghost = opts.ghost(el);
@@ -1755,7 +1755,7 @@
         });
     }
 
-    // ===== Галерея: свайп / тап вліво-вправо, розсування пальців, червоний «палець» закриває =====
+    // ===== Галерея: свайп / дотик вліво-вправо, розсування пальців, червоний «палець» закриває =====
     let galZoom = { s: 1, x: 0, y: 0 };
     function applyGalTransform() {
         const img = document.querySelector('#mediaContainer img');
@@ -1871,7 +1871,7 @@
             if (galZoom.s > 1 || e.type !== 'pointerup') return;
             const dx = e.clientX - d.x, dy = e.clientY - d.y;
             if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) galleryGo(dx < 0 ? 1 : -1);   // свайп
-            else if (!d.moved && isVideo()) { const v = stage.querySelector('video'); if (v) { if (v.paused) v.play().catch(() => { }); else v.pause(); } }   // тап по відео = пауза/плей
+            else if (!d.moved && isVideo()) { const v = stage.querySelector('video'); if (v) { if (v.paused) v.play().catch(() => { }); else v.pause(); } }   // дотик до відео = пауза/плей
             else if (!d.moved) {                                                         // одиночний дотик (на відео — лишається рідна поведінка плеєра)
                 const r = stage.getBoundingClientRect();
                 galleryGo((e.clientX - r.left) < r.width / 2 ? -1 : 1);
@@ -2408,7 +2408,7 @@
             if (!down) return;
             const dx = e.clientX - sx, dy = e.clientY - sy;
             if (!dragging) {
-                if (Math.hypot(dx, dy) < 6) return;       // менше 6px — це звичайний тап
+                if (Math.hypot(dx, dy) < 6) return;       // менше 6px — це звичайний дотик
                 dragging = true; fabDragMoved = true;
                 try { fab.setPointerCapture(e.pointerId); } catch (err) {}
                 fab.style.transform = 'scale(1.12)';
@@ -3664,7 +3664,7 @@
         setTimeout(() => t.remove(), 2200);
     }
 
-    // ----- Контекстне меню (правий клік / ctrl+клік / двопальцевий тап на Mac / довге натискання на телефоні) -----
+    // ----- Контекстне меню (правий клік / ctrl+клік / двопальцевий дотик на Mac / довге натискання на телефоні) -----
     function closeCtx() { if (ctxEl) { ctxEl.remove(); ctxEl = null; } }
     function openCtx(x, y, title, items, opts) {
         opts = opts || {};
@@ -3836,7 +3836,7 @@
             try { if (routeLine && routeLine._renderer && routeLine._renderer._reset) routeLine._renderer._reset(); } catch (e) { }
             applyRouteWeight();
         });
-        map.on('zoomanim', (e) => applyRouteWeight(e.zoom));                // анімація кнопок +/−, подвійний тап
+        map.on('zoomanim', (e) => applyRouteWeight(e.zoom));                // анімація кнопок +/−, подвійний дотик
         map.on('zoomend moveend', () => { applyRouteWeight(); setTimeout(applyRouteWeight, 0); });   // після скидання SVG-трансформу
         map.on('zoomend rotate', () => layoutRouteLabels());      // підписи перерозміщуються під новий масштаб/поворот
 
@@ -3943,7 +3943,7 @@
         }
     }
 
-    // ----- Назви на карті (тап — показати, ще тап — сховати), утримання — вибір точки, кнопка скидання -----
+    // ----- Назви на карті (дотик — показати, ще дотик — сховати), утримання — вибір точки, кнопка скидання -----
     // Витрати на точках (хв, гроші): лише для поточного розрахунку, зберігаються в браузері окремо і у збережені маршрути не потрапляють
     let stopExtras = {};
     try { stopExtras = JSON.parse(localStorage.getItem('stop_extras') || '{}') || {}; } catch (e) { stopExtras = {}; }
@@ -4148,7 +4148,7 @@
         } catch (e) { console.warn('Спідометр:', e); }
     }
     function speedoError(err) {
-        SPD.err = (err && err.code === 1) ? 'denied' : 'nosig';     // 1 — немає дозволу; 2/3 — позиція недоступна / таймаут
+        SPD.err = (err && err.code === 1) ? 'denied' : 'nosig';     // 1 — немає дозволу; 2/3 — позиція недоступна / час очікування
         speedoRender();
     }
     function speedoState() {
@@ -4185,18 +4185,54 @@
     function speedoEnsureTimer() { if (!SPD.timer && !document.hidden) SPD.timer = setInterval(speedoTick, 1000); }
     function speedoStopTimer() { if (SPD.timer) { clearInterval(SPD.timer); SPD.timer = 0; } }
     function speedoTick() { speedoRender(); if (!SPD.open && speedoState() !== 'ok') speedoStopTimer(); }
+
+    // ===== Екран не гасне, поки відкрито спідометр =====
+    // 1) Screen Wake Lock API (Chrome/Android, Safari на iOS 16.4+); браузер сам знімає блокування, коли сторінка йде у фон, тому при поверненні беремо його знову.
+    // 2) Запасний варіант для iPhone (особливо в режимі «На екран Додому», де Wake Lock може не працювати): крихітне беззвучне відео в циклі.
+    let _wlSentinel = null, _wlVideo = null;
+    const WL_VIDEO = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAANNbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAnd0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAABAAAAAQAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHvbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAUABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABmm1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAVpzdGJsAAAAunN0c2QAAAAAAAAAAQAAAKphdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABAAEABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAMGF2Y0MBQsAe/+EAF2dCwB6mEXsBEAAAAwAQAAADAKDxYuEYAQAGaMhCA5LIAAAAEHBhc3AAAAABAAAAAQAAABRidHJ0AAAAAAAAC3wAAAt8AAAAGHN0dHMAAAAAAAAAAQAAAAoAAAgAAAAAFHN0c3MAAAAAAAAAAQAAAAEAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAoAAAABAAAAPHN0c3oAAAAAAAAAAAAAAAoAAAKFAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAACgAAAAoAAAAKAAAAFHN0Y28AAAAAAAAAAQAAA30AAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjYwLjE2LjEwMAAAAAhmcmVlAAAC521kYXQAAAJyBgX//27cRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MCByZWY9MTYgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MToweDEzMSBtZT11bWggc3VibWU9MTAgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0yNCBjaHJvbWFfbWU9MSB0cmVsbGlzPTIgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTUgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD02MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTQwLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAALZYiCAj5MUAARbcAAAAAGQZocBH1AAAAABkGaKgEfUAAAAAZBmjsBH1AAAAAGQZpJAEfUAAAABkGaWUBH1AAAAAZBmmmAR9QAAAAGQZp5wEfUAAAABkGaiIAQ9QAAAAZBmpiQP9Q=';
+    function wakeVideoEl() {
+        if (!_wlVideo) {
+            const v = document.createElement('video');
+            v.muted = true; v.loop = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.tabIndex = -1;
+            v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none;z-index:-1';
+            v.src = WL_VIDEO;
+            document.body.appendChild(v);
+            _wlVideo = v;
+        }
+        return _wlVideo;
+    }
+    function wakePlayVideo() { try { const pr = wakeVideoEl().play(); if (pr && pr.catch) pr.catch(() => { }); } catch (e) { } }
+    async function wakeAcquire() {                              // викликається з натискання (відкриття спідометра) — це потрібно для відео на iOS
+        const needVideo = !navigator.wakeLock || window.navigator.standalone === true;
+        if (needVideo) wakePlayVideo();                          // синхронно, у межах жесту
+        if (!navigator.wakeLock || _wlSentinel || document.visibilityState !== 'visible') return;
+        try {
+            const sent = await navigator.wakeLock.request('screen');
+            if (!SPD.open) { try { sent.release(); } catch (e) { } return; }   // тим часом спідометр закрили
+            _wlSentinel = sent;
+            sent.addEventListener('release', () => { if (_wlSentinel === sent) _wlSentinel = null; });
+        } catch (e) { _wlSentinel = null; if (!needVideo) wakePlayVideo(); }   // Wake Lock відхилено — тримаємо екран відео
+    }
+    function wakeRelease() {
+        try { if (_wlSentinel) _wlSentinel.release(); } catch (e) { }
+        _wlSentinel = null;
+        if (_wlVideo) { try { _wlVideo.pause(); } catch (e) { } }
+    }
     function openSpeedo() {
         const el = document.getElementById('speedoScreen');
         if (!el || SPD.open) return;
         SPD.open = true;
         el.classList.add('show'); el.setAttribute('aria-hidden', 'false'); document.body.classList.add('speedo-open');
         startGps();                                                 // нічого не робить, якщо потік уже запущено (другого watchPosition не буде)
+        wakeAcquire();                                              // екран не гасне, поки спідометр відкритий
         SPD.shown = ''; speedoRender(); speedoEnsureTimer();
         try { document.getElementById('speedoClose').focus({ preventScroll: true }); } catch (e) { }
     }
     function closeSpeedo() {                                        // GPS-потік карти не чіпаємо
         if (!SPD.open) return;
         SPD.open = false;
+        wakeRelease();
         const el = document.getElementById('speedoScreen');
         el.classList.remove('show'); el.setAttribute('aria-hidden', 'true'); document.body.classList.remove('speedo-open');
         SPD.shown = ''; speedoRender();
@@ -4209,6 +4245,7 @@
     }
     document.addEventListener('visibilitychange', () => {           // повернення з фону: перевіряємо актуальність GPS-даних
         if (document.hidden) { speedoStopTimer(); return; }
+        if (SPD.open) wakeAcquire();                                // браузер зняв блокування екрана у фоні — беремо знову
         SPD.shown = ''; speedoRender();
         if (SPD.open || speedoState() === 'ok') speedoEnsureTimer();
     });
@@ -4408,7 +4445,7 @@
     function routeWidthAt(z) {
         return Math.max(ROUTE_W_MIN, Math.min(ROUTE_W_MAX, ROUTE_W_REF * Math.pow(ROUTE_W_STEP, z - ROUTE_W_REF_ZOOM)));
     }
-    // targetZoom — масштаб, до якого йде жест/анімація. Під час щипка Leaflet масштабує весь SVG трансформом,
+    // targetZoom — масштаб, до якого йде жест/анімація. Під час щипка Leaflet масштабує весь SVG перетворенням,
     // тому ширину ділимо на поточний коефіцієнт трансформу — на екрані виходить рівно routeWidthAt(targetZoom).
     function applyRouteWeight(targetZoom) {
         if (!map || !routeLine) return;
