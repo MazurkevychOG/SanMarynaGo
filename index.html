@@ -2578,7 +2578,7 @@
     function handleMainToggle(src) {
         if (!src.checked) places.forEach(p => { p.selected = false; });                     // зняти ВСІ (разом із тими, що приховані пошуком чи фільтром)
         else (matchIdx() || places.map((p, i) => i)).forEach(i => { places[i].selected = true; });   // вибрати всі видимі
-        persistSelection(); render();
+        persistSelection(); refreshSelectionUI();
     }
     function syncMainToggle() {                                                              // стан чекбокса рахуємо за ВИДИМИМИ картками
         const mt = document.getElementById('mainToggle');
@@ -2587,7 +2587,18 @@
         mt.checked = scope.length > 0 ? scope.every(p => p.selected) : places.some(p => p.selected);
         mt.title = mt.checked ? 'Зняти всі' : 'Вибрати всі';
     }
-    function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); render(); }
+    // Вибір/зняття картки НЕ перемальовує список: міняється лише стан чекбоксів, лічильник, маршрут (у фоні) і маркери на карті,
+    // тому фото в картках не зникають і не завантажуються заново.
+    function refreshSelectionUI() {
+        closeOpenRow(true);
+        const rows = document.getElementById('placesTable').children;
+        for (let i = 0; i < rows.length && i < places.length; i++) {
+            const cb = rows[i].querySelector('.c-chk input');
+            if (cb && cb.checked !== !!places[i].selected) cb.checked = !!places[i].selected;
+        }
+        syncMainToggle(); updateListCount(); updateLinks(); refreshMarkerStates();
+    }
+    function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); refreshSelectionUI(); }
     function sync() { places.forEach((p, i) => { p.order = i + 1; }); recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }   // order перераховується для ВСІХ карток
 
 
@@ -3163,7 +3174,7 @@
             places.forEach(p => { p.selected = ids.has(p.id); });
             const rt = document.getElementById('returnToStart');
             if (rt) { rt.checked = !!r.ret; onReturnToggle(rt); }
-            persistSelection(); render();
+            persistSelection(); refreshSelectionUI();
             closeProfile();
             toast(missing ? '▶ Маршрут відкрито (' + missing + ' місць уже немає в списку)' : '▶ Маршрут відкрито: ' + r.name);
             if (window.matchMedia && window.matchMedia('(max-width: 700px)').matches) {
@@ -3734,7 +3745,7 @@
     // ----- Вибір точки кліком по карті -----
     function togglePlace(i) {
         places[i].selected = !places[i].selected;
-        persistSelection(); render(); flashRow(i);
+        persistSelection(); refreshSelectionUI(); flashRow(i);
     }
     function flashRow(i) {
         const tr = $('placesTable').children[i];
@@ -3982,7 +3993,7 @@
     function resetAllPoints() {
         const had = places.some(p => p.selected);
         shownNames.clear();
-        if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); render(); toast('⟲ Усі точки скинуто'); }
+        if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); refreshSelectionUI(); toast('⟲ Усі точки скинуто'); }
         else { updateMapMarkers(); toast('Немає вибраних точок'); }
     }
     function addResetControl() {
@@ -4476,20 +4487,36 @@
         if (map) drawRoute(real, pts, closing);
     }
 
+    let markerByIdx = [];
+    function markerIcon(p, i, sz) {
+        const color = p.selected ? '#e74c3c' : '#4285F4';
+        return L.divIcon({
+            className: '',
+            html: `<div data-idx="${i}" style="background:${color};color:white;border-radius:50%;width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:${sz > 30 ? 13 : 11}px;font-weight:700;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35);${p.selected ? 'transform:scale(1.15);' : ''}">${i + 1}</div>`,
+            iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2]
+        });
+    }
+    function refreshMarkerStates() {                         // міняємо лише ті маркери, у яких змінився стан «вибрано»
+        if (!map || !markersLayer) return;
+        const sz = isCoarse() ? 34 : 26;
+        markerByIdx.forEach((mk, i) => {
+            const p = places[i];
+            if (!mk || !p || mk._sel === !!p.selected) return;
+            mk._sel = !!p.selected;
+            mk.setIcon(markerIcon(p, i, sz)); mk.setZIndexOffset(p.selected ? 500 : 0);
+        });
+    }
     function updateMapMarkers() {
         if (!map || !markersLayer) return;
         markersLayer.clearLayers();
+        markerByIdx = [];
         const sz = isCoarse() ? 34 : 26;
         places.forEach((p, i) => {
             const c = parseCoords(p.coords);
             if (!c) return;
-            const color = p.selected ? '#e74c3c' : '#4285F4';
-            const icon = L.divIcon({
-                className: '',
-                html: `<div data-idx="${i}" style="background:${color};color:white;border-radius:50%;width:${sz}px;height:${sz}px;display:flex;align-items:center;justify-content:center;font-size:${sz > 30 ? 13 : 11}px;font-weight:700;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.35);${p.selected ? 'transform:scale(1.15);' : ''}">${i + 1}</div>`,
-                iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2]
-            });
+            const icon = markerIcon(p, i, sz);
             const mk = L.marker(c, { icon, keyboard: false, zIndexOffset: p.selected ? 500 : 0 });
+            mk._sel = !!p.selected; markerByIdx[i] = mk;
             const tipOpts = { permanent: true, interactive: false, direction: 'top', offset: [0, -sz / 2], className: 'map-name-tip' };
             if (shownNames.has(p.id)) mk.bindTooltip(esc(p.name), tipOpts);
             // коротке натискання: показати назву й залишити; наступне — сховати
