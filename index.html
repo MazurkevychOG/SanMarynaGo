@@ -2684,35 +2684,79 @@
     }
     function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); }
     function navPickGo(kind) {
-        const box = document.getElementById('navPickParts');
-        if (kind === 'google') {
-            const links = buildRouteLinks();
-            if (links.length <= 1) { closeNavPick(); openUrl(links[0]); return; }
-            box.innerHTML = '<div class="nav-sub-title">Google Maps — оберіть частину маршруту:</div><div class="nav-sub">' +
-                links.map((u, k) => '<button type="button" data-u="' + k + '">Частина ' + (k + 1) + '</button>').join('') + '</div>';
-            box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
+        
+function navPickGo(kind) {
+    const box = document.getElementById('navPickParts');
+
+    if (kind === 'google') {
+        const links = buildRouteLinks();
+        if (links.length <= 1) {
+            closeNavPick();
+            openUrl(links[0]);
             return;
         }
-        // Maps.me: лише дві точки — де ви зараз → найближча до вас точка маршруту.
-        // Позицію визначено заздалегідь (при відкритті вікна), тому перехід у Maps.me виконується СИНХРОННО в межах натискання:
-        // після очікування (await) iOS міг блокувати відкриття іншої програми, і маршрут не будувався.
-        const targets = navTargets();
-        if (!targets.length) return;
-        const ready = (startFromMe && startSnap) ? { c: [startSnap[0], startSnap[1]] } : (_posCache && Date.now() - _posCache.t < 300000 ? _posCache : null);
-        if (ready) { goMapsme(ready, targets); return; }
-        toast('Визначаю ваше місце…');
-        Promise.race([_posPromise || warmPosition(), new Promise(r => setTimeout(() => r(null), 5000))]).then(pos => goMapsme(pos, targets));
+        box.innerHTML = '<div class="nav-sub-title">Google Maps — оберіть частину маршруту:</div><div class="nav-sub">' +
+            links.map((u, k) => '<button type="button" data-u="' + k + '">Частина ' + (k + 1) + '</button>').join('') + '</div>';
+        box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
+        return;
     }
-    function goMapsme(pos, targets) {
-        let from, list = targets;
-        if (pos) from = { ll: pos.c, name: '' };
-        else if (targets.length >= 2) { from = targets[0]; list = targets.slice(1); toast('Не вдалося визначити ваше місце — будую від першої точки до найближчої'); }
-        else { toast('Дозвольте доступ до геолокації, щоб побудувати маршрут від вас'); return; }
-        let best = list[0], bd = Infinity;
-        for (const t of list) { const d = haversine(from.ll, t.ll); if (d < bd) { bd = d; best = t; } }
-        closeNavPick();
-        openMapsme(mapsmeLegUrl(from, best));
+
+    // Maps.me: поточне місце → найближча вибрана точка
+    const targets = navTargets();
+    if (!targets.length) {
+        toast('Спочатку позначте місця для маршруту');
+        return;
     }
+
+    // Беремо актуальну GPS-позицію
+    const ready = (startFromMe && startSnap)
+        ? { c: [startSnap[0], startSnap[1]], t: Date.now() }
+        : (_posCache && Date.now() - _posCache.t < 120000 ? _posCache : null);
+
+    if (!ready) {
+        toast('Не вдалося визначити ваше місце. Перевірте дозвіл на геолокацію та відкрийте вікно маршруту повторно.');
+        return;
+    }
+
+    goMapsme(ready, targets);
+    }
+    
+function goMapsme(pos, targets) {
+    // Без GPS не будуємо маршрут від іншої точки
+    if (!pos || !pos.c || !targets || !targets.length) {
+        toast('Не вдалося визначити ваше місце. Дозвольте доступ до геолокації.');
+        return;
+    }
+
+    // Поточне місце користувача
+    const from = {
+        ll: [pos.c[0], pos.c[1]],
+        name: ''
+    };
+
+    // Знаходимо найближчу вибрану точку
+    let best = null;
+    let bd = Infinity;
+
+    for (const t of targets) {
+        const d = haversine(from.ll, t.ll);
+        if (d < bd) {
+            bd = d;
+            best = t;
+        }
+    }
+
+    if (!best) {
+        toast('Не вдалося знайти найближчу точку');
+        return;
+    }
+
+    // Відкриваємо готовий маршрут у Maps.me
+    const url = mapsmeLegUrl(from, best);
+    closeNavPick();
+    openMapsme(url);
+}
+
     document.getElementById('navPickModal').addEventListener('click', e => { if (e.target.id === 'navPickModal') closeNavPick(); });
 
     function updateLinks() {
