@@ -2714,6 +2714,37 @@
         document.getElementById('navPickModal').classList.add('open');
     }
     function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); }
+    // ----- Maps.me: від ПОТОЧНОГО місця до НАЙБЛИЖЧОЇ вибраної точки (за географічною відстанню) -----
+    // Позиція береться лише з GPS: з живої підписки (карта/спідометр) або з запиту геолокації. Знімок «старт від мене» і старий кеш не використовуються.
+    // iOS дозволяє перехід в іншу програму лише синхронно в межах натискання користувача, тому:
+    //   • позиція вже свіжа → Maps.me відкривається прямо в обробнику натискання;
+    //   • позиції ще немає → чекаємо GPS і показуємо кнопку «Відкрити в Maps.me» — її натискання є новим жестом, і перехід дозволено.
+    // Якщо GPS недоступний — маршрут НЕ будується (жодного запасного старту від першої точки).
+    let _mmToken = 0;
+    function mapsmeFreshFix() {                                  // → { c: [lat, lng] } або null
+        const now = Date.now();
+        if (lastGps && lastGps.ll && SPD.fixAt && now - SPD.fixAt <= 20000) return { c: lastGps.ll.slice() };            // жива GPS-підписка
+        if (!(startFromMe && startSnap) && _posCache && now - _posCache.t <= 60000) return { c: _posCache.c.slice() };   // запит геолокації щойно (при відкритті вікна)
+        return null;
+    }
+    function mapsmeRequestFix(ms) {                              // свіжий запит геолокації → { c } або null
+        return new Promise(resolve => {
+            if (!navigator.geolocation) return resolve(null);
+            let done = false;
+            const fin = v => { if (!done) { done = true; clearTimeout(timer); resolve(v); } };
+            const timer = setTimeout(() => fin(null), ms + 1500);
+            navigator.geolocation.getCurrentPosition(
+                p => { _posCache = { c: [p.coords.latitude, p.coords.longitude], t: Date.now() }; fin({ c: _posCache.c.slice() }); },
+                () => fin(null),
+                { enableHighAccuracy: true, timeout: ms, maximumAge: 15000 });
+        });
+    }
+    function mapsmeRoute(pos, targets) {                         // → { url, best } — найближча за географічною відстанню точка
+        const from = { ll: pos.c, name: '' };
+        let best = null, bd = Infinity;
+        for (const t of targets) { const d = haversine(from.ll, t.ll); if (d < bd) { bd = d; best = t; } }
+        return best ? { url: mapsmeLegUrl(from, best), best } : null;
+    }
     function navPickGo(kind) {
         const box = document.getElementById('navPickParts');
         if (kind === 'google') {
@@ -2724,25 +2755,31 @@
             box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
             return;
         }
-        // Maps.me: лише дві точки — де ви зараз → найближча до вас точка маршруту.
-        // Позицію визначено заздалегідь (при відкритті вікна), тому перехід у Maps.me виконується СИНХРОННО в межах натискання:
-        // після очікування (await) iOS міг блокувати відкриття іншої програми, і маршрут не будувався.
-        const targets = navTargets();
+        const targets = navTargets();                            // усі вибрані точки з координатами
         if (!targets.length) return;
-        const ready = (startFromMe && startSnap) ? { c: [startSnap[0], startSnap[1]] } : (_posCache && Date.now() - _posCache.t < 300000 ? _posCache : null);
-        if (ready) { goMapsme(ready, targets); return; }
-        toast('Визначаю ваше місце…');
-        Promise.race([_posPromise || warmPosition(), new Promise(r => setTimeout(() => r(null), 5000))]).then(pos => goMapsme(pos, targets));
+        const fix = mapsmeFreshFix();
+        if (fix) { goMapsme(fix, targets); return; }             // позиція свіжа → перехід синхронно, у межах натискання
+        const token = ++_mmToken;                                // позиції ще немає: чекаємо GPS, а перехід — після нового натискання
+        box.innerHTML = '<div class="nav-sub-title">Визначаю ваше місце за GPS…</div>';
+        mapsmeRequestFix(10000).then(pos => {
+            if (token !== _mmToken || !document.getElementById('navPickModal').classList.contains('open')) return;   // вікно закрито або запит повторено
+            if (!pos) {
+                box.innerHTML = '<div class="nav-sub-title">Не вдалося визначити ваше місце. Увімкніть геолокацію для цього сайту й спробуйте ще раз.</div>';
+                toast('Немає доступу до GPS — маршрут у Maps.me не побудовано');
+                return;
+            }
+            const r = mapsmeRoute(pos, targets);
+            if (!r) return;
+            box.innerHTML = '<div class="nav-sub-title">Місце визначено. До найближчої точки: «' + esc(r.best.name || '') + '»</div><div class="nav-sub"><button type="button" id="mmGoBtn" style="flex:1 1 100%">📍 Відкрити в Maps.me</button></div>';
+            document.getElementById('mmGoBtn').onclick = () => { closeNavPick(); openMapsme(r.url); };   // нове натискання → iOS дозволяє перехід
+        });
     }
-    function goMapsme(pos, targets) {
-        let from, list = targets;
-        if (pos) from = { ll: pos.c, name: '' };
-        else if (targets.length >= 2) { from = targets[0]; list = targets.slice(1); toast('Не вдалося визначити ваше місце — будую від першої точки до найближчої'); }
-        else { toast('Дозвольте доступ до геолокації, щоб побудувати маршрут від вас'); return; }
-        let best = list[0], bd = Infinity;
-        for (const t of list) { const d = haversine(from.ll, t.ll); if (d < bd) { bd = d; best = t; } }
+    function goMapsme(pos, targets) {                            // pos — свіжа GPS-позиція { c: [lat, lng] }
+        if (!pos || !pos.c || !isFinite(pos.c[0]) || !isFinite(pos.c[1])) { toast('Не вдалося визначити ваше місце — маршрут у Maps.me не побудовано'); return; }   // без GPS старту від першої точки немає
+        const r = mapsmeRoute(pos, targets);
+        if (!r) return;
         closeNavPick();
-        openMapsme(mapsmeLegUrl(from, best));
+        openMapsme(r.url);                                       // викликається синхронно з обробника натискання
     }
     document.getElementById('navPickModal').addEventListener('click', e => { if (e.target.id === 'navPickModal') closeNavPick(); });
 
