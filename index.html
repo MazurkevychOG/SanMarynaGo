@@ -517,6 +517,35 @@
         .pf-out { border: none; background: #fde8e8; color: #c0392b; padding: 10px 18px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; flex: none; }
         #pfLoggedIn[hidden], #pfLoggedOut[hidden] { display: none; }
         .mdl-open .fab-add { visibility: hidden; }
+        /* ===== Смуга списку: лічильник в один рядок; спідометр і фільтр — квадрати праворуч, фільтр під шестірнею ===== */
+        .list-head { flex-wrap: wrap; }
+        .lh-count { flex: 0 1 auto; min-width: 0; max-width: calc(100% - 42px); white-space: nowrap; overflow: hidden; }   /* вміщується в ряд із чекбоксом */
+        .list-head.has-save .lh-count { max-width: calc(100% - 92px); }                                                     /* … і з кнопкою 💾 */
+        .lh-br { display: none; flex: 0 0 100%; height: 0; }
+        .list-head.has-count .lh-br { display: block; }
+        .return-toggle { margin-left: 0; margin-right: auto; }
+        .save-route-btn { width: 38px; height: 38px; margin-left: auto; }
+        .spd-sq { flex: none; width: 38px; height: 38px; margin-left: auto; padding: 0; border: none; border-radius: 8px; background: #10151c; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); -webkit-tap-highlight-color: transparent; }
+        .spd-sq:active { transform: scale(.94); }
+        .spd-sq .hub { fill: #718096; }
+        .spd-sq.ok .hub { fill: #2ecc71; }
+        .spd-sq.wait .hub { fill: #f1c40f; }
+        .spd-sq.lost .hub { fill: #e74c3c; }
+        #spdNeedle { transition: transform .6s cubic-bezier(.3,.7,.2,1); }
+        .filter-btn { margin-left: 0; width: 38px; height: 38px; border-radius: 8px; }
+        @media (max-width: 700px) { .list-head { padding-right: 6px; } }
+        /* ===== Спідометр: фон залежить від швидкості; закриття свайпом ===== */
+        .spd-screen { transition: background-color .6s ease; touch-action: none; will-change: transform, opacity; }
+        .spd-screen[data-band="g"] { background: #2d6a4a; }     /* 50–70 км/год — приглушений зелений */
+        .spd-screen[data-band="o"] { background: #c0600d; }     /* 70–90 — помаранчевий */
+        .spd-screen[data-band="p"] { background: #c4487c; }     /* 90–120 — рожевий */
+        .spd-screen[data-band="b"] { background: #6d1230; }     /* від 120 — бордовий */
+        .spd-screen[data-band] .spd-unit { color: rgba(255,255,255,.82); }
+        .spd-screen[data-band] .spd-gps { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.22); }
+        .spd-screen[data-band] .spd-msg { color: rgba(255,255,255,.9); }
+        .spd-screen[data-band] .spd-close { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.3); }
+        .spd-screen.dragging { transition: none; }
+
         .btn-profile { position: relative; }
         .btn-profile .offline-ic { position: absolute; right: -5px; bottom: -5px; width: 21px; height: 21px; padding: 3px; margin: 0; box-sizing: border-box; border-radius: 50%; background: #fff; color: #e67e22; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
         .top-controls .btn-profile .offline-ic { width: 18px; height: 18px; padding: 2px; right: -4px; bottom: -4px; }
@@ -529,7 +558,7 @@
         .spd-pill.ok .dot, .spd-gps.ok .dot { background: #2ecc71; box-shadow: 0 0 0 3px rgba(46,204,113,.25); }
         .spd-pill.wait .dot, .spd-gps.wait .dot { background: #f1c40f; }
         .spd-pill.lost .dot, .spd-gps.lost .dot { background: #e74c3c; }
-        .spd-screen { position: fixed; inset: 0; z-index: 4500; display: none; background: #05070a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+        .spd-screen { position: fixed; inset: 0; z-index: 4500; display: none; background: #05070a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); -webkit-user-select: none; user-select: none; touch-action: none; overscroll-behavior: contain; }
         .spd-screen.show { display: flex; }
         .spd-close { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 14px); width: 56px; height: 56px; padding: 0; border-radius: 50%; border: 2px solid #3a4452; background: #121821; color: #fff; font-size: 28px; line-height: 1; cursor: pointer; z-index: 2; -webkit-tap-highlight-color: transparent; }
         .spd-main { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 64px 14px 14px; }
@@ -987,9 +1016,11 @@
             <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Вибрати всі">
             <span class="lh-count" id="listCount"></span>
             <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+            <span class="lh-br" aria-hidden="true"></span>
             <label class="return-toggle" id="returnToggle" title="Побудувати зворотний маршрут до першої вибраної точки"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)"><span>back to start</span></label>
+            <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Спідометр (GPS)" aria-label="Спідометр: швидкість невідома"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
             <button type="button" class="filter-btn" id="filterBtn" onclick="openFilter()" title="Фільтр: країна, час, відстань, тип місця" aria-label="Фільтр"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>
-            <button type="button" class="spd-pill wait" id="speedoPill" onclick="openSpeedo()" title="Спідометр (GPS)" aria-label="Спідометр: швидкість невідома"><i class="dot"></i><span class="v" id="speedoPillV">—</span><span class="u">км/год</span></button>
+            
         </div>
     </div>
     <div id="placesTable"></div>
@@ -3210,7 +3241,9 @@
         if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none';
         const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
-        if (!n) { el.style.display = 'none'; el.textContent = ''; return; }   // лічильник лише коли щось вибрано
+        const lh = document.getElementById('listHead');
+        if (lh) { lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
+        if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
         const tm = (routeTotals && eff >= 2)
@@ -3219,7 +3252,23 @@
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
         el.title = 'Вибрано / усього місць' + (tm ? ' · загальний час і відстань' : '') + (startFromMe ? ' · торкніться, щоб скасувати старт від моєї позиції' : '');
+        fitListCount();
     }
+    // Лічильник у сірій смузі завжди в ОДИН рядок: якщо не вміщається — зменшуємо шрифт (до 8 px)
+    function fitListCount() {
+        const el = document.getElementById('listCount');
+        if (!el || el.style.display === 'none') return;
+        el.style.fontSize = '';
+        let size = parseFloat(getComputedStyle(el).fontSize) || 14, guard = 0;
+        while (el.scrollWidth > el.clientWidth + 0.5 && size > 8 && guard++ < 40) { size -= 0.5; el.style.fontSize = size + 'px'; }
+    }
+    (function initFitListCount() {
+        let raf = 0;
+        const again = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(fitListCount); };
+        window.addEventListener('resize', again); window.addEventListener('orientationchange', again);
+        if (window.ResizeObserver) { const lh = document.getElementById('listHead'); if (lh) new ResizeObserver(again).observe(lh); }
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+    })();
     // «Повернутися на старт»: перемикач. Якщо увімкнено — і маршрут Google, і лінія на карті
     // добудовують зворотний відрізок до ПЕРШОЇ вибраної точки.
     function autoClearReturn() {
@@ -4169,8 +4218,17 @@
         SPD.shown = key;
         const cls = st === 'ok' ? 'ok' : st === 'wait' ? 'wait' : 'lost';
         const pill = document.getElementById('speedoPill');
-        if (pill) { pill.className = 'spd-pill ' + cls; pill.setAttribute('aria-label', 'Спідометр: ' + (v === null ? 'швидкість невідома' : v + ' км/год')); document.getElementById('speedoPillV').textContent = txt; }
+        if (pill) {
+            pill.className = 'spd-sq ' + cls;
+            const lbl = 'Спідометр: ' + (v === null ? 'швидкість невідома' : v + ' км/год');
+            pill.setAttribute('aria-label', lbl); pill.title = lbl;
+            const nd = document.getElementById('spdNeedle');
+            if (nd) nd.style.transform = 'rotate(' + (v === null ? -135 : -135 + Math.min(v, 180) / 180 * 270) + 'deg)';   // 0…180 км/год → дуга 270°
+        }
         if (!SPD.open) return;
+        const scr = document.getElementById('speedoScreen');            // колір фону: 50–70 зелений, 70–90 помаранчевий, 90–120 рожевий, 120+ бордовий
+        const band = v === null ? '' : v >= 120 ? 'b' : v >= 90 ? 'p' : v >= 70 ? 'o' : v >= 50 ? 'g' : '';
+        if (band) scr.dataset.band = band; else delete scr.dataset.band;
         const val = document.getElementById('spdVal'); val.textContent = txt; val.classList.toggle('none', v === null);
         document.getElementById('spdGps').className = 'spd-gps ' + cls;
         document.getElementById('spdGpsTxt').textContent = st === 'ok' ? 'GPS активний' : st === 'wait' ? 'Очікування GPS' : 'Немає сигналу GPS';
@@ -4235,6 +4293,7 @@
         wakeRelease();
         const el = document.getElementById('speedoScreen');
         el.classList.remove('show'); el.setAttribute('aria-hidden', 'true'); document.body.classList.remove('speedo-open');
+        el.style.transform = ''; el.style.opacity = ''; el.style.transition = ''; el.classList.remove('dragging');
         SPD.shown = ''; speedoRender();
         if (speedoState() !== 'ok') speedoStopTimer();
     }
@@ -4250,6 +4309,44 @@
         if (SPD.open || speedoState() === 'ok') speedoEnsureTimer();
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && SPD.open) closeSpeedo(); });
+    // Свайп вгору або вниз закриває спідометр: екран їде за пальцем і зникає; короткий рух повертає його назад.
+    (function initSpeedoSwipe() {
+        const el = document.getElementById('speedoScreen');
+        if (!el) return;
+        let id = null, x0 = 0, y0 = 0, dy = 0, t0 = 0, drag = false;
+        el.addEventListener('pointerdown', e => {
+            if (!SPD.open || e.target.closest('button')) return;
+            id = e.pointerId; x0 = e.clientX; y0 = e.clientY; dy = 0; t0 = performance.now(); drag = false;
+        });
+        el.addEventListener('pointermove', e => {
+            if (e.pointerId !== id) return;
+            const ddx = e.clientX - x0, ddy = e.clientY - y0;
+            if (!drag) {
+                if (Math.abs(ddy) > 8 && Math.abs(ddy) > Math.abs(ddx) * 1.3) { drag = true; el.classList.add('dragging'); try { el.setPointerCapture(id); } catch (x) { } }
+                else return;
+            }
+            dy = ddy;
+            el.style.transform = 'translateY(' + dy + 'px)';
+            el.style.opacity = String(Math.max(.2, 1 - Math.abs(dy) / (innerHeight * .75)));
+        });
+        const end = e => {
+            if (e.pointerId !== id) return;
+            id = null;
+            if (!drag) return;
+            drag = false; el.classList.remove('dragging');
+            const speed = Math.abs(dy) / Math.max(1, performance.now() - t0);        // px/мс
+            if (Math.abs(dy) > 110 || (Math.abs(dy) > 40 && speed > .5)) {            // достатньо далеко або швидко — закриваємо
+                el.style.transition = 'transform .22s ease-out, opacity .22s ease-out';
+                el.style.transform = 'translateY(' + (dy > 0 ? '100%' : '-100%') + ')'; el.style.opacity = '0';
+                setTimeout(closeSpeedo, 230);
+            } else {                                                                  // замало — повертаємо на місце
+                el.style.transition = 'transform .2s ease-out, opacity .2s ease-out';
+                el.style.transform = ''; el.style.opacity = '';
+                setTimeout(() => { el.style.transition = ''; }, 210);
+            }
+        };
+        el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+    })();
     function addLocateControl() {
         const Ctl = L.Control.extend({
             options: { position: 'topleft' },
