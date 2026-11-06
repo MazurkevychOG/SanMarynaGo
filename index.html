@@ -2831,7 +2831,7 @@
             el.onclick = (e) => {
                 e.preventDefault();
                 if (href === '#') { alert('Спочатку позначте галочками місця для маршруту'); return; }
-                openNavPick();                       // Google Maps чи Maps.me
+                routeButtonAction();                 // одразу Google Maps (вікно вибору збережено — див. ROUTE_CHOOSER_ENABLED)
             };
         });
         document.querySelectorAll('.route-parts').forEach(box => {
@@ -3841,7 +3841,47 @@
         } else fallback();
     }
     const gUrl = (p) => safeUrl(p.gmapsUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(String(p.coords).replace(/\s+/g, '')));
-    const openUrl = (u) => window.open(u, '_blank', 'noopener');
+    // ----- Відкриття зовнішніх посилань (Google Maps) -----
+    // false: «Маршрут» одразу відкриває Google Maps. true — повернути вікно вибору програми (openNavPick зі скасуванням Maps.me тощо; код збережено).
+    let ROUTE_CHOOSER_ENABLED = false;
+    function routeButtonAction() {
+        if (ROUTE_CHOOSER_ENABLED) { openNavPick(); return; }
+        const links = buildRouteLinks();
+        if (!links.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        closeCtx();
+        openUrl(links[0]);                                   // дуже довгий маршрут — частина 1, решта — кнопки Ч2, Ч3…
+    }
+    // На iPhone в режимі «На екран Додому» window.open відкриває вбудований браузер; коли посилання передається застосунку Google Maps,
+    // у ньому лишається порожня вкладка («Search or enter website name») — після повернення додаток виглядає «завислим».
+    // Тому в цьому режимі переходимо звичайною навігацією (посилання одразу передається застосунку), без додаткової вкладки.
+    let _extNavAt = 0, _extAway = false;
+    function navigateExternal(u) { window.location.href = u; }
+    const openUrl = (u) => {
+        _extNavAt = Date.now(); _extAway = false;            // пішли в інший застосунок: після повернення покажемо головний екран
+        if (window.navigator.standalone === true) navigateExternal(u);
+        else window.open(u, '_blank', 'noopener');
+    };
+    // Посилання target="_blank" (назва місця, частини маршруту) у режимі «Додому» теж ведемо через openUrl
+    document.addEventListener('click', e => {
+        if (window.navigator.standalone !== true || e.defaultPrevented) return;
+        const a = e.target && e.target.closest ? e.target.closest('a[target="_blank"]') : null;
+        const href = a && a.getAttribute('href');
+        if (!href || !/^https?:\/\//i.test(href)) return;
+        e.preventDefault(); openUrl(href);
+    });
+    // Повернення з карт у додаток → головний екран: закриваємо накладку карти, вікна вибору й меню (без перезавантаження сторінки)
+    function returnToMainScreen() {
+        _extNavAt = 0; _extAway = false;
+        document.body.classList.remove('map-open');
+        try { closeCtx(); } catch (e) { }
+        try { closeNavPick(); } catch (e) { }
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (!_extNavAt) return;
+        if (document.hidden) { _extAway = true; return; }                                    // справді пішли з додатка
+        if (_extAway && Date.now() - _extNavAt < 6 * 3600 * 1000) returnToMainScreen();      // повернулись
+    });
+    window.addEventListener('pageshow', e => { if (e.persisted && _extNavAt && _extAway) returnToMainScreen(); });
 
     function openMapMenu(ll, x, y) {
         const lat = ll.lat.toFixed(6), lng = ll.lng.toFixed(6), cs = lat + ', ' + lng;
