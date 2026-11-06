@@ -841,6 +841,39 @@
         html[data-theme="dark"] .pf-user-name { color: #e8ecf2; }
         html[data-theme="dark"] .tm-link { color: #8fb5f5; }
         html[data-theme="dark"] .nav-opt, html[data-theme="dark"] .pf-btn, html[data-theme="dark"] .srm-acts button.ok { color: #fff; }
+    
+        /* ===== Кнопки-піктограми 38×38 (як «Зберегти»): карта, маршрут, повернутися на старт ===== */
+        .sq-btn, .mobile-controls .sq-btn, .top-controls .sq-btn, .map-bar-actions .sq-btn {
+            box-sizing: border-box !important; flex: none !important; position: relative; display: inline-flex; align-items: center; justify-content: center;
+            width: 38px !important; height: 38px !important; min-width: 38px !important; padding: 0 !important; margin: 0;
+            border: none !important; border-radius: 8px !important; background: #27ae60 !important; color: #fff !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,.25) !important; font-size: 0 !important; line-height: 1; cursor: pointer; text-decoration: none;
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .sq-btn:hover { background: #27ae60 !important; }
+        .sq-btn:active { transform: scale(.94); }
+        .sq-btn svg { width: 20px; height: 20px; display: block; pointer-events: none; }
+        .sq-btn > input { position: absolute; inset: 0; width: 100% !important; height: 100% !important; margin: 0 !important; opacity: 0; cursor: pointer; }
+        .sq-btn.return-toggle.on { background: #1e8449 !important; box-shadow: inset 0 0 0 2px #fff, 0 1px 3px rgba(0,0,0,.25) !important; }   /* увімкнено: темніший фон + біле кільце */
+        @media (min-width: 701px) { .btn-map-open { display: none !important; } }
+        /* шапка телефону: усе в один рядок */
+        .mobile-controls { gap: 4px; flex-wrap: nowrap; align-items: center; flex: 0 0 auto; }
+        .mobile-controls .spd-sq { margin-left: 0; }
+        .mobile-header { flex-wrap: nowrap; }
+        .mh-left { flex: 1 1 0; min-width: 0; }
+        .mh-left .app-brand { min-width: 0; overflow: hidden; }
+        .mh-left .app-brand .mobile-title { display: block; overflow: hidden; text-overflow: ellipsis; }
+        .mh-left .app-brand .app-user { overflow: hidden; text-overflow: ellipsis; }
+        .mh-left .app-brand .mobile-title { font-size: clamp(9px, 3.05vw, 13px); letter-spacing: -0.4px; }
+        /* друга смужка: вибір усіх, цифри розрахунку, зберегти, фільтр */
+        .lh-count { max-width: calc(100% - 88px); }
+        .list-head.has-save .lh-count { max-width: calc(100% - 134px); }
+        .list-head .filter-btn { margin-left: 0; }
+        .list-head:not(.has-save) .filter-btn { margin-left: auto; }
+        /* Maps.me тимчасово приховано в діалозі вибору програми для маршруту */
+        #navMapsmeBtn { display: none !important; }
+        /* підказки */
+        .tip-bubble { position: fixed; z-index: 5000; max-width: 220px; padding: 6px 10px; border-radius: 8px; background: #1f2937; color: #fff; font-size: 13px; font-weight: 600; line-height: 1.25; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
+        .tip-bubble[hidden] { display: none; }
     </style>
 </head>
 <body>
@@ -858,7 +891,7 @@
     <div class="map-bar">
         <span class="map-bar-title">🗺 Карта</span>
         <div class="map-bar-actions">
-            <a id="gmapsLinkMap" class="link-btn btn-export" href="#" target="_blank">Route</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+            <a id="gmapsLinkMap" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
             <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
@@ -999,8 +1032,11 @@
         <div class="mobile-header">
         <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
         <div class="app-brand"><span class="mobile-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div></div>
-        <div class="mobile-controls"><button class="btn-map-open" onclick="openMobileMap()">🗺 map</button>
-            <a id="gmapsLink" class="link-btn btn-export" href="#" target="_blank">🗺 routes</a><span class="route-parts"></span>
+        <div class="mobile-controls">
+            <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Спідометр (GPS)" aria-label="Спідометр: швидкість невідома"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
+            <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Карта" aria-label="Карта"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
+            <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
+            <label class="return-toggle sq-btn" id="returnToggle" data-tip="Повернутися на старт"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Повернутися на старт"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
             <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
         </div>
     </div>
@@ -1016,9 +1052,8 @@
             <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Вибрати всі">
             <span class="lh-count" id="listCount"></span>
             <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
-            <span class="lh-br" aria-hidden="true"></span>
-            <label class="return-toggle" id="returnToggle" title="Побудувати зворотний маршрут до першої вибраної точки"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)"><span>back to start</span></label>
-            <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Спідометр (GPS)" aria-label="Спідометр: швидкість невідома"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
+            
+            
             <button type="button" class="filter-btn" id="filterBtn" onclick="openFilter()" title="Фільтр: країна, час, відстань, тип місця" aria-label="Фільтр"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>
             
         </div>
@@ -1034,7 +1069,7 @@
             <div class="top-controls desktop-only">
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Додати місце" aria-label="Додати місце">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-                <a id="gmapsLinkDesktop" class="link-btn btn-export" href="#" target="_blank">Route</a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+                <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Повернутися на старт"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Повернутися на старт"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
         </div>
@@ -2792,7 +2827,7 @@
             const el = document.getElementById(id);
             if (!el) return;
             el.href = href;
-            el.title = links.length > 1 ? 'Маршрут задовгий для одного посилання — відкриється частина 1' : '';
+            el.dataset.tip = links.length > 1 ? 'Маршрут задовгий для одного посилання — відкриється частина 1' : 'Маршрут';
             el.onclick = (e) => {
                 e.preventDefault();
                 if (href === '#') { alert('Спочатку позначте галочками місця для маршруту'); return; }
@@ -3274,8 +3309,7 @@
         if (!el) return;
         const n = places.filter(p => p.selected).length;
         const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));   // точки маршруту (разом із моєю позицією)
-        const rt = document.getElementById('returnToggle');
-        if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none';
+        ['returnToggle', 'returnToggleDesk'].forEach(id => { const rt = document.getElementById(id); if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none'; });
         const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         const lh = document.getElementById('listHead');
@@ -3315,18 +3349,20 @@
     }
     function onReturnToggle(el) {
         try { localStorage.setItem('return_to_start', el.checked ? '1' : '0'); } catch (e) { }
-        const lab = document.getElementById('returnToggle');
-        if (lab) lab.classList.toggle('on', el.checked);
+        syncReturnToggles(el.checked);
         updateLinks();
     }
+    function syncReturnToggles(on) {                         // мобільний і настільний перемикачі показують один стан
+        [['returnToStart', 'returnToggle'], ['returnToStartDesktop', 'returnToggleDesk']].forEach(([i, l]) => {
+            const c = document.getElementById(i), lab = document.getElementById(l);
+            if (c) c.checked = on;
+            if (lab) lab.classList.toggle('on', on);
+        });
+    }
     function restoreReturnToggle() {
-        const el = document.getElementById('returnToStart');
-        if (!el) return;
         let v = '0';
         try { v = localStorage.getItem('return_to_start') || '0'; } catch (e) { }
-        el.checked = v === '1';
-        const lab = document.getElementById('returnToggle');
-        if (lab) lab.classList.toggle('on', el.checked);
+        syncReturnToggles(v === '1');
     }
 
     (function initCounterTap() {
@@ -4180,6 +4216,40 @@
         }, err => { console.warn('GPS:', err && err.message); speedoError(err); }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
     }
 
+
+    // ===== Підказки до кнопок-піктограм: при наведенні (миша) і при довгому натисканні (дотик) =====
+    (function initTips() {
+        const tip = document.createElement('div');
+        tip.className = 'tip-bubble'; tip.setAttribute('role', 'tooltip'); tip.hidden = true;
+        document.body.appendChild(tip);
+        let showT = 0, hideT = 0, pressT = 0, sx = 0, sy = 0, suppress = false;
+        const target = e => (e.target && e.target.closest) ? e.target.closest('[data-tip]') : null;
+        const place = el => {
+            tip.textContent = el.dataset.tip || ''; tip.hidden = false; tip.style.left = '0px'; tip.style.top = '0px';
+            const r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+            const x = Math.max(6, Math.min(innerWidth - w - 6, r.left + r.width / 2 - w / 2));
+            let y = r.bottom + 8; if (y + h > innerHeight - 6) y = r.top - h - 8;
+            tip.style.left = x + 'px'; tip.style.top = Math.max(6, y) + 'px';
+        };
+        const hide = () => { clearTimeout(showT); clearTimeout(hideT); clearTimeout(pressT); pressT = 0; tip.hidden = true; };
+        document.addEventListener('pointerover', e => { if (e.pointerType !== 'mouse') return; const el = target(e); if (!el) return; clearTimeout(showT); showT = setTimeout(() => place(el), 350); });
+        document.addEventListener('pointerout', e => { if (e.pointerType === 'mouse' && target(e)) hide(); });
+        document.addEventListener('pointerdown', e => {
+            suppress = false;
+            if (e.pointerType === 'mouse') { hide(); return; }
+            const el = target(e); if (!el) return;
+            sx = e.clientX; sy = e.clientY; clearTimeout(pressT);
+            pressT = setTimeout(() => { pressT = 0; suppress = true; place(el); clearTimeout(hideT); hideT = setTimeout(hide, 1800); }, 450);   // довге натискання
+        }, { passive: true });
+        const cancelPress = () => { clearTimeout(pressT); pressT = 0; };
+        document.addEventListener('pointerup', cancelPress, { passive: true });
+        document.addEventListener('pointercancel', cancelPress, { passive: true });
+        document.addEventListener('pointermove', e => { if (pressT && Math.hypot(e.clientX - sx, e.clientY - sy) > 10) cancelPress(); }, { passive: true });
+        // після довгого натискання лише показуємо підказку — дію кнопки не виконуємо
+        document.addEventListener('click', e => { if (suppress && target(e)) { suppress = false; e.preventDefault(); e.stopPropagation(); } }, true);
+        document.addEventListener('contextmenu', e => { if (target(e) && e.pointerType !== 'mouse') e.preventDefault(); });
+        window.addEventListener('scroll', hide, { passive: true, capture: true });
+    })();
     // ===== Офлайн-режим: значок біля назви, коли немає інтернету =====
     function updateOfflineIcon() {
         const off = navigator.onLine === false;
