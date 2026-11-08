@@ -874,6 +874,8 @@
         /* підказки */
         .tip-bubble { position: fixed; z-index: 5000; max-width: 220px; padding: 6px 10px; border-radius: 8px; background: #1f2937; color: #fff; font-size: 13px; font-weight: 600; line-height: 1.25; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
         .tip-bubble[hidden] { display: none; }
+        /* Кнопка «Маршрут» — лише коли вибрана хоча б 1 точка */
+        body:not(.has-sel) #gmapsLink, body:not(.has-sel) #gmapsLinkDesktop, body:not(.has-sel) #gmapsLinkMap, body:not(.has-sel) .route-parts { display: none !important; }
     </style>
 </head>
 <body>
@@ -2824,6 +2826,7 @@
         scheduleRoute();
         const links = buildRouteLinks();
         const href = links[0] || '#';
+        document.body.classList.toggle('has-sel', links.length > 0);
         ['gmapsLink', 'gmapsLinkDesktop', 'gmapsLinkMap'].forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -3318,9 +3321,11 @@
         if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
-        const tm = (routeTotals && eff >= 2)
-            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + (ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '')
-            : '';
+        const hasRoute = !!(routeTotals && eff >= 2);
+        const costTxt = ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '';
+        const tm = hasRoute
+            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + costTxt
+            : ((ex.min ? ' · ⏱ ' + fmtTime(ex.min * 60) : '') + costTxt);   // 1 точка (маршруту ще нема) — вартість і час показуємо одразу
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
         el.title = 'Вибрано / усього місць' + (tm ? ' · загальний час і відстань' : '') + (startFromMe ? ' · торкніться, щоб скасувати старт від моєї позиції' : '');
