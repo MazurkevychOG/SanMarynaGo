@@ -910,7 +910,8 @@
 <div id="waitOverlay" class="wait-ov" role="status" aria-live="polite"><div class="wait-card"><svg class="snake-svg" viewBox="-50 -50 100 100" width="108" height="108" aria-hidden="true" focusable="false"><defs><path id="snkPath" d="M0,-34 A34,34 0 1,1 0,34 A34,34 0 1,1 0,-34"/></defs><circle r="34" fill="none" stroke="rgba(120,130,150,.18)" stroke-width="1.2" stroke-dasharray="2 4"/><circle r="2.08" fill="#a8e6a1" opacity="0.45"><animateMotion dur="2.2s" begin="-1.000s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.35" fill="#9fe29c" opacity="0.48"><animateMotion dur="2.2s" begin="-1.075s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.62" fill="#97df98" opacity="0.52"><animateMotion dur="2.2s" begin="-1.150s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.89" fill="#8fdb94" opacity="0.55"><animateMotion dur="2.2s" begin="-1.225s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.16" fill="#87d890" opacity="0.59"><animateMotion dur="2.2s" begin="-1.300s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.43" fill="#7fd48c" opacity="0.62"><animateMotion dur="2.2s" begin="-1.375s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.70" fill="#77d188" opacity="0.66"><animateMotion dur="2.2s" begin="-1.450s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.97" fill="#6fcd84" opacity="0.69"><animateMotion dur="2.2s" begin="-1.525s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.24" fill="#67ca80" opacity="0.72"><animateMotion dur="2.2s" begin="-1.600s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.51" fill="#5fc67c" opacity="0.76"><animateMotion dur="2.2s" begin="-1.675s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.78" fill="#57c378" opacity="0.79"><animateMotion dur="2.2s" begin="-1.750s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.05" fill="#4fbf74" opacity="0.83"><animateMotion dur="2.2s" begin="-1.825s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.32" fill="#47bc70" opacity="0.86"><animateMotion dur="2.2s" begin="-1.900s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.59" fill="#3fb86c" opacity="0.90"><animateMotion dur="2.2s" begin="-1.975s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.86" fill="#37b568" opacity="0.93"><animateMotion dur="2.2s" begin="-2.050s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="6.13" fill="#2fb164" opacity="0.97"><animateMotion dur="2.2s" begin="-2.125s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><g><animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto"><mpath href="#snkPath"/></animateMotion><circle r="7.4" fill="#1e8449"/><circle cx="2.6" cy="-3.2" r="1.9" fill="#fff"/><circle cx="2.6" cy="3.2" r="1.9" fill="#fff"/><circle cx="3.2" cy="-3.2" r="0.9" fill="#111"/><circle cx="3.2" cy="3.2" r="0.9" fill="#111"/><path d="M7 0 L12 0 M12 0 L14.5 -2 M12 0 L14.5 2" stroke="#e74c3c" stroke-width="1.1" fill="none" stroke-linecap="round"/></g></svg><div class="wait-txt" id="waitTxt">Оновлюю…</div></div></div>
 <div id="filterModal" class="mdl" role="dialog" aria-label="Фільтр місць">
     <div class="srm-box mdl-box">
-        <h3>🔎 Фільтр місць</h3>
+        <h3>🔎 Фільтр і сортування</h3>
+        <div class="flt-sec"><div class="flt-lab">Сортування</div><div class="flt-chips" id="fltSort"></div><div class="srm-meta" id="fltSortHint" style="margin-top:6px"></div></div>
         <div class="flt-sec"><div class="flt-lab">Країна</div><div class="flt-chips" id="fltCountries"></div></div>
         <div class="flt-sec"><div class="flt-lab">Тип місця</div><div class="flt-chips" id="fltTypes"></div></div>
         <div class="flt-sec"><div class="flt-lab">Час у дорозі, хв</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_tMin" placeholder="від" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_tMax" placeholder="до" autocomplete="off"></div></div>
@@ -1415,7 +1416,7 @@
                 try { if (navigator.vibrate) navigator.vibrate(16); } catch (err) { }
                 startReorder({ currentTarget: content, pointerId: pid, pointerType: ptype, clientX: sx, clientY: sy, button: 0, target: content, preventDefault() { } },
                     row, () => Array.from(tbody.children),
-                    (from, to) => { const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); persistPlaces(true); },   // номери всіх карток перераховуються в render(), порядок зберігається одразу
+                    (from, to) => { if (sortMode === 'group') setSortMode('manual'); const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); persistPlaces(true); },   // номери всіх карток перераховуються в render(), порядок зберігається одразу
                     { ghost: () => rowGhost(row, i), immediate: true, onEnd: () => { row._reordering = false; }, onDone: () => { suppressClickUntil = Date.now() + 450; } });
             }, ptype === 'mouse' ? 250 : LONG_PRESS_MS);
         });
@@ -2330,7 +2331,7 @@
         }
         sync();
         closeFormDissolve();
-        if (data._at !== undefined) { const at = data._at; delete data._at; setTimeout(() => flashRow(at), 120); }
+        if (data._at !== undefined) { delete data._at; const at = places.indexOf(data); setTimeout(() => flashRow(at), 120); }
     }
 
     function handleEdit(i) {
@@ -2665,7 +2666,7 @@
         syncMainToggle(); updateListCount(); updateLinks(); refreshMarkerStates();
     }
     function handleRowToggle(i, src) { places[i].selected = src.checked; persistSelection(); refreshSelectionUI(); }
-    function sync() { places.forEach((p, i) => { p.order = i + 1; }); recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }   // order перераховується для ВСІХ карток
+    function sync() { if (sortMode === 'group') reorderAuto(); places.forEach((p, i) => { p.order = i + 1; }); recomputeDeleted(); persistPlaces(); persistSelection(); render(); touchVersion(); }   // order перераховується для ВСІХ карток
 
 
     // ===== Маршрут Google Maps =====
@@ -4242,6 +4243,7 @@
             const ll = [pos.coords.latitude, pos.coords.longitude];
             lastGps = { ll, acc: pos.coords.accuracy };
             speedoFeed(pos);                                       // спідометр користується цим самим потоком
+            sortOnFix(ll);                                         // сортування «за відстанню до мене»
             if (!_fltGps) { _fltGps = true; if (hasMetricFilter()) applySearch(); }   // перша GPS-позиція: перерахувати фільтр за часом/відстанню від мене
             if (!autoStart && !(startFromMe && startSnap) && places.filter(p => p.selected).length === 1) updateLinks();   // вибрана одна точка, а позиція з'явилась пізніше — будуємо від неї
             if (!map) return;
@@ -5071,6 +5073,7 @@
             b.classList.toggle('on', i < 0); onFilterChange();
         });
         updateFilterInfo();
+        renderSortChips();                                   // після призначення обробників фільтра — щоб їх не перебити
     }
     function onFilterChange() { saveFilter(); if (hasMetricFilter()) { try { startGps(); } catch (e) { } } applySearch(); updateFilterInfo(); }   // час/відстань рахуються від мене — потрібен GPS
     function updateFilterInfo() {
@@ -5210,6 +5213,66 @@
         sw.addEventListener('change', () => setTheme(sw.checked ? 'dark' : 'light'));
     })();
 
+
+    // ===== Сортування списку =====
+    // За замовчуванням: за ГРУПОЮ (типом місця; порядок груп — як у списку типів, без типу — в кінець), а в межах групи — за відстанню до мого ПОТОЧНОГО місця
+    // (GPS; поки його немає — остання відома позиція; якщо й її немає, у групі лишається попередній порядок). «Мій порядок» — ручне перетягування карток.
+    const SORT_KEY = 'mymaps_sort', POS_KEY = 'mymaps_lastpos';
+    let sortMode = 'group';                                  // 'group' — за групою й відстанню (за замовчуванням), 'manual' — мій порядок
+    try { const v = localStorage.getItem(SORT_KEY); if (v === 'manual' || v === 'group') sortMode = v; } catch (e) { }
+    let cachedPos = null, _sortRef = null, _posSavedAt = 0, _sortTimer = 0, _lastTouch = 0, SORT_DEBOUNCE = 1500, SORT_IDLE = 3000, SORT_MOVE_M = 1000;
+    try { const a = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); if (Array.isArray(a) && isFinite(a[0]) && isFinite(a[1])) cachedPos = [a[0], a[1]]; } catch (e) { }
+    ['pointerdown', 'touchmove', 'wheel', 'scroll'].forEach(ev => document.addEventListener(ev, () => { _lastTouch = Date.now(); }, { passive: true, capture: true }));
+    function groupIndex(p) {                                 // група = перший за порядком у списку типів тип місця
+        const ids = p.types || [], i = typeDefs.findIndex(t => ids.includes(t.id));
+        return i < 0 ? typeDefs.length + 1 : i;
+    }
+    function sortRef() { return lastGps ? lastGps.ll : cachedPos; }
+    function reorderAuto() {                                 // впорядковує places у пам'яті; true — якщо порядок змінився
+        if (!places.length) return false;
+        const ref = sortRef();
+        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, g: groupIndex(p), d: (ref && c) ? haversine(ref, c) : Infinity }; });
+        it.sort((a, b) => (a.g - b.g) || (a.d === b.d ? 0 : (a.d < b.d ? -1 : 1)) || (a.i - b.i));
+        _sortRef = ref ? ref.slice() : null;
+        const changed = it.some((x, k) => x.p !== places[k]);
+        if (changed) places = it.map(x => x.p);
+        return changed;
+    }
+    function setSortMode(m, quiet) {
+        if (m !== 'group' && m !== 'manual') return;
+        sortMode = m;
+        try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
+        if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Список впорядковано: за групою й відстанню від вас'); }
+        else if (!quiet) toast('Ручний порядок: утримуйте картку, щоб перетягнути');
+        renderSortChips();
+    }
+    function renderSortChips() {
+        const box = document.getElementById('fltSort');
+        if (!box) return;
+        box.innerHTML = [['group', '🧭 За групою й відстанню'], ['manual', '✋ Мій порядок']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
+        box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
+        const hint = document.getElementById('fltSortHint');
+        if (hint) hint.textContent = sortMode === 'manual' ? 'Порядок задаєте ви: утримуйте картку й перетягніть.' : (sortRef() ? 'Групи — за порядком типів; у групі — від найближчого до вашого місця.' : 'GPS ще не визначено — поки місця впорядковані лише за групами.');
+    }
+    function sortOnFix(ll) {                                 // викликається з GPS-підписки
+        const now = Date.now();
+        if (now - _posSavedAt > 20000) { _posSavedAt = now; cachedPos = ll.slice(); try { localStorage.setItem(POS_KEY, JSON.stringify([ll[0], ll[1], now])); } catch (e) { } }
+        if (sortMode !== 'group') return;
+        if (_sortRef && haversine(_sortRef, ll) < SORT_MOVE_M) return;     // ще поруч із місцем останнього сортування
+        scheduleAutoResort();
+    }
+    function scheduleAutoResort() {                          // перевпорядкування не під пальцем: лише коли ви нічого не робите й немає відкритих екранів
+        clearTimeout(_sortTimer);
+        _sortTimer = setTimeout(function tick() {
+            if (sortMode !== 'group') return;
+            const b = document.body.classList, sb = document.getElementById('sidebar'), ed = document.getElementById('editIndex');
+            const busy = ['map-open', 'form-open', 'profile-open', 'settings-open', 'speedo-open', 'mdl-open', 'filtering'].some(c => b.contains(c)) ||
+                (sb && sb.classList.contains('open')) || (ed && ed.value !== '') || Date.now() - _lastTouch < SORT_IDLE;
+            if (busy) { _sortTimer = setTimeout(tick, 2500); return; }
+            if (reorderAuto()) sync();
+        }, SORT_DEBOUNCE);
+    }
+
     // ===== Старт: каталог + ваші локальні зміни =====
     async function loadCatalog() {
         const r = await fetch(DATA_BASE + 'index.json', { cache: 'no-cache' });
@@ -5291,6 +5354,7 @@
         restoreReturnToggle();
         applyUserSettings();
         pfFillForm();
+        if (sortMode === 'group') reorderAuto();                  // порядок за замовчуванням: група → відстань до мого місця (остання відома позиція)
         render();
         syncStickyOffset();
         initMap();
