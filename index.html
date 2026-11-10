@@ -874,8 +874,10 @@
         /* підказки */
         .tip-bubble { position: fixed; z-index: 5000; max-width: 220px; padding: 6px 10px; border-radius: 8px; background: #1f2937; color: #fff; font-size: 13px; font-weight: 600; line-height: 1.25; box-shadow: 0 4px 14px rgba(0,0,0,.35); pointer-events: none; }
         .tip-bubble[hidden] { display: none; }
-        /* Кнопка «Маршрут» — лише коли вибрана хоча б 1 точка */
-        body:not(.has-sel) #gmapsLink, body:not(.has-sel) #gmapsLinkDesktop, body:not(.has-sel) #gmapsLinkMap, body:not(.has-sel) .route-parts { display: none !important; }
+    
+        /* ===== Рідна прокрутка списку на телефонах: картка «прилипає» рівно під верхньою смугою ===== */
+        html.native-snap .content-area { scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        html.native-snap .place-row { scroll-snap-align: start; }
     </style>
 </head>
 <body>
@@ -1255,7 +1257,7 @@
         const m = p.media[0];
         const inner = (m.type || '').startsWith('video/')
             ? '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;">🎞</div>'
-            : `<img src="${esc(m.thumb || m.data)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
+            : `<img src="${esc(m.thumb || m.data)}" ${(!m.thumb && String(m.data).startsWith('data:')) ? 'loading="lazy" ' : ''}decoding="async" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
         return inner + (p.media.length > 1 ? `<span class="photo-count-badge">+${p.media.length - 1}</span>` : '');
     }
 
@@ -1303,6 +1305,7 @@
         updateListCount();
         updateLinks();
         if (places.some(p => p.near === undefined || p.country === undefined)) scheduleNear();
+        scheduleThumbs();                                        // мініатюри для власних фото
         updateMapMarkers();
     }
 
@@ -1487,6 +1490,12 @@
     document.addEventListener('pointerdown', e => { if (openRow && !openRow.contains(e.target)) closeOpenRow(); }, true);
 
     // Шапка (кнопки) і заголовки колонок закріплені; висоту шапки передаємо в CSS
+    // ===== Прокрутка списку на телефонах: рідна інерція + рідне «прилипання» до карток (CSS scroll-snap) =====
+    // Власна анімація scrollTop на кожен кадр (швидкий кидок, дотягування, випереджальне дотягування) після оновлення iOS ламала відмальовування:
+    // фото зникали під час гортання, а дотягування спрацьовувало некоректно. Тому на пристроях із дотиком вони вимкнені й замінені рідними механізмами браузера;
+    // для миші (комп'ютер) власне дотягування лишається. Щоб повернути старе, змініть значення нижче на false.
+    const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    if (NATIVE_SNAP) document.documentElement.classList.add('native-snap');
     function syncStickyOffset() {
         const ca = document.querySelector('.content-area');
         const mh = document.querySelector('.mobile-header');
@@ -1537,7 +1546,7 @@
     (function initScrollSettle() {
         const ca = document.querySelector('.content-area');
         const top = document.querySelector('.sticky-top');
-        if (!ca || !top) return;
+        if (!ca || !top || NATIVE_SNAP) return;                  // на телефонах — рідне прилипання (CSS scroll-snap)
         let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0, anim = 0;
         let vel = 0, lastTop = ca.scrollTop, lastTs = performance.now(), lastTouchEnd = 0;   // швидкість прокрутки (px/мс) — для випереджального дотягування
         const stopAnim = () => { if (anim) { cancelAnimationFrame(anim); anim = 0; } };
@@ -1631,7 +1640,7 @@
     // Швидкий «кидок» пальцем прокручує далеко: до ~10 карток за раз (рідна інерція браузера давала лише 2–3)
     (function initFling() {
         const ca = document.querySelector('.content-area');
-        if (!ca) return;
+        if (!ca || NATIVE_SNAP) return;                          // на телефонах — рідна інерція браузера
         let samples = [], raf = 0, active = false, horizontal = false, startX = 0, startY = 0;
         const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } scrollCtl.flinging = false; };
         ca.addEventListener('touchstart', e => {
@@ -2002,6 +2011,56 @@
         });
     }
 
+
+    // ===== Мініатюри власних фото =====
+    // Список показував повне фото (до 5 МБ, тисячі пікселів) в картці ~100 px: iOS декодує його повністю й під тиском пам'яті скидає — фото «зникали».
+    // Для власних фото робимо мініатюру (≈360 px, JPEG) і показуємо її; повне фото — лише в перегляді. Мініатюри не потрапляють у файл обміну.
+    function makeThumbData(src, max) {
+        max = max || 360;
+        return new Promise(resolve => {
+            const img = new Image();
+            img.decoding = 'async';
+            img.onload = () => {
+                try {
+                    const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight, 1));
+                    const w = Math.max(1, Math.round(img.naturalWidth * k)), h = Math.max(1, Math.round(img.naturalHeight * k));
+                    const c = document.createElement('canvas'); c.width = w; c.height = h;
+                    c.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(c.toDataURL('image/jpeg', 0.78));
+                } catch (e) { resolve(null); }
+            };
+            img.onerror = () => resolve(null);
+            img.src = src;
+        });
+    }
+    async function thumbExtra(type, data) {                  // → { thumb } або {}
+        if (!String(type || '').startsWith('image/') || typeof data !== 'string' || !data.startsWith('data:')) return {};
+        const t = await makeThumbData(data);
+        return (t && t.length < data.length) ? { thumb: t } : {};
+    }
+    function updateRowThumb(p) {                             // підміняємо картинку в уже намальованому рядку (без перебудови списку)
+        const row = document.getElementById('placesTable').children[places.indexOf(p)], m = p.media && p.media[0];
+        const img = row && row.querySelector('.cell-photo-img img, .c-photo img, img');
+        if (img && m && m.thumb && img.getAttribute('src') !== m.thumb) img.src = m.thumb;
+    }
+    let _thumbBusy = false, _thumbT = 0;
+    function scheduleThumbs() { clearTimeout(_thumbT); _thumbT = setTimeout(ensureThumbs, 1200); }
+    async function ensureThumbs() {                          // фоном, по одній, без навантаження на пристрій
+        if (_thumbBusy) return;
+        _thumbBusy = true;
+        let changed = false;
+        try {
+            for (const p of places.slice()) for (const m of (p.media || [])) {
+                if (m.thumb || !String(m.type || '').startsWith('image/') || typeof m.data !== 'string' || !m.data.startsWith('data:')) continue;
+                const t = await makeThumbData(m.data);
+                if (t && t.length < m.data.length) { m.thumb = t; changed = true; updateRowThumb(p); }
+                await new Promise(r => setTimeout(r, 40));
+            }
+        } catch (e) { console.warn('Мініатюри:', e); }
+        _thumbBusy = false;
+        if (changed) persistPlaces();
+    }
+
     async function handleFileSelect(input) {
         const files = Array.from(input.files);
         input.value = '';
@@ -2016,7 +2075,7 @@
                         data = await shrinkImage(data, MAX_BYTES);
                         type = 'image/jpeg';
                     }
-                    currentEditMedia.push({ type, data });
+                    currentEditMedia.push({ type, data, ...(await thumbExtra(type, data)) });
                 } else if (f.type.startsWith('video/')) {
                     if (f.size > MAX_BYTES) {
                         alert('Відео "' + f.name + '" більше 5 МБ — його не можна стиснути в браузері, пропущено.');
@@ -2826,7 +2885,6 @@
         scheduleRoute();
         const links = buildRouteLinks();
         const href = links[0] || '#';
-        document.body.classList.toggle('has-sel', links.length > 0);
         ['gmapsLink', 'gmapsLinkDesktop', 'gmapsLinkMap'].forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -3321,11 +3379,9 @@
         if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
-        const hasRoute = !!(routeTotals && eff >= 2);
-        const costTxt = ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '';
-        const tm = hasRoute
-            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + costTxt
-            : ((ex.min ? ' · ⏱ ' + fmtTime(ex.min * 60) : '') + costTxt);   // 1 точка (маршруту ще нема) — вартість і час показуємо одразу
+        const tm = (routeTotals && eff >= 2)
+            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + (ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '')
+            : '';
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
         el.title = 'Вибрано / усього місць' + (tm ? ' · загальний час і відстань' : '') + (startFromMe ? ' · торкніться, щоб скасувати старт від моєї позиції' : '');
