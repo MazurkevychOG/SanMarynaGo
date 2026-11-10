@@ -1494,7 +1494,8 @@
     // Власна анімація scrollTop на кожен кадр (швидкий кидок, дотягування, випереджальне дотягування) після оновлення iOS ламала відмальовування:
     // фото зникали під час гортання, а дотягування спрацьовувало некоректно. Тому на пристроях із дотиком вони вимкнені й замінені рідними механізмами браузера;
     // для миші (комп'ютер) власне дотягування лишається. Щоб повернути старе, змініть значення нижче на false.
-    const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    //const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    const NATIVE_SNAP = false;
     if (NATIVE_SNAP) document.documentElement.classList.add('native-snap');
     function syncStickyOffset() {
         const ca = document.querySelector('.content-area');
