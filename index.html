@@ -1558,7 +1558,7 @@
             stopAnim();
             const from = ca.scrollTop, dist = to - from;
             if (Math.abs(dist) < 1) return;
-            const dur = Math.min(3000, Math.max(2000, 2000 + Math.abs(dist) * 10)), t0 = performance.now();   // удвічі повільніше
+            const dur = Math.min(6000, Math.max(4000, 4000 + Math.abs(dist) * 20)), t0 = performance.now();   // удвічі повільніше
             const step = now => {
                 const k = Math.min(1, (now - t0) / dur);
                 selfUntil = Date.now() + 250;                  // власну анімацію не вважаємо новим жестом
