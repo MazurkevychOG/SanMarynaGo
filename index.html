@@ -1558,7 +1558,7 @@
             stopAnim();
             const from = ca.scrollTop, dist = to - from;
             if (Math.abs(dist) < 1) return;
-            const dur = Math.min(6000, Math.max(4000, 4000 + Math.abs(dist) * 20)), t0 = performance.now();   // удвічі повільніше
+            const dur = Math.min(650, Math.max(280, 240 + Math.abs(dist) * 0.32)), t0 = performance.now();
             const step = now => {
                 const k = Math.min(1, (now - t0) / dur);
                 selfUntil = Date.now() + 250;                  // власну анімацію не вважаємо новим жестом
@@ -1668,10 +1668,10 @@
         const a = samples[0], b = samples[samples.length - 1], dt = b.t - a.t;
         if (dt < 8 || performance.now() - b.t > 80) return;
         const v = (a.y - b.y) / dt;                         // px/мс; >0 — вниз по списку
-        if (Math.abs(v) < 1.1) return;                      // повільний свайп — рідна прокрутка
+        if (Math.abs(v) < 0.9) return;                      // повільний свайп — рідна прокрутка
         const row = document.querySelector('#placesTable .place-row');
         const rowH = (row && row.offsetHeight) || 150;
-        const dist = Math.min(10 * rowH, Math.abs(v) * 1600) * Math.sign(v);
+        const dist = Math.min(10 * rowH, Math.abs(v) * 900) * Math.sign(v);
         const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
         const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));
         if (Math.abs(to - from) < 40) return;
