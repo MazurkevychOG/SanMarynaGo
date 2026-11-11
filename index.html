@@ -1494,9 +1494,17 @@
     // Власна анімація scrollTop на кожен кадр (швидкий кидок, дотягування, випереджальне дотягування) після оновлення iOS ламала відмальовування:
     // фото зникали під час гортання, а дотягування спрацьовувало некоректно. Тому на пристроях із дотиком вони вимкнені й замінені рідними механізмами браузера;
     // для миші (комп'ютер) власне дотягування лишається. Щоб повернути старе, змініть значення нижче на false.
-    const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    //aaa const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
     //const NATIVE_SNAP = false; // власний кидок + плавне прилипання (до ~10 карток)
     if (NATIVE_SNAP) document.documentElement.classList.add('native-snap');
+    const NATIVE_SNAP = (() => {
+  try {
+    const ios = /iP(hone|ad|od)/.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return ios && matchMedia('(pointer: coarse)').matches
+      && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory'));
+  } catch (e) { return false; }
+})();
     function syncStickyOffset() {
         const ca = document.querySelector('.content-area');
         const mh = document.querySelector('.mobile-header');
