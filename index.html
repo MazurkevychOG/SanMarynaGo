@@ -1667,7 +1667,7 @@
             if (Math.abs(v) < 1.1) return;                                // звичайна прокрутка лишається рідною
             const row = document.querySelector('#placesTable .place-row');
             const rowH = (row && row.offsetHeight) || 150;
-            const dist = Math.min(10 * rowH, Math.abs(v) * 650) * Math.sign(v);
+            const dist = Math.min(10 * rowH, Math.abs(v) * 1650) * Math.sign(v);
             const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
             const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));   // одразу зупиняємось рівно на краю картки
             if (Math.abs(to - from) < 40) return;
