@@ -1494,7 +1494,8 @@
     // Власна анімація scrollTop на кожен кадр (швидкий кидок, дотягування, випереджальне дотягування) після оновлення iOS ламала відмальовування:
     // фото зникали під час гортання, а дотягування спрацьовувало некоректно. Тому на пристроях із дотиком вони вимкнені й замінені рідними механізмами браузера;
     // для миші (комп'ютер) власне дотягування лишається. Щоб повернути старе, змініть значення нижче на false.
-    const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    //const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    const NATIVE_SNAP = false; // власний кидок + плавне прилипання (до ~10 карток)
     if (NATIVE_SNAP) document.documentElement.classList.add('native-snap');
     function syncStickyOffset() {
         const ca = document.querySelector('.content-area');
@@ -1667,7 +1668,8 @@
             if (Math.abs(v) < 1.1) return;                                // звичайна прокрутка лишається рідною
             const row = document.querySelector('#placesTable .place-row');
             const rowH = (row && row.offsetHeight) || 150;
-            const dist = Math.min(10 * rowH, Math.abs(v) * 650) * Math.sign(v);
+            //const dist = Math.min(10 * rowH, Math.abs(v) * 650) * Math.sign(v);
+            const dist = Math.min(10 * rowH, Math.abs(v) * 1600) * Math.sign(v);
             const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
             const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));   // одразу зупиняємось рівно на краю картки
             if (Math.abs(to - from) < 40) return;
