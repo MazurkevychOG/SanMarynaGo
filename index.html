@@ -1638,53 +1638,57 @@
     })();
 
     // Швидкий «кидок» пальцем прокручує далеко: до ~10 карток за раз (рідна інерція браузера давала лише 2–3)
-    (function initFling() {
-        const ca = document.querySelector('.content-area');
-        if (!ca || NATIVE_SNAP) return;                          // на телефонах — рідна інерція браузера
-        let samples = [], raf = 0, active = false, horizontal = false, startX = 0, startY = 0;
-        const stop = () => { if (raf) { cancelAnimationFrame(raf); raf = 0; } scrollCtl.flinging = false; };
-        ca.addEventListener('touchstart', e => {
-            stop();
-            if (e.touches.length !== 1) { active = false; return; }
-            const t = e.touches[0];
-            active = !(e.target.closest && e.target.closest('.swipe-actions, .drag-handle'));
-            startX = t.clientX; startY = t.clientY; horizontal = false;
-            samples = [{ t: performance.now(), y: t.clientY }];
-        }, { passive: true });
-        ca.addEventListener('touchmove', e => {
-            if (!active || !e.touches.length) return;
-            const t = e.touches[0], now = performance.now();
-            if (!horizontal && Math.abs(t.clientX - startX) > 10 && Math.abs(t.clientX - startX) > Math.abs(t.clientY - startY)) horizontal = true;
-            samples.push({ t: now, y: t.clientY });
-            while (samples.length > 2 && now - samples[0].t > 120) samples.shift();
-        }, { passive: true });
-        ca.addEventListener('touchcancel', () => { active = false; }, { passive: true });
-        ca.addEventListener('touchend', () => {
-            if (!active || horizontal || reorderingNow || samples.length < 2) return;
-            const a = samples[0], b = samples[samples.length - 1], dt = b.t - a.t;
-            if (dt < 8 || performance.now() - b.t > 80) return;           // палець зупинився перед відпусканням — це не кидок
-            const v = (a.y - b.y) / dt;                                   // px/мс; додатне — список їде вниз
-            if (Math.abs(v) < 1.1) return;                                // звичайна прокрутка лишається рідною
-            const row = document.querySelector('#placesTable .place-row');
-            const rowH = (row && row.offsetHeight) || 150;
-            const dist = Math.min(10 * rowH, Math.abs(v) * 1650) * Math.sign(v);
-            const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
-            const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));   // одразу зупиняємось рівно на краю картки
-            if (Math.abs(to - from) < 40) return;
-            const dur = Math.min(1600, 500 + Math.abs(to - from) * 0.55), t0 = performance.now();
-            stop();
-            scrollCtl.flinging = true;
-            const step = now => {
-                const k = Math.min(1, (now - t0) / dur);
-                ca.scrollTop = from + (to - from) * (1 - Math.pow(1 - k, 3));
-                if (k < 1) raf = requestAnimationFrame(step); else { raf = 0; scrollCtl.flinging = false; }
-            };
-            raf = requestAnimationFrame(step);
-        }, { passive: true });
-        ca.addEventListener('wheel', stop, { passive: true });
-        ca.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') stop(); }, true);
-    })();
-
+    // Швидкий «кидок»: до ~10 карток, одна плавна прокрутка (без scrollTop на кожен кадр — без миготіння фото на iOS)
+(function initFling() {
+    const ca = document.querySelector('.content-area');
+    if (!ca) return;
+    let samples = [], active = false, horizontal = false, startX = 0, startY = 0, snapRestoreTimer = 0;
+    const restoreSnap = () => {
+        clearTimeout(snapRestoreTimer);
+        ca.style.scrollSnapType = '';
+    };
+    ca.addEventListener('touchstart', e => {
+        restoreSnap();
+        if (e.touches.length !== 1) { active = false; return; }
+        const t = e.touches[0];
+        active = !(e.target.closest && e.target.closest('.swipe-actions, .drag-handle'));
+        startX = t.clientX; startY = t.clientY; horizontal = false;
+        samples = [{ t: performance.now(), y: t.clientY }];
+    }, { passive: true });
+    ca.addEventListener('touchmove', e => {
+        if (!active || !e.touches.length) return;
+        const t = e.touches[0], now = performance.now();
+        if (!horizontal && Math.abs(t.clientX - startX) > 10 && Math.abs(t.clientX - startX) > Math.abs(t.clientY - startY)) horizontal = true;
+        samples.push({ t: now, y: t.clientY });
+        while (samples.length > 2 && now - samples[0].t > 120) samples.shift();
+    }, { passive: true });
+    ca.addEventListener('touchcancel', () => { active = false; restoreSnap(); }, { passive: true });
+    ca.addEventListener('touchend', () => {
+        if (!active || horizontal || reorderingNow || samples.length < 2) return;
+        const a = samples[0], b = samples[samples.length - 1], dt = b.t - a.t;
+        if (dt < 8 || performance.now() - b.t > 80) return;
+        const v = (a.y - b.y) / dt;                         // px/мс; >0 — вниз по списку
+        if (Math.abs(v) < 1.1) return;                      // повільний свайп — рідна прокрутка
+        const row = document.querySelector('#placesTable .place-row');
+        const rowH = (row && row.offsetHeight) || 150;
+        const dist = Math.min(10 * rowH, Math.abs(v) * 1600) * Math.sign(v);
+        const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
+        const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));
+        if (Math.abs(to - from) < 40) return;
+        // на час жесту вимикаємо CSS-snap, щоб він не обрізав кидок до 1–2 карток
+        ca.style.scrollSnapType = 'none';
+        ca.scrollTo({ top: to, behavior: 'smooth' });       // ОДИН виклик — без rAF і без миготіння
+        const onEnd = () => {
+            ca.removeEventListener('scrollend', onEnd);
+            restoreSnap();
+            // фінальне вирівнювання по краю картки (на випадок, якщо smooth трохи «промахнувся»)
+            const fixed = snapScrollTarget(ca, ca.scrollTop, Math.sign(v) || 1);
+            if (Math.abs(fixed - ca.scrollTop) > 2) ca.scrollTo({ top: fixed, behavior: 'smooth' });
+        };
+        ca.addEventListener('scrollend', onEnd);
+        snapRestoreTimer = setTimeout(onEnd, 900);          // запас, якщо scrollend не прийшов
+    }, { passive: true });
+})();
     // ===== Перетягування (миша + дотик, через Pointer Events) =====
     function findScroller(el) {
         let n = el.parentElement;
