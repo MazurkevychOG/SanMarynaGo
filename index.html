@@ -939,7 +939,7 @@
         <div class="settings-section">
             <h3>Файл обміну</h3>
             <div class="set-note" id="localInfo"></div>
-            <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update</button>
+            <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update Data</button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
             <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Export</button>
             <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Import</button>
@@ -3123,18 +3123,26 @@
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const h = hashText(await r.text());
             let prev = null; try { prev = localStorage.getItem(APP_HASH_KEY); } catch (e) { }
-            if (prev && prev !== h) {
-                if (!manual && appBusy()) { toast('Вийшла нова версія — оновиться при наступному відкритті'); return false; }
-                try { localStorage.setItem(APP_HASH_KEY, h); } catch (e) { }
+                        if (prev && prev !== h) {
+                if (appBusy()) { toast('Вийшла нова версія — оновиться при наступному відкритті'); return false; }
+                try {
+                    localStorage.setItem(APP_HASH_KEY, h);
+                    localStorage.setItem(VER_KEY, String(Date.now()));
+                } catch (e) { }
                 toast('Знайдено нову версію — оновлюю…');
                 setTimeout(() => location.replace(base + '?v=' + Date.now()), 500);
                 return true;
             }
-            if (!prev) { try { localStorage.setItem(APP_HASH_KEY, h); } catch (e) { } }
+            if (!prev) {
+                try {
+                    localStorage.setItem(APP_HASH_KEY, h);
+                    if (!localStorage.getItem(VER_KEY)) localStorage.setItem(VER_KEY, String(Date.now()));
+                } catch (e) { }
+            }
         } catch (e) { if (manual) toast('Немає зв’язку — працюю з локальною версією'); }
         return false;
     }
-    document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - _lastAppCheck > 30000) checkAppUpdate(false); });
+    //document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - _lastAppCheck > 30000) checkAppUpdate(false); });
     // Офлайн-режим: service worker (файл sw.js поруч з index.html) — спершу мережа (свіжа версія з GitHub), без інтернету — кеш
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
         window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(err => console.warn('Service worker:', err)); });
@@ -3168,17 +3176,15 @@
         if (!w) return;
         try { const t = w.ac.currentTime; w.g.gain.cancelScheduledValues(t); w.g.gain.setValueAtTime(w.g.gain.value, t); w.g.gain.linearRampToValueAtTime(0, t + 0.4); w.src.stop(t + 0.45); } catch (e) { }
     }
-    async function runUpdate() {                            // кнопка Update: змійка й звук крутяться, поки йде оновлення
+        async function runUpdate() {
         if (_runUpd) return;
         _runUpd = true;
-        showWait('Оновлюю…'); startWaitSound();
+        showWait('Оновлюю дані…'); startWaitSound();
         const t0 = Date.now();
         try {
-            const reloading = await checkAppUpdate(true);
-            if (reloading) await new Promise(r => setTimeout(r, 2500));   // зараз перезавантажимось — лишаємо змійку
-            else await updateFromCatalog();
+            await updateFromCatalog();
         } finally {
-            const left = 900 - (Date.now() - t0);            // щоб змійка не мигала, якщо оновлення миттєве
+            const left = 900 - (Date.now() - t0);
             if (left > 0) await new Promise(r => setTimeout(r, left));
             hideWait(); stopWaitSound(); _runUpd = false;
         }
