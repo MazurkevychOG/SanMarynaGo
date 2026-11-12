@@ -2894,6 +2894,61 @@
     }
 
 
+    // ===== Офлайн-маршрут: Google Maps із завантаженою картою =====
+    // Офлайн-карти Google Maps будують лише маршрут «з точки А в точку Б» (без проміжних зупинок) і тільки в самому застосунку.
+    // Тому без інтернету (або з увімкненим «Завжди ділянками») маршрут ділиться на ділянки А→Б, а посилання відкривають
+    // ЗАСТОСУНОК Google Maps напряму (а не сайт у браузері, який офлайн не завантажується).
+    const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const IS_ANDROID = /Android/i.test(navigator.userAgent);
+    function offlineAlways() { try { return localStorage.getItem('offlineRoute') === '1'; } catch (e) { return false; } }
+    function isOfflineRoute() { return navigator.onLine === false || offlineAlways(); }
+    function openApp(u) { _extNavAt = Date.now(); _extAway = false; window.location.href = u; }   // перехід у застосунок (не нова вкладка)
+    const _ll = c => Number(c[0]).toFixed(6) + ',' + Number(c[1]).toFixed(6);
+    function gmapsAppLeg(from, to) {                        // from: [lat,lng] або null («моя позиція»), to: [lat,lng]
+        if (IS_IOS) return 'comgooglemaps://?' + (from ? 'saddr=' + _ll(from) + '&' : '') + 'daddr=' + _ll(to) + '&directionsmode=driving';
+        const web = 'https://www.google.com/maps/dir/?api=1' + (from ? '&origin=' + encodeURIComponent(_ll(from)) : '') +
+            '&destination=' + encodeURIComponent(_ll(to)) + '&travelmode=driving&dir_action=navigate';
+        if (IS_ANDROID) {
+            if (!from) return 'google.navigation:q=' + _ll(to) + '&mode=d';
+            return 'intent://' + web.replace(/^https:\/\//, '') + '#Intent;scheme=https;package=com.google.android.apps.maps;S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
+        }
+        return web;
+    }
+    function gmapsAppPoint(c) {                             // показати точку в застосунку Google Maps
+        if (IS_IOS) return 'comgooglemaps://?q=' + _ll(c);
+        if (IS_ANDROID) return 'geo:' + _ll(c) + '?q=' + _ll(c);
+        return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(_ll(c));
+    }
+    function offlineLegs() {                                // ділянки А→Б за вибраними точками (та сама логіка, що й у buildRouteLinks)
+        const sel = places.filter(p => p.selected).map(p => { const c = parseCoords(p.coords); return c ? { ll: c, name: p.name || '' } : null; }).filter(Boolean);
+        if (!sel.length) return [];
+        const shouldReturn = document.getElementById('returnToStart')?.checked || document.getElementById('returnToStartDesktop')?.checked || false;
+        const pts = sel.slice();
+        const fromMe = startFromMe && startSnap;
+        if (fromMe) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'Моя позиція' });
+        if (shouldReturn && pts.length >= 2) pts.push(pts[0]);
+        const legs = [];
+        if (!fromMe) legs.push({ from: null, to: pts[0].ll, title: 'Від мене', sub: '→ ' + (pts[0].name || 'точка 1') });
+        for (let i = 0; i + 1 < pts.length; i++) legs.push({ from: pts[i].ll, to: pts[i + 1].ll, title: 'Ділянка ' + (legs.length + 1), sub: (pts[i].name || 'точка') + ' → ' + (pts[i + 1].name || 'точка') });
+        return legs;
+    }
+    function openOfflineRoute() {
+        const legs = offlineLegs();
+        if (!legs.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        closeCtx();
+        if (legs.length === 1) { openApp(gmapsAppLeg(legs[0].from, legs[0].to)); return; }
+        document.getElementById('navPickMeta').textContent = 'Офлайн: Google Maps будує одну ділянку за раз. Проїдьте її й натисніть наступну.';
+        document.getElementById('navGoogleBtn').style.display = 'none';
+        document.getElementById('navMapsmeBtn').style.display = 'none';
+        const box = document.getElementById('navPickParts');
+        box.innerHTML = legs.map((l, k) => '<button type="button" class="nav-opt g" data-k="' + k + '"><span>🧭</span><span>' + esc(l.title) + '<small>' + esc(l.sub) + '</small></span></button>').join('') +
+            '<label style="display:flex;gap:8px;align-items:center;margin:10px 2px 0;font-size:13px"><input type="checkbox" id="offRouteAlways"' + (offlineAlways() ? ' checked' : '') + '> Завжди будувати ділянками (слабкий інтернет)</label>';
+        box.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => { const l = legs[+b.dataset.k]; openApp(gmapsAppLeg(l.from, l.to)); });
+        document.getElementById('offRouteAlways').onchange = e => { try { localStorage.setItem('offlineRoute', e.target.checked ? '1' : '0'); } catch (x) { } toast(e.target.checked ? 'Маршрут завжди ділянками' : 'Звичайний маршрут Google Maps'); };
+        document.getElementById('navPickModal').classList.add('open');
+    }
+
+
     // ===== Вибір, де будувати маршрут: Google Maps або Maps.me =====
     // Google Maps приймає до 11 точок в одному посиланні (довші маршрути діляться на частини).
     // Maps.me через зовнішнє посилання вміє лише «звідки → куди» без проміжних зупинок, тому для маршруту
@@ -2945,7 +3000,7 @@
         document.getElementById('navPickParts').innerHTML = '';
         document.getElementById('navPickModal').classList.add('open');
     }
-    function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); }
+    function closeNavPick() { document.getElementById('navPickModal').classList.remove('open'); const g = document.getElementById('navGoogleBtn'); if (g) g.style.display = ''; }
     // ----- Maps.me: від ПОТОЧНОГО місця до НАЙБЛИЖЧОЇ вибраної точки (за географічною відстанню) -----
     // Позиція береться лише з GPS: з живої підписки (карта/спідометр) або з запиту геолокації. Знімок «старт від мене» і старий кеш не використовуються.
     // iOS дозволяє перехід в іншу програму лише синхронно в межах натискання користувача, тому:
@@ -2980,6 +3035,7 @@
     function navPickGo(kind) {
         const box = document.getElementById('navPickParts');
         if (kind === 'google') {
+            if (isOfflineRoute()) { openOfflineRoute(); return; }
             const links = buildRouteLinks();
             if (links.length <= 1) { closeNavPick(); openUrl(links[0]); return; }
             box.innerHTML = '<div class="nav-sub-title">Google Maps — оберіть частину маршруту:</div><div class="nav-sub">' +
@@ -3032,9 +3088,10 @@
             };
         });
         document.querySelectorAll('.route-parts').forEach(box => {
-            box.innerHTML = links.length > 1
+            box.innerHTML = (links.length > 1
                 ? links.map((u, k) => `<a class="link-btn part-btn" target="_blank" rel="noopener" href="${esc(u)}">Ч${k + 1}</a>`).join('')
-                : '';
+                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1" title="Маршрут офлайн (ділянками)" aria-label="Маршрут офлайн">📴</a>' : '');
+            box.querySelectorAll('a').forEach(a => a.onclick = e => { if (a.dataset.off || isOfflineRoute()) { e.preventDefault(); openOfflineRoute(); } });
         });
     }
 
@@ -4048,6 +4105,7 @@
     // false: «Маршрут» одразу відкриває Google Maps. true — повернути вікно вибору програми (openNavPick зі скасуванням Maps.me тощо; код збережено).
     let ROUTE_CHOOSER_ENABLED = false;
     function routeButtonAction() {
+        if (isOfflineRoute()) { openOfflineRoute(); return; }   // без інтернету — ділянками, напряму в застосунок
         if (ROUTE_CHOOSER_ENABLED) { openNavPick(); return; }
         const links = buildRouteLinks();
         if (!links.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
@@ -4091,8 +4149,8 @@
         openCtx(x, y, cs, [
             { label: '➕ Додати місце тут', action: () => addPlaceAt(ll) },
             { label: '📋 Копіювати координати', action: () => copyText(cs) },
-            { label: '🗺 Відкрити в Google Maps', action: () => openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cs)) },
-            { label: '🧭 Маршрут сюди (Google Maps)', action: () => openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') },
+            { label: '🗺 Відкрити в Google Maps', action: () => isOfflineRoute() ? openApp(gmapsAppPoint([ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cs)) },
+            { label: '🧭 Маршрут сюди (Google Maps)', action: () => isOfflineRoute() ? openApp(gmapsAppLeg(null, [ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') },
             { label: '📍 Відкрити в Maps.me', action: () => openMapsme(mapsmePointUrl(ll.lat, ll.lng, '')) }
         ]);
     }
@@ -4101,7 +4159,7 @@
         openCtx(x, y, (i + 1) + '. ' + p.name, [
             { label: p.selected ? '☐ Зняти вибір' : '☑ Вибрати для маршруту', action: () => togglePlace(i) },
             { label: '✎ Редагувати', action: () => handleEdit(i) },
-            { label: '🗺 Відкрити в Google Maps', action: () => openUrl(gUrl(p)) },
+            { label: '🗺 Відкрити в Google Maps', action: () => { const c = parseCoords(p.coords); if (isOfflineRoute() && c) openApp(gmapsAppPoint(c)); else openUrl(gUrl(p)); } },
             { label: '📍 Відкрити в Maps.me', action: () => { const c = parseCoords(p.coords); if (c) openMapsme(mapsmePointUrl(c[0], c[1], p.name)); } },
             { label: '✕ Видалити', danger: true, action: () => handleDelete(i) }
         ]);
