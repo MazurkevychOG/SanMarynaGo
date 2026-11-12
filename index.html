@@ -878,9 +878,109 @@
         /* ===== Рідна прокрутка списку на телефонах: картка «прилипає» рівно під верхньою смугою ===== */
         html.native-snap .content-area { scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         html.native-snap .place-row { scroll-snap-align: start; }
+
+        /* ===== Заставка: Вльора і дороги ===== */
+        #splash{position:fixed;inset:0;z-index:9000;background:var(--sp-sea);overflow:hidden;transition:opacity .7s ease;
+          --sp-sea:#eaf1f8;--sp-land:#fff;--sp-edge:#cfd8e3;--sp-r1:#2c3e50;--sp-r2:#4a5568;--sp-acc:#4a90d9;--sp-lab:#4a5568}
+        html[data-theme="dark"] #splash{--sp-sea:#1b2027;--sp-land:#252d3a;--sp-edge:#465068;--sp-r1:#d3dae5;--sp-r2:#9cb2c9;--sp-acc:#75a3f0;--sp-lab:#aeb9ca}
+        #splash.out{opacity:0;pointer-events:none}
+        #spArt{position:absolute;left:50%;top:50%;width:max(100vw,170vh);aspect-ratio:680/400;
+          transform:translate(-50%,-50%) scale(1);transition:transform .9s cubic-bezier(.65,0,.25,1);will-change:transform;
+          -webkit-mask-image:radial-gradient(ellipse at center,#000 55%,transparent 100%);
+          mask-image:radial-gradient(ellipse at center,#000 55%,transparent 100%)}
+        #splash.shrink #spArt{transform:translate(-50%,-50%) scale(var(--sp-s,.33))}
+        #spIn{width:100%;height:100%;opacity:0}
+        #splash.draw #spIn{animation:spPop .8s ease-out forwards}
+        @keyframes spPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+        #spArt svg{display:block;width:100%;height:100%}
+        #splash .land{fill:var(--sp-land);stroke:var(--sp-edge);stroke-width:1;stroke-linejoin:round}
+        #splash .r{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+        #splash .t{stroke:var(--sp-r1);stroke-width:5}
+        #splash .b{stroke:var(--sp-r1);stroke-width:3.6}
+        #splash .w{stroke:var(--sp-r2);stroke-width:2.6}
+        #splash.draw .r{animation:spDraw var(--u) cubic-bezier(.3,.6,.3,1) var(--d) forwards}
+        @keyframes spDraw{to{stroke-dashoffset:0}}
+        #splash .nd{fill:var(--sp-sea);stroke:var(--sp-acc);stroke-width:2.5;opacity:0;transform-box:fill-box;transform-origin:center}
+        #splash.draw .nd{animation:spNode .3s ease-out var(--d) forwards}
+        @keyframes spNode{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        #splash .c{fill:var(--sp-acc)}
+        #splash .ring{fill:none;stroke:var(--sp-acc);stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+        #splash.draw .ring{animation:spRing .8s ease-out infinite}
+        @keyframes spRing{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(3.5)}}
+        #splash .lb{font-size:6.5px;fill:var(--sp-lab);opacity:0;paint-order:stroke;stroke:var(--sp-land);stroke-width:3px}
+        #splash .lb.v{font-size:8px;font-weight:600}
+        #splash.draw .lb{opacity:1;transition:opacity .3s ease var(--d)}
+        #splash.shrink .lb{opacity:0;transition:opacity .25s ease 0s}
+        @keyframes spRow{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+        body.app-in .place-row{animation:spRow .5s ease-out backwards}
+        body.app-in .place-row:nth-child(2){animation-delay:.05s}
+        body.app-in .place-row:nth-child(3){animation-delay:.10s}
+        body.app-in .place-row:nth-child(4){animation-delay:.15s}
+        body.app-in .place-row:nth-child(5){animation-delay:.20s}
+        body.app-in .place-row:nth-child(6){animation-delay:.25s}
+        body.app-in .place-row:nth-child(7){animation-delay:.30s}
+        body.app-in .place-row:nth-child(n+8){animation-delay:.35s}
+        @media (prefers-reduced-motion:reduce){
+          #splash *,#spArt{animation-duration:.01s!important;transition-duration:.01s!important}
+          body.app-in .place-row{animation:none}
+        }
     </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true">
+  <div id="spArt"><div id="spIn">
+    <svg viewBox="0 0 680 400" preserveAspectRatio="xMidYMid meet">
+      <path class="land" d="M680 0 L680 141 L676 140 L669 134 L652 132 L648 134 L642 140 L634 142 L615 140 L604 144 L580 145 L578 135 L576 133 L559 129 L556 130 L547 135 L543 134 L539 131 L537 126 L529 96 L516 92 L515 81 L504 62 L500 44 L501 39 L503 40 L508 36 L510 26 L507 21 L502 19 L501 12 L499 9 L496 6 L495 0 Z M580 145 L604 144 L615 140 L634 142 L642 140 L648 134 L652 132 L669 134 L676 140 L680 141 L680 400 L439 400 L437 398 L422 393 L425 392 L437 396 L444 400 L456 400 L458 399 L462 400 L463 395 L468 391 L471 386 L467 379 L469 375 L467 371 L468 370 L471 369 L483 374 L486 371 L487 367 L486 363 L479 350 L474 345 L471 330 L484 329 L488 318 L493 314 L498 314 L504 312 L517 313 L528 307 L531 298 L530 289 L534 286 L536 281 L536 268 L543 262 L548 250 L548 237 L554 234 L557 228 L559 226 L564 226 L571 229 L575 226 L579 217 L583 215 L589 207 L591 186 L589 179 L580 169 L576 163 L579 160 L580 155 Z M377 400 L376 398 L371 398 L370 396 L368 387 L365 389 L365 383 L361 382 L368 372 L389 370 L398 365 L410 372 L411 374 L414 373 L413 379 L411 383 L396 391 L396 396 L399 400 Z M0 139 L9 149 L21 155 L35 159 L54 167 L70 178 L82 181 L88 183 L88 188 L96 188 L98 193 L102 198 L101 208 L115 219 L134 229 L137 235 L145 242 L151 252 L156 255 L167 270 L177 295 L179 298 L179 305 L176 309 L174 316 L166 323 L162 332 L159 346 L161 354 L159 367 L156 371 L150 371 L139 362 L130 362 L107 347 L94 329 L94 327 L98 325 L98 320 L90 315 L96 312 L97 307 L95 302 L83 290 L82 279 L79 274 L81 274 L81 273 L73 266 L15 262 L4 256 L0 256 Z M495 0 L496 6 L499 9 L501 12 L502 19 L507 21 L510 26 L508 36 L503 40 L501 39 L500 44 L504 62 L515 81 L516 92 L529 96 L537 126 L539 131 L543 134 L547 135 L556 130 L559 129 L576 133 L578 135 L580 139 L580 155 L579 160 L576 163 L580 169 L589 179 L592 190 L588 210 L583 215 L579 217 L575 226 L571 229 L564 226 L559 226 L557 228 L554 234 L548 237 L548 250 L543 262 L536 268 L536 281 L534 286 L530 289 L531 298 L528 307 L517 313 L504 312 L498 314 L493 314 L488 318 L484 329 L471 330 L474 345 L479 350 L486 363 L487 367 L486 371 L483 374 L471 369 L468 370 L467 371 L469 375 L467 379 L471 386 L468 391 L463 395 L462 400 L459 399 L456 400 L444 400 L437 396 L425 392 L420 395 L420 388 L423 382 L419 380 L424 363 L424 356 L416 354 L415 351 L412 349 L407 348 L412 340 L410 338 L400 318 L389 315 L390 314 L386 311 L385 314 L378 304 L365 299 L351 289 L342 286 L336 282 L321 264 L315 247 L306 237 L306 236 L310 233 L313 233 L316 235 L323 245 L326 256 L328 257 L336 253 L337 230 L327 222 L323 215 L322 211 L324 216 L326 215 L329 219 L332 218 L333 208 L331 204 L327 202 L323 203 L322 209 L308 187 L318 175 L319 155 L320 153 L325 151 L323 146 L326 141 L321 132 L325 130 L331 124 L328 126 L330 131 L328 140 L330 140 L330 137 L331 140 L333 137 L341 133 L344 130 L344 124 L340 112 L339 118 L333 129 L332 127 L335 122 L336 113 L332 111 L331 108 L333 90 L331 82 L334 80 L335 72 L342 62 L343 53 L338 47 L329 45 L327 43 L326 30 L323 24 L325 26 L329 26 L331 23 L331 18 L339 12 L342 8 L343 0 Z"/>
+      <g id="spRd"></g>
+      <g id="spNd"></g>
+      <circle class="ring" cx="340" cy="225" r="9"/>
+      <circle class="c" cx="340" cy="225" r="8"/>
+      <text class="lb v" style="--d:.2s" x="326" y="230" text-anchor="end">Vlorë</text>
+    </svg>
+  </div></div>
+</div>
+<script>
+(function () {
+  var sp = document.getElementById('splash'); if (!sp) return;
+  var R=["b|341 229 338 215 338 202 334 192","b|341 229 341 238 337 254 338 261 351 274 364 292 382 305","w|342 232 353 233 364 238 368 242 371 251 374 252 380 254 394 252 419 260 431 269 440 271","w|334 192 338 181 352 165","b|361 188 356 181 352 165","b|361 188 376 192 384 200 396 223 398 243 427 268 432 276 439 302 460 324 464 334 464 340","t|352 165 358 157 368 129 368 106 361 96","w|420 223 424 213 427 211 427 207 422 194 420 192 412 169 397 160","w|420 223 420 227 425 234 431 236 435 235 447 243 454 261","w|397 160 394 151 386 138 376 131","w|382 305 403 311 415 319 424 332 430 336 433 348 437 353 442 351 443 343 445 340 450 340 454 343 465 340","w|440 271 462 269 476 271 485 278 508 302 516 306 524 305 529 300 531 294 526 281 526 276 538 268 540 264 541 251 535 239 535 233 546 200","b|365 98 386 104 402 98 419 97 424 91","b|361 96 353 77 347 73 344 53","w|428 93 421 83 421 73 413 66","b|428 92 436 90 449 78 470 74 479 77","b|465 340 470 340 490 348 516 347 525 349 528 359","t|344 53 348 39 367 28 375 9","b|402 62 403 52 392 41 383 22 374 15","b|478 77 488 83 498 93 509 100 521 98","b|538 181 538 162 543 147 538 140 524 136 523 110","b|538 181 545 198 548 200 552 197 561 180 565 176 573 178 585 191 590 195 597 194 606 188","w|477 75 487 61 500 61 503 59 500 39 504 22 501 17 493 12 491 8 492 1 501 -5 498 -20","b|521 109 522 78 528 73 532 72 541 75","b|375 9 365 -25","b|530 335 544 316 552 290 560 281 565 279 577 277 606 286 612 286 625 280 647 260 656 259","b|528 359 561 398","w|439 9 445 11 453 10 463 2 484 3 489 2","w|438 6 436 -1 427 -16","b|542 76 553 43 557 14 569 8 578 -4 578 -12","b|542 76 551 85 562 72 569 71 578 76 591 96 596 100 608 101 628 98 635 100 641 105","t|619 211 627 223 644 237 647 242 651 245 658 263","b|617 161 638 156 658 157","t|580 391 576 399 576 411","t|580 391 591 384 625 378 627 376","t|656 259 673 275 683 278","t|646 326 651 315 672 284 678 280 683 280 684 278","t|646 326 645 333 648 339 633 368 627 376","b|639 105 649 76 654 65 668 51 676 34 681 32 686 33","b|656 156 672 156 679 159 684 165 691 182","b|641 105 653 130","w|658 155 659 145 653 130","b|631 375 642 372 660 379 665 386 670 388 681 387 691 392","t|684 278 693 268","b|686 33 695 34","w|686 32 688 28"];
+  var C=[["Tirana",392,42,1],["Durrës",332,44,0],["Elbasan",436,86,1],["Fier",352,171,0],["Berat",417,175,1],["Korçë",547,195,1],["Gjirokastër",446,311,1],["Sarandë",422,354,1]];
+  var NS='http://www.w3.org/2000/svg', rd=document.getElementById('spRd'), nd=document.getElementById('spNd');
+  function mk(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+  R.forEach(function(s){
+    var q=s.split('|'), n=q[1].split(' '), d='M'+n[0]+' '+n[1];
+    for(var i=2;i<n.length;i+=2) d+=' L'+n[i]+' '+n[i+1];
+    var p=mk('path',{'class':'r '+q[0],pathLength:1,d:d},rd);
+    var L=p.getTotalLength(), d0=Math.hypot(n[0]-340,n[1]-225);
+    p.style.setProperty('--d',(0.05+0.5*Math.min(1,d0/330)).toFixed(2)+'s');
+    p.style.setProperty('--u',(0.3+0.35*Math.min(1,L/400)).toFixed(2)+'s');
+  });
+  C.forEach(function(c){
+    var d=(0.35+0.5*Math.min(1,Math.hypot(c[1]-340,c[2]-225)/330)).toFixed(2)+'s';
+    var o=mk('circle',{'class':'nd',cx:c[1],cy:c[2],r:5},nd); o.style.setProperty('--d',d);
+    var t=mk('text',{'class':'lb',x:c[1]+(c[3]?10:-10),y:c[2]+4,'text-anchor':c[3]?'start':'end'},nd);
+    t.textContent=c[0]; t.style.setProperty('--d',d);
+  });
+  var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var T_SHRINK = rm ? 0 : 1200;
+  var T_MIN    = rm ? 0 : 2100;
+  var art = document.getElementById('spArt'), ready=false, shrunk=false, done=false;
+  function fit(){ var w=Math.max(innerWidth/3,160); art.style.setProperty('--sp-s',(w/art.offsetWidth).toFixed(4)); }
+  fit(); addEventListener('resize', fit);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ sp.classList.add('draw'); }); });
+  setTimeout(function(){ sp.classList.add('shrink'); }, T_SHRINK);
+  setTimeout(function(){ shrunk=true; tryHide(); }, T_MIN);
+  function tryHide(){
+    if (done || !ready || !shrunk) return;
+    done = true;
+    document.body.classList.add('app-in');
+    sp.classList.add('out');
+    setTimeout(function(){ sp.remove(); }, 800);
+    setTimeout(function(){ document.body.classList.remove('app-in'); }, 1800);
+  }
+  window.splashHide = function(){ ready=true; tryHide(); };
+  setTimeout(window.splashHide, 12000);
+})();
+</script>
 
 <div id="mediaModal" class="modal">
     <div id="mediaContainer" class="modal-content"></div>
@@ -5443,7 +5543,7 @@
         } else if (localList) {
             places = localList; places.forEach(normalize);
             toast('Каталог недоступний — показано вашу локальну копію');
-        } else { showLoadError(catErr); return; }
+        } else { showLoadError(catErr); window.splashHide && window.splashHide(); return; }
         places.forEach(normalize);
         mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
         if (sl && Array.isArray(sl.ids)) { const ids = new Set(sl.ids.map(id => idRemap.get(id) || id)); places.forEach(p => { p.selected = ids.has(p.id); }); }
@@ -5456,6 +5556,7 @@
         syncStickyOffset();
         initMap();
         stateReady = true;
+        window.splashHide && window.splashHide();
     }
     init();
     checkAppUpdate(false);
