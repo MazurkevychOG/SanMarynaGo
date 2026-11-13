@@ -3693,7 +3693,7 @@
         el.style.display = 'inline-block';
         const ex = extrasTotals();
         const tm = (routeTotals && eff >= 2)
-            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance) + (ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + (pfLoad().cur || '€') : '')
+            ? ' · ' + (routeTotals.estimated ? '≈ ' : '') + fmtTime(routeTotals.duration + ex.min * 60) + ' · ' + fmtKm(routeTotals.distance)
             : '';
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
@@ -5082,10 +5082,10 @@
     function renderRouteSummary() {
         if (!routeSumEl || !routeSum) return;
         const ex = extrasTotals(), cur = pfLoad().cur || '€';
-        const hasEx = ex.min > 0 || ex.cost > 0;
+        const hasEx = ex.min > 0;
         const total = routeSum.t + ex.min * 60;
         routeSumEl.innerHTML = `🧭 <b>${fmtKm(routeSum.d)}</b> · <b>${fmtTime(total)}</b>` +
-            (hasEx ? `<small style="font-size:16px;color:#2d3748">🚗 ${fmtTime(routeSum.t)}${ex.min ? ' + ⏱ ' + fmtTime(ex.min * 60) : ''}${ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + esc(cur) : ''}</small>` : '') +
+            (hasEx ? `<small style="font-size:16px;color:#2d3748">🚗 ${fmtTime(routeSum.t)}${ex.min ? ' + ⏱ ' + fmtTime(ex.min * 60) : ''}</small>` : '') +
             `<small>${routeSum.n} points${routeSum.est ? ' · straight-line est.' : ' · car · OSRM routes, © OpenStreetMap'}</small>`;
     }
     function drawRoute(r, pts, skipLast) {
