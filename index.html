@@ -934,6 +934,18 @@
         html[data-theme="dark"] .act-edit, html[data-theme="dark"] .btn-edit { background: #e8b923; color: #1b1f27; }
         #placeCountry { opacity: .55; background: rgba(128,128,128,.14); cursor: not-allowed; pointer-events: none; }
         .input-wrapper:has(#placeCountry) > label { opacity: .6; }
+        /* ===== Trip cost button ===== */
+        .trip-cost-btn { display: none; flex: none; align-items: center; justify-content: center; width: 36px; height: 34px; padding: 0 !important; border: none; border-radius: 8px; background: #2f80ed; color: #fff; font-size: 18px !important; line-height: 1; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+        .trip-cost-btn:active { transform: scale(.94); }
+        .list-head .trip-cost-btn { margin-left: auto; width: 38px; height: 38px; }
+        .list-head.has-cost .save-route-btn { margin-left: 0; }
+        .list-head.has-cost .filter-btn { margin-left: 0 !important; }
+        .map-bar-actions .trip-cost-btn, .top-controls .trip-cost-btn { margin-right: 4px; }
+        #tripCostModal { position: fixed; inset: 0; z-index: 3700; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+        #tripCostModal .tc-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(128,128,128,.25); font-size: 15px; }
+        #tripCostModal .tc-row b { white-space: nowrap; }
+        #tripCostModal .tc-total { border-bottom: 0; font-size: 18px; padding-top: 10px; }
+        #tripCostModal .tc-note { font-size: 12px; opacity: .7; margin-top: 8px; }
     </style>
 </head>
 <body>
@@ -1005,7 +1017,7 @@
     <div class="map-bar">
         <span class="map-bar-title">🗺 Map</span>
         <div class="map-bar-actions">
-            <a id="gmapsLinkMap" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
+            <a id="gmapsLinkMap" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span><button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
             <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
@@ -1166,7 +1178,7 @@
         <div class="list-head" id="listHead">
             <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Select all">
             <span class="lh-count" id="listCount"></span>
-            <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
+            <button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
             
             
             <button type="button" class="filter-btn" id="filterBtn" onclick="openFilter()" title="Filter: country, time, distance, type" aria-label="Filter"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>
@@ -1184,7 +1196,7 @@
             <div class="top-controls desktop-only">
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Add place" aria-label="Add place">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-                <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
+                <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
                 <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
         </div>
@@ -3631,6 +3643,41 @@
     })();
 
     // ===== Лічильник у шапці та кнопка «Йти на старт» =====
+    // ===== Trip cost (€): km × fuel use × fuel price (Profile) + stop costs =====
+    function closeTripCost() { const m = document.getElementById('tripCostModal'); if (m) m.remove(); }
+    function showTripCost() {
+        const n = places.filter(p => p.selected).length;
+        if (!n) return;
+        const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));
+        const pf = pfLoad(), cur = pf.cur || '€', ex = extrasTotals();
+        const cons = pfNum(pf.cons), price = pfNum(pf.price);
+        const meters = (routeTotals && eff >= 2) ? routeTotals.distance : null;
+        const f = meters != null ? pfFuel(meters, cons, price) : null;
+        const money = v => pfFmt(v, 2) + ' ' + esc(cur);
+        const row = (l, v) => '<div class="tc-row"><span>' + l + '</span><b>' + v + '</b></div>';
+        let html = '<h3>💶 Trip cost</h3>';
+        const notes = [];
+        html += row('🧭 Distance', meters != null ? (routeTotals.estimated ? '≈ ' : '') + fmtKm(meters) : '—');
+        if (meters == null) notes.push(eff < 2 ? 'Distance needs a start: allow GPS, or select 2+ points.' : 'Route is still calculating — try again in a moment.');
+        let total = 0, haveAny = false;
+        if (f) {
+            html += row('⛽ Fuel', pfFmt(f.liters, 1) + ' L');
+            if (isFinite(f.cost)) {
+                html += row('💶 Fuel cost', money(f.cost)); total += f.cost; haveAny = true;
+                notes.push(fmtKm(meters) + ' × ' + pfFmt(cons, 1) + ' L/100 km × ' + pfFmt(price, 2) + ' ' + esc(cur) + '/L');
+            } else notes.push('Set fuel price in Profile.');
+        } else if (meters != null) notes.push('Set fuel use and price in Profile.');
+        if (ex.cost > 0) { html += row('💰 Stops', money(ex.cost)); total += ex.cost; haveAny = true; }
+        if (haveAny) html += '<div class="tc-row tc-total"><span>Total</span><b>' + money(total) + '</b></div>';
+        if (notes.length) html += '<div class="tc-note">' + notes.join('<br>') + '</div>';
+        closeTripCost();
+        const m = document.createElement('div');
+        m.id = 'tripCostModal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Trip cost');
+        m.innerHTML = '<div class="srm-box">' + html + '<div class="srm-acts"><button type="button" id="tcClose">Close</button></div></div>';
+        m.addEventListener('click', e => { if (e.target === m) closeTripCost(); });
+        document.body.appendChild(m);
+        document.getElementById('tcClose').onclick = closeTripCost;
+    }
     function updateListCount() {
         const el = document.getElementById('listCount');
         if (!el) return;
@@ -3638,9 +3685,10 @@
         const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));   // точки маршруту (разом із моєю позицією)
         ['returnToggle', 'returnToggleDesk'].forEach(id => { const rt = document.getElementById(id); if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none'; });
         const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
-        document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
+        document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });
+        document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = n >= 1 ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         const lh = document.getElementById('listHead');
-        if (lh) { lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
+        if (lh) { lh.classList.toggle('has-cost', n > 0); lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
         if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
