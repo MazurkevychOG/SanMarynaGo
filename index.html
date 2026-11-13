@@ -3526,6 +3526,9 @@
         }).join('') : '<div class="pf-empty">No saved routes yet</div>';
     }
     // Збереження: кнопка 💾 (список, карта) -> діалог із назвою -> запис у каталог
+    // Підпис відкритого/щойно збереженого маршруту: кнопка 💾 з'являється лише коли вибір або «повернення на старт» змінились
+    let savedRouteSig = null;
+    function routeSig() { const r = document.getElementById('returnToStart'); return pfSelected().map(p => p.id).join(',') + '|' + (r && r.checked ? 1 : 0); }
     function openSaveRoute() {
         const sel = pfSelected();
         const eff = sel.length + (startFromMe && startSnap ? 1 : 0);
@@ -3550,6 +3553,7 @@
         });
         if (!pfRoutesSave(list)) return;
         closeSaveRoute();
+        savedRouteSig = routeSig(); updateListCount();
         toast('📁 Route «' + name + '» saved');
     }
     document.addEventListener('keydown', e => {
@@ -3631,6 +3635,7 @@
             const rt = document.getElementById('returnToStart');
             if (rt) { rt.checked = !!r.ret; onReturnToggle(rt); }
             persistSelection(); refreshSelectionUI();
+            savedRouteSig = routeSig(); updateListCount();      // щойно відкритий маршрут — без змін, 💾 прихована
             closeProfile();
             toast(missing ? '▶ Route opened (' + missing + ' places no longer in list)' : '▶ Route opened: ' + r.name);
             if (window.matchMedia && window.matchMedia('(max-width: 700px)').matches) {
@@ -3698,7 +3703,7 @@
         const n = places.filter(p => p.selected).length;
         const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));   // точки маршруту (разом із моєю позицією)
         ['returnToggle', 'returnToggleDesk'].forEach(id => { const rt = document.getElementById(id); if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none'; });
-        const canSave = !!(routeTotals && eff >= 2);                           // кнопка 💾 лише коли є готовий маршрут
+        const canSave = !!(routeTotals && eff >= 2) && !(savedRouteSig !== null && routeSig() === savedRouteSig);                           // кнопка 💾 лише коли є готовий маршрут
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });
         document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = n >= 1 ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         const lh = document.getElementById('listHead');
@@ -3740,6 +3745,7 @@
         try { localStorage.setItem('return_to_start', el.checked ? '1' : '0'); } catch (e) { }
         syncReturnToggles(el.checked);
         updateLinks();
+        updateListCount();
     }
     function syncReturnToggles(on) {                         // мобільний і настільний перемикачі показують один стан
         [['returnToStart', 'returnToggle'], ['returnToStartDesktop', 'returnToggleDesk']].forEach(([i, l]) => {
