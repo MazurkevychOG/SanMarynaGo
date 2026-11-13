@@ -946,6 +946,20 @@
         #tripCostModal .tc-row b { white-space: nowrap; }
         #tripCostModal .tc-total { border-bottom: 0; font-size: 18px; padding-top: 10px; }
         #tripCostModal .tc-note { font-size: 12px; opacity: .7; margin-top: 8px; }
+        /* ===== Search box on the map ===== */
+        .map-search { position: absolute; top: 10px; left: 64px; right: 64px; max-width: 340px; margin: 0 auto; z-index: 1000; }
+        .map-search input { width: 100%; box-sizing: border-box; height: 38px; border-radius: 19px; border: 1px solid #cbd5e0; padding: 0 14px; font-size: 16px; background: #fff; color: #2d3748; box-shadow: 0 2px 6px rgba(0,0,0,.25); outline: none; }
+        .ms-list { display: none; background: #fff; border-radius: 12px; margin-top: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.3); overflow: hidden; max-height: 50vh; overflow-y: auto; }
+        .ms-list.open { display: block; }
+        .ms-row { padding: 9px 14px; font-size: 14px; border-bottom: 1px solid #edf2f7; cursor: pointer; color: #2d3748; }
+        .ms-row:last-child { border-bottom: 0; }
+        .ms-row small { display: block; color: #718096; }
+        .ms-addr { color: #2f80ed; font-weight: 600; }
+        html[data-theme="dark"] .map-search input { background: #2b3445; color: #e2e8f0; border-color: #465068; }
+        html[data-theme="dark"] .ms-list { background: #2b3445; }
+        html[data-theme="dark"] .ms-row { color: #e2e8f0; border-color: #3a4558; }
+        html[data-theme="dark"] .ms-row small { color: #9fb0c6; }
+        html[data-theme="dark"] .ms-addr { color: #75a3f0; }
     </style>
 </head>
 <body>
@@ -1021,7 +1035,7 @@
             <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
-    <div class="map-hint-m">Tap point — show/hide name · hold point — add/remove from route · long press map — menu (add place) · ⟲ — reset all points · two fingers: pan, zoom, rotate · green dot — you</div>
+    <div class="map-hint-m">Tap point — show/hide name · hold point — add/remove from route · double tap point — stop costs · long press map — menu (add place) · ⟲ — reset all points · two fingers: pan, zoom, rotate · green dot — you</div>
 </div>
 <div id="speedoScreen" class="spd-screen" role="dialog" aria-modal="true" aria-label="Speedometer" aria-hidden="true">
     <button type="button" class="spd-close" id="speedoClose" onclick="closeSpeedo()" aria-label="Close speedometer">✕</button>
@@ -1240,7 +1254,7 @@
             </div>
         </div>
     </div>
-    <div class="map-hint" id="mapHint">Click point — show/hide name · hold point — add/remove from route · right click — menu · ⟲ — reset all points · touchpad: two fingers — pan, pinch — zoom · rotate: two fingers or Shift+drag · green dot — you (GPS)</div>
+    <div class="map-hint" id="mapHint">Click point — show/hide name · hold point — add/remove from route · double-click point — stop costs · right click — menu · ⟲ — reset all points · touchpad: two fingers — pan, pinch — zoom · rotate: two fingers or Shift+drag · green dot — you (GPS)</div>
 
 <div id="albaniaMap"></div></div>
 
@@ -4337,6 +4351,71 @@
     });
 
     // ----- Ініціалізація -----
+    // ===== Search box on the map: catalog places first, then address search (Nominatim) =====
+    let searchPin = null;
+    function addMapSearch(el) {
+        if (!el || el.querySelector('.map-search')) return;
+        const box = document.createElement('div');
+        box.className = 'map-search';
+        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><div class="ms-list" id="msList"></div>';
+        el.appendChild(box);
+        L.DomEvent.disableClickPropagation(box); L.DomEvent.disableScrollPropagation(box);
+        const inp = box.querySelector('input'), list = box.querySelector('.ms-list');
+        const closeList = () => { list.classList.remove('open'); list.innerHTML = ''; };
+        const clearPin = () => { if (searchPin) { map.removeLayer(searchPin); searchPin = null; } };
+        const find = q => {
+            const out = [];
+            places.forEach((p, i) => {
+                if (!parseCoords(p.coords)) return;
+                const k = normText(p.name + ' ' + (p.near || '') + ' ' + (p.country || '')).indexOf(q);
+                if (k < 0) return;
+                out.push({ i, rank: normText(p.name).startsWith(q) ? 0 : (k === 0 ? 1 : 2) });
+            });
+            return out.sort((a, b) => a.rank - b.rank).slice(0, 6);
+        };
+        const goPlace = i => {
+            const p = places[i], c = parseCoords(p && p.coords); if (!c) return;
+            clearPin(); closeList(); inp.blur();
+            shownNames.add(p.id); updateMapMarkers();
+            map.flyTo(c, Math.max(map.getZoom(), 13), { duration: .8 });
+        };
+        const goPoint = (lat, lon, name) => {
+            clearPin(); closeList(); inp.blur();
+            searchPin = L.circleMarker([lat, lon], { radius: 9, color: '#fff', weight: 2, fillColor: '#e74c3c', fillOpacity: 1 }).addTo(map);
+            if (name) searchPin.bindTooltip(esc(name), { permanent: true, direction: 'top', offset: [0, -10], className: 'map-name-tip' });
+            map.flyTo([lat, lon], Math.max(map.getZoom(), 13), { duration: .8 });
+        };
+        const addrSearch = async q => {
+            list.innerHTML = '<div class="ms-row"><small>Searching…</small></div>'; list.classList.add('open');
+            try {
+                const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language=sq,en&q=' + encodeURIComponent(q));
+                const d = await r.json();
+                if (!d.length) { list.innerHTML = '<div class="ms-row"><small>Nothing found</small></div>'; return; }
+                list.innerHTML = d.map((x, k) => '<div class="ms-row" data-k="' + k + '">' + esc(x.display_name) + '</div>').join('');
+                list.querySelectorAll('.ms-row').forEach(row => row.onclick = () => { const x = d[+row.dataset.k]; goPoint(+x.lat, +x.lon, String(x.display_name).split(',')[0]); });
+            } catch (e) { list.innerHTML = '<div class="ms-row"><small>Offline — address search unavailable</small></div>'; }
+        };
+        const render = () => {
+            const q = normText(inp.value).trim();
+            if (q.length < 2) { closeList(); return; }
+            let html = find(q).map(r => { const p = places[r.i]; return '<div class="ms-row" data-i="' + r.i + '">' + esc(p.name) + (p.near ? '<small>' + esc(p.near) + '</small>' : '') + '</div>'; }).join('');
+            if (q.length >= 3) html += '<div class="ms-row ms-addr">🌍 Search address: ' + esc(inp.value.trim()) + '</div>';
+            if (!html) { closeList(); return; }
+            list.innerHTML = html; list.classList.add('open');
+            list.querySelectorAll('.ms-row[data-i]').forEach(row => row.onclick = () => goPlace(+row.dataset.i));
+            const a = list.querySelector('.ms-addr'); if (a) a.onclick = () => addrSearch(inp.value.trim());
+        };
+        inp.addEventListener('input', render);
+        inp.addEventListener('focus', render);
+        inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const q = normText(inp.value).trim(), res = find(q);
+                if (res.length) goPlace(res[0].i); else if (q.length >= 3) addrSearch(inp.value.trim());
+            } else if (e.key === 'Escape') { e.stopPropagation(); inp.value = ''; closeList(); clearPin(); inp.blur(); }
+        });
+        document.addEventListener('pointerdown', e => { if (!box.contains(e.target)) closeList(); });
+    }
     function initMap() {
         if (map || typeof L === 'undefined') return;
         if (window.innerWidth <= 700 && !document.body.classList.contains('map-open')) return;
@@ -4365,6 +4444,7 @@
         setupWheelAndGestures(el);
         addLocateControl();
         addResetControl();
+        addMapSearch(el);
         startGps();
         map.attributionControl.addAttribution('Place names © OpenStreetMap (Nominatim)');
         setupContextAndLongPress(el);
@@ -4575,7 +4655,7 @@
                 if (icon && !d) return;                                   // зелений маркер нового місця
                 if (d) {
                     const idx = Number(d.dataset.idx);
-                    markerHold = { i: idx, armed: true, t2: setTimeout(() => { if (!markerHold) return; markerHold = null; openStopDlg(idx); }, 2000 - 550) };
+                    markerHold = { i: idx, armed: true, t2: null };
                     try { if (navigator.vibrate) navigator.vibrate(10); } catch (e) { }
                     return;
                 }
@@ -5200,7 +5280,6 @@
                     stop(); opened = false;
                     if (e.pointerType !== 'mouse' || e.button !== 0) return;
                     t1 = setTimeout(() => { armed = true; }, 500);
-                    t2 = setTimeout(() => { armed = false; opened = true; openStopDlg(i); }, 2000);
                 });
                 mel.addEventListener('pointerup', () => {
                     const was = armed; stop();
@@ -5208,6 +5287,17 @@
                     else if (opened) markerHoldAt = Date.now(); // вікно вже відкрито — не рахувати як клік
                 });
                 ['pointerleave', 'pointercancel'].forEach(t => mel.addEventListener(t, stop));
+                // двічі клацнути / двічі торкнутись точки — витрати на точці (гроші й хвилини)
+                const openCosts = () => { if (Date.now() - stopOpenAt < 600) return; stop(); openStopDlg(i); };
+                mel.addEventListener('dblclick', e => { e.preventDefault(); e.stopPropagation(); openCosts(); });
+                let downAt = 0, lastTapAt = 0;
+                mel.addEventListener('pointerdown', () => { downAt = Date.now(); });
+                mel.addEventListener('pointerup', e => {                     // дотик: iOS не генерує dblclick, тому ловимо самі
+                    if (e.pointerType === 'mouse') return;
+                    const now = Date.now();
+                    if (now - downAt > 300) { lastTapAt = 0; return; }       // це було утримання, а не дотик
+                    if (now - lastTapAt < 350) { lastTapAt = 0; openCosts(); } else lastTapAt = now;
+                });
             }
         });
     }
