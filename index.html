@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk"><head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SanMarynaGO</title>
@@ -448,7 +448,7 @@
         .settings-bar { justify-content: space-between; }
         .settings-gear { font-size: 30px; line-height: 1; }
         .settings-close { width: 46px; height: 46px; padding: 0; border-radius: 50%; background: #e74c3c; font-size: 22px; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
-        .mobile-controls .btn-save-file[aria-label="Налаштування"], .top-controls .btn-save-file[aria-label="Налаштування"] { font-size: 16px !important; padding: 5px 10px !important; line-height: 1.1; }
+        .mobile-controls .btn-save-file[aria-label="Settings"], .top-controls .btn-save-file[aria-label="Settings"] { font-size: 16px !important; padding: 5px 10px !important; line-height: 1.1; }
         .gps-hit { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .gps-dot.start { box-shadow: 0 0 0 4px rgba(231,76,60,.85), 0 2px 6px rgba(0,0,0,.4); }
         .lh-count.start-on { cursor: pointer; background: #fde8e6; color: #b3362a; }
@@ -677,8 +677,8 @@
             font-size: 1.3em !important;
             padding: 9px 13px !important;
         }
-        .mobile-controls .btn-save-file[aria-label="Налаштування"],
-        .top-controls .btn-save-file[aria-label="Налаштування"] {
+        .mobile-controls .btn-save-file[aria-label="Settings"],
+        .top-controls .btn-save-file[aria-label="Settings"] {
             width: 44px !important;
             height: 44px !important;
             min-width: 44px;
@@ -687,8 +687,8 @@
             align-items: center;
             justify-content: center;
         }
-        .mobile-controls .btn-save-file[aria-label="Налаштування"] .gear-w,
-        .top-controls .btn-save-file[aria-label="Налаштування"] .gear-w {
+        .mobile-controls .btn-save-file[aria-label="Settings"] .gear-w,
+        .top-controls .btn-save-file[aria-label="Settings"] .gear-w {
             display: block;
             font-size: 40px;
             line-height: 1;
@@ -708,8 +708,8 @@
             .mobile-controls .btn-profile { width: 38px; height: 38px; }
             .mobile-controls .btn-map-open,
             .mobile-controls #gmapsLink { font-size: 1.05em !important; padding: 6px 5px !important; white-space: nowrap; }
-            .mobile-controls .btn-save-file[aria-label="Налаштування"] { width: 38px !important; height: 38px !important; min-width: 38px; }
-            .mobile-controls .btn-save-file[aria-label="Налаштування"] .gear-w { font-size: 34px; }
+            .mobile-controls .btn-save-file[aria-label="Settings"] { width: 38px !important; height: 38px !important; min-width: 38px; }
+            .mobile-controls .btn-save-file[aria-label="Settings"] .gear-w { font-size: 34px; }
         }
 
     
@@ -987,59 +987,59 @@
 <div id="mediaModal" class="modal">
     <div id="mediaContainer" class="modal-content"></div>
     <div id="galleryCount"></div>
-    <button type="button" id="galPrev" class="gal-nav gal-prev" aria-label="Попереднє">‹</button>
-    <button type="button" id="galNext" class="gal-nav gal-next" aria-label="Наступне">›</button>
+    <button type="button" id="galPrev" class="gal-nav gal-prev" aria-label="Previous">‹</button>
+    <button type="button" id="galNext" class="gal-nav gal-next" aria-label="Next">›</button>
 </div>
 
 <!-- FAB кнопка для мобільного -->
 <input type="file" id="importFile" accept=".json,application/json,text/plain" multiple style="display:none" onchange="importData(this)">
 <div id="mapOverlay">
     <div class="map-bar">
-        <span class="map-bar-title">🗺 Карта</span>
+        <span class="map-bar-title">🗺 Map</span>
         <div class="map-bar-actions">
-            <a id="gmapsLinkMap" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+            <a id="gmapsLinkMap" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
             <button class="btn-map-close" onclick="closeMobileMap()">☰ places</button>
         </div>
     </div>
-    <div class="map-hint-m">Дотик до точки — показати/сховати назву · утримання точки — вибрати/зняти з маршруту · довге натискання по карті — меню (додати місце) · ⟲ — скинути всі точки · два пальці: рух, масштаб, поворот · зелена точка — ви</div>
+    <div class="map-hint-m">Tap point — show/hide name · hold point — add/remove from route · long press map — menu (add place) · ⟲ — reset all points · two fingers: pan, zoom, rotate · green dot — you</div>
 </div>
-<div id="speedoScreen" class="spd-screen" role="dialog" aria-modal="true" aria-label="Спідометр" aria-hidden="true">
-    <button type="button" class="spd-close" id="speedoClose" onclick="closeSpeedo()" aria-label="Закрити спідометр">✕</button>
+<div id="speedoScreen" class="spd-screen" role="dialog" aria-modal="true" aria-label="Speedometer" aria-hidden="true">
+    <button type="button" class="spd-close" id="speedoClose" onclick="closeSpeedo()" aria-label="Close speedometer">✕</button>
     <div class="spd-main">
         <div class="spd-val none" id="spdVal">—</div>
-        <div class="spd-unit">км/год</div>
-        <div class="spd-gps" id="spdGps" role="status" aria-live="polite"><i class="dot"></i><span id="spdGpsTxt">Очікування GPS</span></div>
+        <div class="spd-unit">km/h</div>
+        <div class="spd-gps" id="spdGps" role="status" aria-live="polite"><i class="dot"></i><span id="spdGpsTxt">Waiting for GPS</span></div>
         <div class="spd-msg" id="spdMsg"></div>
-        <button type="button" class="spd-retry" id="spdRetry" onclick="speedoRetry()" hidden>Спробувати знову</button>
+        <button type="button" class="spd-retry" id="spdRetry" onclick="speedoRetry()" hidden>Retry</button>
     </div>
 </div>
-<div id="waitOverlay" class="wait-ov" role="status" aria-live="polite"><div class="wait-card"><svg class="snake-svg" viewBox="-50 -50 100 100" width="108" height="108" aria-hidden="true" focusable="false"><defs><path id="snkPath" d="M0,-34 A34,34 0 1,1 0,34 A34,34 0 1,1 0,-34"/></defs><circle r="34" fill="none" stroke="rgba(120,130,150,.18)" stroke-width="1.2" stroke-dasharray="2 4"/><circle r="2.08" fill="#a8e6a1" opacity="0.45"><animateMotion dur="2.2s" begin="-1.000s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.35" fill="#9fe29c" opacity="0.48"><animateMotion dur="2.2s" begin="-1.075s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.62" fill="#97df98" opacity="0.52"><animateMotion dur="2.2s" begin="-1.150s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.89" fill="#8fdb94" opacity="0.55"><animateMotion dur="2.2s" begin="-1.225s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.16" fill="#87d890" opacity="0.59"><animateMotion dur="2.2s" begin="-1.300s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.43" fill="#7fd48c" opacity="0.62"><animateMotion dur="2.2s" begin="-1.375s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.70" fill="#77d188" opacity="0.66"><animateMotion dur="2.2s" begin="-1.450s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.97" fill="#6fcd84" opacity="0.69"><animateMotion dur="2.2s" begin="-1.525s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.24" fill="#67ca80" opacity="0.72"><animateMotion dur="2.2s" begin="-1.600s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.51" fill="#5fc67c" opacity="0.76"><animateMotion dur="2.2s" begin="-1.675s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.78" fill="#57c378" opacity="0.79"><animateMotion dur="2.2s" begin="-1.750s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.05" fill="#4fbf74" opacity="0.83"><animateMotion dur="2.2s" begin="-1.825s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.32" fill="#47bc70" opacity="0.86"><animateMotion dur="2.2s" begin="-1.900s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.59" fill="#3fb86c" opacity="0.90"><animateMotion dur="2.2s" begin="-1.975s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.86" fill="#37b568" opacity="0.93"><animateMotion dur="2.2s" begin="-2.050s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="6.13" fill="#2fb164" opacity="0.97"><animateMotion dur="2.2s" begin="-2.125s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><g><animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto"><mpath href="#snkPath"/></animateMotion><circle r="7.4" fill="#1e8449"/><circle cx="2.6" cy="-3.2" r="1.9" fill="#fff"/><circle cx="2.6" cy="3.2" r="1.9" fill="#fff"/><circle cx="3.2" cy="-3.2" r="0.9" fill="#111"/><circle cx="3.2" cy="3.2" r="0.9" fill="#111"/><path d="M7 0 L12 0 M12 0 L14.5 -2 M12 0 L14.5 2" stroke="#e74c3c" stroke-width="1.1" fill="none" stroke-linecap="round"/></g></svg><div class="wait-txt" id="waitTxt">Оновлюю…</div></div></div>
-<div id="filterModal" class="mdl" role="dialog" aria-label="Фільтр місць">
+<div id="waitOverlay" class="wait-ov" role="status" aria-live="polite"><div class="wait-card"><svg class="snake-svg" viewBox="-50 -50 100 100" width="108" height="108" aria-hidden="true" focusable="false"><defs><path id="snkPath" d="M0,-34 A34,34 0 1,1 0,34 A34,34 0 1,1 0,-34"/></defs><circle r="34" fill="none" stroke="rgba(120,130,150,.18)" stroke-width="1.2" stroke-dasharray="2 4"/><circle r="2.08" fill="#a8e6a1" opacity="0.45"><animateMotion dur="2.2s" begin="-1.000s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.35" fill="#9fe29c" opacity="0.48"><animateMotion dur="2.2s" begin="-1.075s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.62" fill="#97df98" opacity="0.52"><animateMotion dur="2.2s" begin="-1.150s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="2.89" fill="#8fdb94" opacity="0.55"><animateMotion dur="2.2s" begin="-1.225s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.16" fill="#87d890" opacity="0.59"><animateMotion dur="2.2s" begin="-1.300s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.43" fill="#7fd48c" opacity="0.62"><animateMotion dur="2.2s" begin="-1.375s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.70" fill="#77d188" opacity="0.66"><animateMotion dur="2.2s" begin="-1.450s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="3.97" fill="#6fcd84" opacity="0.69"><animateMotion dur="2.2s" begin="-1.525s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.24" fill="#67ca80" opacity="0.72"><animateMotion dur="2.2s" begin="-1.600s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.51" fill="#5fc67c" opacity="0.76"><animateMotion dur="2.2s" begin="-1.675s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="4.78" fill="#57c378" opacity="0.79"><animateMotion dur="2.2s" begin="-1.750s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.05" fill="#4fbf74" opacity="0.83"><animateMotion dur="2.2s" begin="-1.825s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.32" fill="#47bc70" opacity="0.86"><animateMotion dur="2.2s" begin="-1.900s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.59" fill="#3fb86c" opacity="0.90"><animateMotion dur="2.2s" begin="-1.975s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="5.86" fill="#37b568" opacity="0.93"><animateMotion dur="2.2s" begin="-2.050s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><circle r="6.13" fill="#2fb164" opacity="0.97"><animateMotion dur="2.2s" begin="-2.125s" repeatCount="indefinite"><mpath href="#snkPath"/></animateMotion></circle><g><animateMotion dur="2.2s" repeatCount="indefinite" rotate="auto"><mpath href="#snkPath"/></animateMotion><circle r="7.4" fill="#1e8449"/><circle cx="2.6" cy="-3.2" r="1.9" fill="#fff"/><circle cx="2.6" cy="3.2" r="1.9" fill="#fff"/><circle cx="3.2" cy="-3.2" r="0.9" fill="#111"/><circle cx="3.2" cy="3.2" r="0.9" fill="#111"/><path d="M7 0 L12 0 M12 0 L14.5 -2 M12 0 L14.5 2" stroke="#e74c3c" stroke-width="1.1" fill="none" stroke-linecap="round"/></g></svg><div class="wait-txt" id="waitTxt">Updating…</div></div></div>
+<div id="filterModal" class="mdl" role="dialog" aria-label="Place filter">
     <div class="srm-box mdl-box">
-        <h3>🔎 Фільтр і сортування</h3>
-        <div class="flt-sec"><div class="flt-lab">Сортування</div><div class="flt-chips" id="fltSort"></div><div class="srm-meta" id="fltSortHint" style="margin-top:6px"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Країна</div><div class="flt-chips" id="fltCountries"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Тип місця</div><div class="flt-chips" id="fltTypes"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Час у дорозі, хв</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_tMin" placeholder="від" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_tMax" placeholder="до" autocomplete="off"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Відстань, км</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_dMin" placeholder="від" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_dMax" placeholder="до" autocomplete="off"></div></div>
+        <h3>🔎 Filter & sort</h3>
+        <div class="flt-sec"><div class="flt-lab">Sort</div><div class="flt-chips" id="fltSort"></div><div class="srm-meta" id="fltSortHint" style="margin-top:6px"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Country</div><div class="flt-chips" id="fltCountries"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Place type</div><div class="flt-chips" id="fltTypes"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Drive time, min</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_tMin" placeholder="from" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_tMax" placeholder="to" autocomplete="off"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Distance, km</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_dMin" placeholder="from" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_dMax" placeholder="to" autocomplete="off"></div></div>
         <div class="srm-meta flt-info" id="fltInfo"></div>
-        <div class="srm-acts"><button type="button" onclick="resetFilter()">Скинути</button><button type="button" class="ok" onclick="closeFilter()">Готово</button></div>
+        <div class="srm-acts"><button type="button" onclick="resetFilter()">Reset</button><button type="button" class="ok" onclick="closeFilter()">Done</button></div>
     </div>
 </div>
-<div id="typesModal" class="mdl" role="dialog" aria-label="Типи місць">
+<div id="typesModal" class="mdl" role="dialog" aria-label="Place types">
     <div class="srm-box mdl-box">
-        <h3>🏷 Типи місць</h3>
-        <div class="srm-meta" style="margin:0 0 10px">Назви й значки — ваші: пляж, ресторан, екстрім, винарня… Одне місце може мати кілька типів.</div>
+        <h3>🏷 Place types</h3>
+        <div class="srm-meta" style="margin:0 0 10px">Names & icons are yours: beach, restaurant, extreme, winery… A place can have several types.</div>
         <div id="typesList"></div>
-        <button type="button" class="tm-add" onclick="addTypeRow()">＋ Додати тип</button>
-        <div class="srm-acts"><button type="button" onclick="closeTypes()">Скасувати</button><button type="button" class="ok" onclick="saveTypesModal()">Зберегти</button></div>
+        <button type="button" class="tm-add" onclick="addTypeRow()">＋ Add type</button>
+        <div class="srm-acts"><button type="button" onclick="closeTypes()">Cancel</button><button type="button" class="ok" onclick="saveTypesModal()">Save</button></div>
     </div>
 </div>
-<div id="settingsPage" class="settings-page" role="dialog" aria-label="Налаштування">
+<div id="settingsPage" class="settings-page" role="dialog" aria-label="Settings">
     <div class="settings-box">
-        <div class="settings-bar"><span class="settings-gear" aria-hidden="true">⚙</span><button type="button" class="settings-close" onclick="closeSettings()" aria-label="Закрити" title="Закрити">✕</button></div>
+        <div class="settings-bar"><span class="settings-gear" aria-hidden="true">⚙</span><button type="button" class="settings-close" onclick="closeSettings()" aria-label="Close" title="Close">✕</button></div>
         <div class="settings-section">
-            <h3>Файл обміну</h3>
+            <h3>Exchange file</h3>
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update Data</button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
@@ -1047,121 +1047,121 @@
             <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Import</button>
         </div>
         <div class="settings-section">
-            <h3>Вигляд і типи</h3>
-            <label class="set-row"><span>🌙 Темна тема</span><span class="switch"><input type="checkbox" id="themeDark"><i></i></span></label>
-            <button type="button" class="set-btn" onclick="closeSettings();openTypes()">🏷 Типи місць</button>
+            <h3>Look & types</h3>
+            <label class="set-row"><span>🌙 Dark mode</span><span class="switch"><input type="checkbox" id="themeDark"><i></i></span></label>
+            <button type="button" class="set-btn" onclick="closeSettings();openTypes()">🏷 Place types</button>
         </div>
         <div class="settings-section">
-            <h3>Звук</h3>
-            <label class="set-row"><span>Звуки</span><span class="switch"><input type="checkbox" id="soundOn"><i></i></span></label>
-            <div class="set-row"><span>Гучність</span><input type="range" id="soundVol" min="0" max="100" step="1" value="50"><output id="soundVolOut">50%</output></div>
-            <button type="button" class="set-btn" onclick="testSounds()">▶ Перевірити звук </button>
+            <h3>Sound</h3>
+            <label class="set-row"><span>Sounds</span><span class="switch"><input type="checkbox" id="soundOn"><i></i></span></label>
+            <div class="set-row"><span>Volume</span><input type="range" id="soundVol" min="0" max="100" step="1" value="50"><output id="soundVolOut">50%</output></div>
+            <button type="button" class="set-btn" onclick="testSounds()">▶ Test sound </button>
         </div>
     </div>
 </div>
-<div id="editRouteModal" role="dialog" aria-label="Редагувати маршрут">
+<div id="editRouteModal" role="dialog" aria-label="Edit route">
     <div class="srm-box erm-box">
-        <h3>✎ Редагувати маршрут</h3>
-        <input type="text" id="ermName" maxlength="80" placeholder="Назва маршруту" autocomplete="off" enterkeyhint="done">
+        <h3>✎ Edit route</h3>
+        <input type="text" id="ermName" maxlength="80" placeholder="Route name" autocomplete="off" enterkeyhint="done">
         <div class="erm-lab" id="ermLab"></div>
         <div id="ermList"></div>
         <select id="ermAdd" onchange="ermAddPoint(this)"></select>
-        <label class="erm-ret"><input type="checkbox" id="ermRet"> туди й назад (повернення на старт)</label>
-        <div class="srm-meta">Відстань і час буде перераховано під час збереження.</div>
-        <div class="srm-acts"><button type="button" onclick="closeEditRoute()">Скасувати</button><button type="button" class="ok" id="ermSave" onclick="saveEditRoute()">Зберегти</button></div>
+        <label class="erm-ret"><input type="checkbox" id="ermRet"> round trip (return to start)</label>
+        <div class="srm-meta">Distance & time are recalculated on save.</div>
+        <div class="srm-acts"><button type="button" onclick="closeEditRoute()">Cancel</button><button type="button" class="ok" id="ermSave" onclick="saveEditRoute()">Save</button></div>
     </div>
 </div>
-<div id="stopModal" role="dialog" aria-label="Витрати на точці">
+<div id="stopModal" role="dialog" aria-label="Stop costs">
     <div class="srm-box">
-        <h3 id="stopTitle">⏱ Витрати на точці</h3>
-        <label class="pf-field"><span>Час на точці, хв</span><input class="pf-input" id="stopMin" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
-        <label class="pf-field"><span id="stopCostLbl">Гроші</span><input class="pf-input" id="stopCost" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
-        <div class="srm-meta">Додається до підсумку маршруту. У збережені маршрути не записується.</div>
-        <div class="srm-acts"><button type="button" onclick="closeStopDlg()">Скасувати</button><button type="button" onclick="clearStopDlg()">Очистити</button><button type="button" class="ok" onclick="saveStopDlg()">OK</button></div>
+        <h3 id="stopTitle">⏱ Stop costs</h3>
+        <label class="pf-field"><span>Stop time, min</span><input class="pf-input" id="stopMin" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+        <label class="pf-field"><span id="stopCostLbl">Money</span><input class="pf-input" id="stopCost" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+        <div class="srm-meta">Added to the route total. Not saved in saved routes.</div>
+        <div class="srm-acts"><button type="button" onclick="closeStopDlg()">Cancel</button><button type="button" onclick="clearStopDlg()">Clear</button><button type="button" class="ok" onclick="saveStopDlg()">OK</button></div>
     </div>
 </div>
-<div id="navPickModal" role="dialog" aria-label="Де побудувати маршрут">
+<div id="navPickModal" role="dialog" aria-label="Open route in">
     <div class="srm-box">
-        <h3>🧭 Де побудувати маршрут?</h3>
+        <h3>🧭 Open route in?</h3>
         <div class="srm-meta" id="navPickMeta"></div>
-        <button type="button" class="nav-opt g" id="navGoogleBtn" onclick="navPickGo('google')"><span>🗺</span><span>Google Maps<small id="navGoogleSub">Весь маршрут з усіма зупинками</small></span></button>
+        <button type="button" class="nav-opt g" id="navGoogleBtn" onclick="navPickGo('google')"><span>🗺</span><span>Google Maps<small id="navGoogleSub">Full route with all stops</small></span></button>
         <button type="button" class="nav-opt m" id="navMapsmeBtn" onclick="navPickGo('mapsme')"><span>📍</span><span>Maps.me<small id="navMapsmeSub"></small></span></button>
         <div id="navPickParts"></div>
-        <div class="srm-acts"><button type="button" onclick="closeNavPick()">Скасувати</button></div>
+        <div class="srm-acts"><button type="button" onclick="closeNavPick()">Cancel</button></div>
     </div>
 </div>
-<div id="saveRouteModal" role="dialog" aria-label="Зберегти маршрут">
+<div id="saveRouteModal" role="dialog" aria-label="Save route">
     <div class="srm-box">
-        <h3>💾 Зберегти маршрут</h3>
-        <input type="text" id="srmName" maxlength="80" placeholder="Назва маршруту" autocomplete="off" enterkeyhint="done">
+        <h3>💾 Save route</h3>
+        <input type="text" id="srmName" maxlength="80" placeholder="Route name" autocomplete="off" enterkeyhint="done">
         <div class="srm-meta" id="srmMeta"></div>
-        <div class="srm-acts"><button type="button" onclick="closeSaveRoute()">Скасувати</button><button type="button" class="ok" onclick="confirmSaveRoute()">Зберегти</button></div>
+        <div class="srm-acts"><button type="button" onclick="closeSaveRoute()">Cancel</button><button type="button" class="ok" onclick="confirmSaveRoute()">Save</button></div>
     </div>
 </div>
-<div id="profilePage" class="settings-page" role="dialog" aria-label="Особистий кабінет">
+<div id="profilePage" class="settings-page" role="dialog" aria-label="Profile">
     <div class="settings-box">
         <div class="settings-bar">
-            <div class="profile-bar-title"><span class="pb-ico"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></span><span><span id="pfTitle">Особистий кабінет</span><small id="pfSub"></small></span></div>
-            <button type="button" class="settings-close" onclick="closeProfile()" aria-label="Закрити" title="Закрити">✕</button>
+            <div class="profile-bar-title"><span class="pb-ico"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg></span><span><span id="pfTitle">Profile</span><small id="pfSub"></small></span></div>
+            <button type="button" class="settings-close" onclick="closeProfile()" aria-label="Close" title="Close">✕</button>
         </div>
         <div class="settings-section" id="pfUserBox">
-            <h3>Користувач</h3>
+            <h3>User</h3>
             <div id="pfLoggedIn" hidden>
-                <div class="pf-user-row"><span class="pf-user-name" id="pfUserName"></span><button type="button" class="pf-out" onclick="pfLogout()">Вийти</button></div>
-                <div class="set-note" style="margin:8px 0 0">Після виходу можна зайти під іншим ім'ям або створити нове.</div>
+                <div class="pf-user-row"><span class="pf-user-name" id="pfUserName"></span><button type="button" class="pf-out" onclick="pfLogout()">Log out</button></div>
+                <div class="set-note" style="margin:8px 0 0">After logging out, sign in as another user or create a new one.</div>
             </div>
             <div id="pfLoggedOut">
-                <label class="pf-field"><span>Ім'я користувача</span><input class="pf-input" id="pfLoginName" type="text" maxlength="40" autocomplete="username" autocapitalize="words" enterkeyhint="go" placeholder="Введіть ім'я"></label>
-                <button type="button" class="pf-btn blue" id="pfLoginBtn" onclick="pfLogin()">Увійти</button>
-                <div class="set-note" style="margin:10px 0 0">Користувачі зберігаються лише в цьому браузері. Якщо ім'я вже є — відкриються його дані (паливо, маршрути, налаштування екрана), якщо ні — буде створено нового користувача.</div>
+                <label class="pf-field"><span>Username</span><input class="pf-input" id="pfLoginName" type="text" maxlength="40" autocomplete="username" autocapitalize="words" enterkeyhint="go" placeholder="Enter name"></label>
+                <button type="button" class="pf-btn blue" id="pfLoginBtn" onclick="pfLogin()">Log in</button>
+                <div class="set-note" style="margin:10px 0 0">Users are stored only in this browser. If the name exists, its data opens (fuel, routes, screen settings); otherwise a new user is created.</div>
             </div>
         </div>
         <div class="settings-section">
-            <h3>Паливо</h3>
+            <h3>Fuel</h3>
             <div class="pf-grid">
-                <label class="pf-field"><span>Витрата, л/100 км</span><input class="pf-input" id="pfCons" type="text" inputmode="decimal" placeholder="7,5"></label>
-                <label class="pf-field"><span>Ціна палива за літр</span><input class="pf-input" id="pfPrice" type="text" inputmode="decimal" placeholder="1,85"></label>
-                <label class="pf-field"><span>Валюта</span><input class="pf-input" id="pfCur" type="text" maxlength="6" placeholder="€"></label>
+                <label class="pf-field"><span>Use, L/100 km</span><input class="pf-input" id="pfCons" type="text" inputmode="decimal" placeholder="7,5"></label>
+                <label class="pf-field"><span>Fuel price per L</span><input class="pf-input" id="pfPrice" type="text" inputmode="decimal" placeholder="1,85"></label>
+                <label class="pf-field"><span>Currency</span><input class="pf-input" id="pfCur" type="text" maxlength="6" placeholder="€"></label>
             </div>
-            <button type="button" class="pf-btn" onclick="pfSaveProfile()">💾 Зберегти</button>
-            <div class="set-note" style="margin:10px 0 0">Налаштування екрана (тема, положення кнопки «＋») зберігаються для вашого користувача автоматично.</div>
+            <button type="button" class="pf-btn" onclick="pfSaveProfile()">💾 Save</button>
+            <div class="set-note" style="margin:10px 0 0">Screen settings (theme, position of «＋») are saved for your user automatically.</div>
         </div>
         <div class="settings-section">
-            <h3 id="pfRoutesHead">📁 Збережені маршрути</h3>
+            <h3 id="pfRoutesHead">📁 Saved routes</h3>
             <div id="pfRoutes"></div>
         </div>
     </div>
 </div>
-<button class="fab-add finger-btn finger-green" id="fabBtn" onclick="fabClick()" aria-label="Додати місце"><span class="finger fp-green" role="img"></span></button>
+<button class="fab-add finger-btn finger-green" id="fabBtn" onclick="fabClick()" aria-label="Add place"><span class="finger fp-green" role="img"></span></button>
 
 <div class="content-area" id="contentArea">
     <div class="sticky-top">
         <div class="mobile-header">
-        <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+        <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
         <div class="app-brand"><span class="mobile-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div></div>
         <div class="mobile-controls">
-            <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Спідометр (GPS)" aria-label="Спідометр: швидкість невідома"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
-            <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Карта" aria-label="Карта"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
-            <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
-            <label class="return-toggle sq-btn" id="returnToggle" data-tip="Повернутися на старт"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Повернутися на старт"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
-            <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
+            <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Speedometer (GPS)" aria-label="Speedometer: speed unknown"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
+            <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Map" aria-label="Map"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
+            <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
+            <label class="return-toggle sq-btn" id="returnToggle" data-tip="Return to start"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
+            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span></button>
         </div>
     </div>
         <div class="search-bar" id="searchBar">
             <div class="search-inner">
                 <span class="search-ico">🔍</span>
-                <input type="search" id="searchInput" placeholder="Пошук місця (від 3 символів)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
-                <button type="button" id="searchClear" class="search-clear" aria-label="Стерти"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6L18 18M18 6L6 18" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button>
+                <input type="search" id="searchInput" placeholder="Search place (3+ chars)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+                <button type="button" id="searchClear" class="search-clear" aria-label="Clear"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6L18 18M18 6L6 18" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button>
             </div>
             <div class="search-info" id="searchInfo"></div>
         </div>
         <div class="list-head" id="listHead">
-            <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Вибрати всі">
+            <input type="checkbox" id="mainToggle" onclick="handleMainToggle(this)" title="Select all">
             <span class="lh-count" id="listCount"></span>
-            <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
+            <button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
             
             
-            <button type="button" class="filter-btn" id="filterBtn" onclick="openFilter()" title="Фільтр: країна, час, відстань, тип місця" aria-label="Фільтр"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>
+            <button type="button" class="filter-btn" id="filterBtn" onclick="openFilter()" title="Filter: country, time, distance, type" aria-label="Filter"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>
             
         </div>
     </div>
@@ -1172,43 +1172,43 @@
     <div class="sidebar-inner">
         <div class="app-brand app-brand-desk"><span class="app-brand-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div>
         <div class="header-top">
-            <h1>📍 Додати місце</h1>
+            <h1>📍 Add place</h1>
             <div class="top-controls desktop-only">
-                <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Додати місце" aria-label="Додати місце">＋</button>
-                <button type="button" class="btn-profile" onclick="openProfile()" title="Особистий кабінет" aria-label="Особистий кабінет"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Офлайн: немає інтернету"><title>Немає інтернету — працюю офлайн</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-                <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Маршрут" aria-label="Маршрут"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Повернутися на старт"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Повернутися на старт"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Зберегти маршрут" aria-label="Зберегти маршрут">💾</button>
-                <button class="btn-save-file" onclick="openSettings()" title="Налаштування" aria-label="Налаштування"><span class="gear-w">⚙&#xFE0E;</span></button>
+                <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Add place" aria-label="Add place">＋</button>
+                <button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
+                <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
+                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span></button>
             </div>
         </div>
         <div class="form-container">
             <input type="hidden" id="editIndex" value="">
             <div class="input-grid">
                 <div class="input-wrapper">
-                    <label>Назва місця</label>
-                    <input type="text" id="placeName" placeholder="Назва">
+                    <label>Place name</label>
+                    <input type="text" id="placeName" placeholder="Name">
                 </div>
                 <div class="input-wrapper">
-                    <label>Координати</label>
-                    <input type="text" id="placeCoords" placeholder="41.047, 19.496 або Plus Code" title="Десяткові координати, градуси, повний Plus Code (8FGXPFC9+GX) або короткий з містом (PFC9+GX9, Fier)">
+                    <label>Coordinates</label>
+                    <input type="text" id="placeCoords" placeholder="41.047, 19.496 or Plus Code" title="Decimal coordinates, degrees, full Plus Code (8FGXPFC9+GX) or short with city (PFC9+GX9, Fier)">
                 </div>
                 <div class="input-wrapper">
-                    <label>Опис</label>
-                    <input type="text" id="placeDesc" placeholder="Нотатки">
+                    <label>Description</label>
+                    <input type="text" id="placeDesc" placeholder="Notes">
                 </div>
                 <div class="input-wrapper">
-                    <label>Посилання Google Maps</label>
+                    <label>Google Maps link</label>
                     <input type="text" id="placeGmapsUrl" placeholder="https://maps.app.goo.gl/...">
                 </div>
                 <div class="input-wrapper">
-                    <label>Країна (англійською, автоматично за координатами)</label>
-                    <input type="text" id="placeCountry" placeholder="визначиться за координатами" autocomplete="off" autocapitalize="words" spellcheck="false">
+                    <label>Country (English, auto from coordinates)</label>
+                    <input type="text" id="placeCountry" placeholder="auto from coordinates" autocomplete="off" autocapitalize="words" spellcheck="false">
                 </div>
                 <div class="input-wrapper input-wide">
-                    <label>Тип місця</label>
+                    <label>Place type</label>
                     <div class="type-chips" id="typeChips"></div>
                 </div>
                 <div class="input-wrapper input-wide">
-                    <label>Додати фото/відео — не більше 5 Мб</label>
+                    <label>Add photo/video — max 5 MB</label>
                     <input type="file" id="placeFiles" accept="image/*,video/*" multiple="" onchange="handleFileSelect(this)">
                 </div>
                 <div id="mediaEditArea"></div>
@@ -1270,7 +1270,7 @@
     let _db = null;
     function idbOpen() {
         return new Promise((resolve, reject) => {
-            if (!window.indexedDB) return reject(new Error('IndexedDB недоступна'));
+            if (!window.indexedDB) return reject(new Error('IndexedDB unavailable'));
             const r = indexedDB.open('my_route_db', 1);
             r.onupgradeneeded = () => r.result.createObjectStore('kv');
             r.onsuccess = () => {
@@ -1280,7 +1280,7 @@
                 resolve(_db);
             };
             r.onerror = () => reject(r.error);
-            r.onblocked = () => reject(new Error('база заблокована іншою вкладкою'));
+            r.onblocked = () => reject(new Error('database blocked by another tab'));
         });
     }
     const idbRetryable = e => !e || /InvalidState|Unknown|Abort|TransactionInactive|NotFound/i.test(String(e.name || '')) || /clos|lost|connection|server/i.test(String(e.message || ''));
@@ -1307,11 +1307,11 @@
             let tx; try { tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(value, key); } catch (e) { return reject(e); }
             tx.oncomplete = () => resolve();
             tx.onerror = () => reject(tx.error);
-            tx.onabort = () => reject(tx.error || new Error('транзакцію скасовано'));
+            tx.onabort = () => reject(tx.error || new Error('transaction aborted'));
         }));
     }
     async function storageHint() {
-        try { const e = await navigator.storage.estimate(); return ' Використано ' + Math.round(e.usage / 1048576) + ' МБ із ' + Math.round(e.quota / 1048576) + ' МБ.'; } catch (x) { return ''; }
+        try { const e = await navigator.storage.estimate(); return ' Used ' + Math.round(e.usage / 1048576) + ' MB of ' + Math.round(e.quota / 1048576) + ' MB.'; } catch (x) { return ''; }
     }
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { }   // просимо браузер не чистити сховище
 
@@ -1322,13 +1322,13 @@
         const run = async () => {
             try { await idbSet('state', { base: 2, places, deleted: deletedIds, deletedNames, types: typeDefs, typesDeleted }); _warned = false; }
             catch (err) {
-                console.error('Помилка збереження в IndexedDB:', err);
+                console.error('IndexedDB save error:', err);
                 try { await saveStateSplit(); _warned = false; return; }            // запасний варіант: фото кожної картки — окремим записом
-                catch (err2) { console.error('Запасне збереження теж не вдалося:', err2); err = err2; }
+                catch (err2) { console.error('Fallback save failed too:', err2); err = err2; }
                 if (!_warned) {
                     _warned = true;
                     const hint = await storageHint();
-                    alert('Не вдалося зберегти зміни в браузері (' + ((err && err.name) || 'помилка') + (err && err.message ? ': ' + err.message : '') + ').' + hint + ' Зробіть «⚙ → Експорт», щоб не втратити зміни.');
+                    alert('Could not save changes in browser (' + ((err && err.name) || 'error') + (err && err.message ? ': ' + err.message : '') + ').' + hint + ' Use «⚙ → Export» to keep changes.');
                 }
             }
         };
@@ -1350,7 +1350,7 @@
     function persistSelection() {
         autoClearReturn();
         idbSet('selection', { ids: places.filter(p => p.selected).map(p => p.id) })
-            .catch(err => console.error('Помилка збереження вибору:', err));
+            .catch(err => console.error('Selection save error:', err));
     }
 
     // ===== Рендер таблиці =====
@@ -1378,8 +1378,8 @@
 
             row.innerHTML = `
                 <div class="swipe-actions">
-                    <button type="button" class="act act-edit" data-a="edit" title="Редагувати">✎<span>Змінити</span></button>
-                    <button type="button" class="act act-del" data-a="del" title="Видалити">🗑<span>Видалити</span></button>
+                    <button type="button" class="act act-edit" data-a="edit" title="Edit">✎<span>Edit</span></button>
+                    <button type="button" class="act act-del" data-a="del" title="Delete">🗑<span>Delete</span></button>
                 </div>
                 <div class="swipe-content">
                     <div class="c-left">
@@ -2135,10 +2135,10 @@
                         if (decodedBytes(out) <= limit) return resolve(out);
                         if (q > 0.55) q -= 0.1; else scale *= 0.8;
                     }
-                    reject(new Error('не вдалося стиснути до ліміту'));
+                    reject(new Error('could not compress to limit'));
                 } catch (e) { reject(e); }
             };
-            img.onerror = () => reject(new Error('не вдалося прочитати зображення'));
+            img.onerror = () => reject(new Error('could not read image'));
             img.src = dataUrl;
         });
     }
@@ -2188,7 +2188,7 @@
                 if (t && t.length < m.data.length) { m.thumb = t; changed = true; updateRowThumb(p); }
                 await new Promise(r => setTimeout(r, 40));
             }
-        } catch (e) { console.warn('Мініатюри:', e); }
+        } catch (e) { console.warn('Thumbnails:', e); }
         _thumbBusy = false;
         if (changed) persistPlaces();
     }
@@ -2210,18 +2210,18 @@
                     currentEditMedia.push({ type, data, ...(await thumbExtra(type, data)) });
                 } else if (f.type.startsWith('video/')) {
                     if (f.size > MAX_BYTES) {
-                        alert('Відео "' + f.name + '" більше 5 МБ — його не можна стиснути в браузері, пропущено.');
+                        alert('Video "' + f.name + '" over 5 MB — cannot compress in browser, skipped.');
                         continue;
                     }
                     currentEditMedia.push({ type: f.type, data: await readFileAsDataURL(f) });
                 } else {
-                    alert('Файл "' + f.name + '" має непідтримуваний тип.');
+                    alert('File "' + f.name + '" has unsupported type.');
                     continue;
                 }
                 renderMediaEdit();
             } catch (err) {
-                console.error('Помилка додавання файлу:', err);
-                alert('Не вдалося додати файл: ' + (f.name || '') + ' (' + err.message + '). Якщо це HEIC, а браузер його не читає — експортуйте фото в JPEG.');
+                console.error('File add error:', err);
+                alert('Could not add file: ' + (f.name || '') + ' (' + err.message + '). If HEIC is unreadable, export the photo as JPEG.');
             }
         }
     }
@@ -2327,19 +2327,19 @@
         if (!raw) return false;
         const det = parseCoordsDetailed(raw);
         if (det) {
-            if (det.kind !== 'dec') { el.value = coordsToString(det.c); el.dispatchEvent(new Event('input', { bubbles: true })); toast('Координати перетворено на десяткові'); }
+            if (det.kind !== 'dec') { el.value = coordsToString(det.c); el.dispatchEvent(new Event('input', { bubbles: true })); toast('Converted to decimal coordinates'); }
             return true;
         }
         const sp = parseShortPlusCode(raw);
         if (!sp) return false;
-        toast('Визначаю місце за Plus Code…');
+        toast('Resolving Plus Code…');
         let ref = sp.locality ? await geocodeLocality(sp.locality) : null;
         if (!ref) ref = fallbackReference();
         const c = olcRecover(sp.code, ref[0], ref[1]);
         if (!c) return false;
         el.value = coordsToString(c);
         el.dispatchEvent(new Event('input', { bubbles: true }));
-        toast('Plus Code перетворено на координати');
+        toast('Plus Code converted to coordinates');
         return true;
     }
 
@@ -2447,8 +2447,8 @@
     function validateForm() {
         const name = document.getElementById('placeName').value.trim();
         const coords = document.getElementById('placeCoords').value.trim();
-        if (!name || !coords) { alert('Заповніть назву та координати'); return false; }
-        if (!parseCoords(coords)) { alert('Координати: 41.047, 19.496 — або Plus Code (наприклад 8FGXPFC9+GX чи PFC9+GX9, Fier)'); return false; }
+        if (!name || !coords) { alert('Enter name and coordinates'); return false; }
+        if (!parseCoords(coords)) { alert('Coordinates: 41.047, 19.496 — or Plus Code (e.g. 8FGXPFC9+GX or PFC9+GX9, Fier)'); return false; }
         return true;
     }
     // Нове місце ставимо поряд зі схожим за територією: спершу те саме місто/район (за назвою найближчого
@@ -2782,11 +2782,11 @@
 
     function setSaveLabel(isEdit) {
         const b = document.getElementById('saveBtn');
-        const t = isEdit ? 'Оновити місце' : 'Додати місце';
+        const t = isEdit ? 'Update place' : 'Add place';
         b.title = t; b.setAttribute('aria-label', t);
         const hw = document.getElementById('stampHeart');
-        if (hw) hw.title = 'Зелена частина — ' + (isEdit ? 'оновити' : 'додати') + ', червона — скасувати';
-        const cap = document.getElementById('saveCaption'); if (cap) cap.textContent = isEdit ? 'Оновити' : 'Додати';
+        if (hw) hw.title = 'Green part — ' + (isEdit ? 'update' : 'add') + ', red — cancel';
+        const cap = document.getElementById('saveCaption'); if (cap) cap.textContent = isEdit ? 'Update' : 'Add';
     }
     // Скасувати: вийти з режиму редагування й повернутися до реєстру місць (панель закривається, місце не змінюється)
     function cancelEdit() {
@@ -2810,8 +2810,8 @@
             const wrap = document.createElement('div');
             wrap.className = 'imp-modal';
             wrap.innerHTML = `<div class="imp-box"><h3>${esc(title)}</h3><p>${esc(text)}</p>
-                <button type="button" class="imp-b imp-r" data-m="ok">${esc(okLabel || 'Так')}</button>
-                <button type="button" class="imp-b" data-m="no">Скасувати</button></div>`;
+                <button type="button" class="imp-b imp-r" data-m="ok">${esc(okLabel || 'Yes')}</button>
+                <button type="button" class="imp-b" data-m="no">Cancel</button></div>`;
             wrap.addEventListener('click', e => {
                 const m = e.target && e.target.dataset && e.target.dataset.m;
                 if (m) { wrap.remove(); resolve(m === 'ok'); }
@@ -2823,7 +2823,7 @@
     async function handleDelete(i) {
         const p = places[i];
         if (!p) return;
-        const ok = await confirmDialog('Видалити місце?', '«' + p.name + '» буде видалено разом з усіма фото й відео.', 'Видалити повністю');
+        const ok = await confirmDialog('Delete place?', '«' + p.name + '» will be deleted with all photos and videos.', 'Delete');
         if (!ok) return;
         const ed = document.getElementById('editIndex').value;
         if (nameKey(p.name) && !deletedNames.includes(nameKey(p.name))) deletedNames.push(nameKey(p.name));
@@ -2845,7 +2845,7 @@
         if (!mt) return;
         const vis = matchIdx(), scope = vis ? vis.map(i => places[i]) : places;
         mt.checked = scope.length > 0 ? scope.every(p => p.selected) : places.some(p => p.selected);
-        mt.title = mt.checked ? 'Зняти всі' : 'Вибрати всі';
+        mt.title = mt.checked ? 'Deselect all' : 'Select all';
     }
     // Вибір/зняття картки НЕ перемальовує список: міняється лише стан чекбоксів, лічильник, маршрут (у фоні) і маркери на карті,
     // тому фото в картках не зникають і не завантажуються заново.
@@ -2942,11 +2942,11 @@
         const shouldReturn = document.getElementById('returnToStart')?.checked || document.getElementById('returnToStartDesktop')?.checked || false;
         const pts = sel.slice();
         const fromMe = startFromMe && startSnap;
-        if (fromMe) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'Моя позиція' });
+        if (fromMe) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'My location' });
         if (shouldReturn && pts.length >= 2) pts.push(pts[0]);
         const legs = [];
-        if (!fromMe) legs.push({ from: null, to: pts[0].ll, title: 'Від мене', sub: '→ ' + (pts[0].name || 'точка 1') });
-        for (let i = 0; i + 1 < pts.length; i++) legs.push({ from: pts[i].ll, to: pts[i + 1].ll, title: 'Ділянка ' + (legs.length + 1), sub: (pts[i].name || 'точка') + ' → ' + (pts[i + 1].name || 'точка') });
+        if (!fromMe) legs.push({ from: null, to: pts[0].ll, title: 'From me', sub: '→ ' + (pts[0].name || 'point 1') });
+        for (let i = 0; i + 1 < pts.length; i++) legs.push({ from: pts[i].ll, to: pts[i + 1].ll, title: 'Leg ' + (legs.length + 1), sub: (pts[i].name || 'point') + ' → ' + (pts[i + 1].name || 'point') });
         return legs;
     }
     // Слабкий інтернет: маршрут будується одразу, без питань — напряму в застосунку Google Maps (з завантаженою картою).
@@ -2954,7 +2954,7 @@
     let offlineRun = null;
     function openOfflineRoute() {
         const legs = offlineLegs();
-        if (!legs.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        if (!legs.length) { toast('Tick places for the route first'); return; }
         closeCtx();
         offlineRun = legs.length > 1 ? { legs, i: 0, left: false } : null;
         hideLegBar();
@@ -2968,9 +2968,9 @@
         const bar = document.createElement('div');
         bar.id = 'legBar';
         bar.style.cssText = 'position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:5000;display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:12px;background:#2c3e50;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.35);font-size:14px';
-        bar.innerHTML = '<div style="flex:1;min-width:0"><div style="opacity:.75;font-size:12px">Наступна ділянка (' + (offlineRun.i + 2) + ' з ' + offlineRun.legs.length + ')</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(l.sub) + '</div></div>' +
-            '<button type="button" id="legGo" style="border:0;border-radius:8px;padding:8px 14px;background:#4a90d9;color:#fff;font-weight:600">Далі ▶</button>' +
-            '<button type="button" id="legX" aria-label="Закрити" style="border:0;background:transparent;color:#fff;font-size:18px;padding:4px 8px">✕</button>';
+        bar.innerHTML = '<div style="flex:1;min-width:0"><div style="opacity:.75;font-size:12px">Next leg (' + (offlineRun.i + 2) + ' of ' + offlineRun.legs.length + ')</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(l.sub) + '</div></div>' +
+            '<button type="button" id="legGo" style="border:0;border-radius:8px;padding:8px 14px;background:#4a90d9;color:#fff;font-weight:600">Next ▶</button>' +
+            '<button type="button" id="legX" aria-label="Close" style="border:0;background:transparent;color:#fff;font-size:18px;padding:4px 8px">✕</button>';
         document.body.appendChild(bar);
         document.getElementById('legGo').onclick = () => { offlineRun.i++; offlineRun.left = false; hideLegBar(); openApp(gmapsAppLeg(l.from, l.to)); };
         document.getElementById('legX').onclick = () => { offlineRun = null; hideLegBar(); };
@@ -2990,7 +2990,7 @@
         const sel = places.filter(p => p.selected);
         const shouldReturn = document.getElementById('returnToStart')?.checked || document.getElementById('returnToStartDesktop')?.checked || false;
         const pts = sel.map(p => { const c = parseCoords(p.coords); return c ? { ll: c, name: p.name || '' } : null; }).filter(Boolean);
-        if (startFromMe && startSnap) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'Моя позиція' });
+        if (startFromMe && startSnap) pts.unshift({ ll: [startSnap[0], startSnap[1]], name: 'My location' });
         if (shouldReturn && pts.length >= 2) pts.push(pts[0]);
         return pts;
     }
@@ -3020,15 +3020,15 @@
     }
     function openNavPick() {
         const links = buildRouteLinks();
-        if (!links.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        if (!links.length) { toast('Tick places for the route first'); return; }
         closeCtx();
         _navPts = navRoutePoints();
         _posPromise = warmPosition();                       // визначаємо позицію заздалегідь, щоб Maps.me відкрився одразу після натискання
         const n = navTargets().length;
         const oneSel = places.filter(p => p.selected);
-        document.getElementById('navPickMeta').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'Від вашого місця до «' + (oneSel[0].name || '') + '»' : _navPts.length + ' точок у маршруті';
-        document.getElementById('navGoogleSub').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'Від вашого поточного місця' : links.length > 1 ? 'Маршрут довгий — відкриється частинами (' + links.length + ')' : 'Весь маршрут з усіма зупинками';
-        document.getElementById('navMapsmeSub').textContent = 'Маршрут із двох точок: від вас до найближчої точки маршруту';
+        document.getElementById('navPickMeta').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'From you to «' + (oneSel[0].name || '') + '»' : _navPts.length + ' points in route';
+        document.getElementById('navGoogleSub').textContent = (oneSel.length === 1 && !(startFromMe && startSnap)) ? 'From your location' : links.length > 1 ? 'Long route — opens in parts (' + links.length + ')' : 'Full route with all stops';
+        document.getElementById('navMapsmeSub').textContent = 'Two-point route: you → nearest route point';
         document.getElementById('navMapsmeBtn').style.display = n >= 1 ? '' : 'none';
         document.getElementById('navPickParts').innerHTML = '';
         document.getElementById('navPickModal').classList.add('open');
@@ -3071,8 +3071,8 @@
             if (isOfflineRoute()) { openOfflineRoute(); return; }
             const links = buildRouteLinks();
             if (links.length <= 1) { closeNavPick(); openUrl(links[0]); return; }
-            box.innerHTML = '<div class="nav-sub-title">Google Maps — оберіть частину маршруту:</div><div class="nav-sub">' +
-                links.map((u, k) => '<button type="button" data-u="' + k + '">Частина ' + (k + 1) + '</button>').join('') + '</div>';
+            box.innerHTML = '<div class="nav-sub-title">Google Maps — pick a part:</div><div class="nav-sub">' +
+                links.map((u, k) => '<button type="button" data-u="' + k + '">Part ' + (k + 1) + '</button>').join('') + '</div>';
             box.querySelectorAll('button').forEach(b => b.onclick = () => openUrl(links[+b.dataset.u]));
             return;
         }
@@ -3081,22 +3081,22 @@
         const fix = mapsmeFreshFix();
         if (fix) { goMapsme(fix, targets); return; }             // позиція свіжа → перехід синхронно, у межах натискання
         const token = ++_mmToken;                                // позиції ще немає: чекаємо GPS, а перехід — після нового натискання
-        box.innerHTML = '<div class="nav-sub-title">Визначаю ваше місце за GPS…</div>';
+        box.innerHTML = '<div class="nav-sub-title">Locating you via GPS…</div>';
         mapsmeRequestFix(10000).then(pos => {
             if (token !== _mmToken || !document.getElementById('navPickModal').classList.contains('open')) return;   // вікно закрито або запит повторено
             if (!pos) {
-                box.innerHTML = '<div class="nav-sub-title">Не вдалося визначити ваше місце. Увімкніть геолокацію для цього сайту й спробуйте ще раз.</div>';
-                toast('Немає доступу до GPS — маршрут у Maps.me не побудовано');
+                box.innerHTML = '<div class="nav-sub-title">Cannot find you. Enable location for this site and retry.</div>';
+                toast('No GPS access — Maps.me route not built');
                 return;
             }
             const r = mapsmeRoute(pos, targets);
             if (!r) return;
-            box.innerHTML = '<div class="nav-sub-title">Місце визначено. До найближчої точки: «' + esc(r.best.name || '') + '»</div><div class="nav-sub"><button type="button" id="mmGoBtn" style="flex:1 1 100%">📍 Відкрити в Maps.me</button></div>';
+            box.innerHTML = '<div class="nav-sub-title">Located. To nearest point: «' + esc(r.best.name || '') + '»</div><div class="nav-sub"><button type="button" id="mmGoBtn" style="flex:1 1 100%">📍 Open in Maps.me</button></div>';
             document.getElementById('mmGoBtn').onclick = () => { closeNavPick(); openMapsme(r.url); };   // нове натискання → iOS дозволяє перехід
         });
     }
     function goMapsme(pos, targets) {                            // pos — свіжа GPS-позиція { c: [lat, lng] }
-        if (!pos || !pos.c || !isFinite(pos.c[0]) || !isFinite(pos.c[1])) { toast('Не вдалося визначити ваше місце — маршрут у Maps.me не побудовано'); return; }   // без GPS старту від першої точки немає
+        if (!pos || !pos.c || !isFinite(pos.c[0]) || !isFinite(pos.c[1])) { toast('Cannot locate you — Maps.me route not built'); return; }   // без GPS старту від першої точки немає
         const r = mapsmeRoute(pos, targets);
         if (!r) return;
         closeNavPick();
@@ -3113,17 +3113,17 @@
             const el = document.getElementById(id);
             if (!el) return;
             el.href = href;
-            el.dataset.tip = links.length > 1 ? 'Маршрут задовгий для одного посилання — відкриється частина 1' : 'Маршрут';
+            el.dataset.tip = links.length > 1 ? 'Route too long for one link — opens part 1' : 'Route';
             el.onclick = (e) => {
                 e.preventDefault();
-                if (href === '#') { alert('Спочатку позначте галочками місця для маршруту'); return; }
+                if (href === '#') { alert('Tick places for the route first'); return; }
                 routeButtonAction();                 // одразу Google Maps (вікно вибору збережено — див. ROUTE_CHOOSER_ENABLED)
             };
         });
         document.querySelectorAll('.route-parts').forEach(box => {
             box.innerHTML = (links.length > 1
-                ? links.map((u, k) => `<a class="link-btn part-btn" target="_blank" rel="noopener" href="${esc(u)}">Ч${k + 1}</a>`).join('')
-                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1"' + (NET_WEAK ? '' : ' style="display:none"') + ' title="Маршрут без інтернету" aria-label="Маршрут без інтернету">📴</a>' : '');
+                ? links.map((u, k) => `<a class="link-btn part-btn" target="_blank" rel="noopener" href="${esc(u)}">P${k + 1}</a>`).join('')
+                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1"' + (NET_WEAK ? '' : ' style="display:none"') + ' title="Route offline" aria-label="Route offline">📴</a>' : '');
             box.querySelectorAll('a').forEach(a => a.onclick = e => { if (a.dataset.off || isOfflineRoute()) { e.preventDefault(); openOfflineRoute(); } });
         });
     }
@@ -3155,8 +3155,8 @@
         recomputeDeleted();
         const dirty = places.filter(p => p.dirty).length;
         el.textContent = (dirty || deletedIds.length)
-            ? `Локальні зміни лише в цьому браузері: нових або змінених місць — ${dirty}, видалених із каталогу — ${deletedIds.length}. Щоб передати їх, зробіть «Експорт».`
-            : 'Локальних змін немає: показано каталог із репозиторію.';
+            ? `Local changes only in this browser: new or edited places — ${dirty}, removed from catalog — ${deletedIds.length}. To share them, use «Export».`
+            : 'No local changes: showing catalog from repo.';
     }
     // Update: докачує каталог із репозиторію (GitHub) і ЗБАГАЧУЄ ним поточні картки — нічого з ваших даних не видаляє.
     // Картка каталогу й ваша картка — одне й те саме місце, якщо збігається id або назва (без урахування регістру).
@@ -3207,15 +3207,15 @@
     async function updateFromCatalog() {
         if (_updating) return;
         _updating = true;
-        setWaitText('Оновлюю з GitHub…');
+        setWaitText('Updating from GitHub…');
         try {
             let cat;
             try { cat = await loadCatalog(); }
-            catch (err) { console.error('Update:', err); alert('Не вдалося завантажити каталог із GitHub: ' + err.message); return; }
+            catch (err) { console.error('Update:', err); alert('Could not load catalog from GitHub: ' + err.message); return; }
             recomputeDeleted();                                   // що ви видалили локально — рахуємо за СТАРИМ каталогом
             const key = n => String(n || '').trim().toLowerCase();
             let added = 0, enriched = 0, merged = 0;
-            setWaitText('Порівнюю фото…');
+            setWaitText('Comparing photos…');
             // Те саме фото може лежати у вашій картці як base64 (імпорт, стара версія), а в каталозі — як файл: порівнюємо за ВМІСТОМ, а не за адресою
             const addMedia = async (t, list) => {               // додає фото/відео, яких у картці ще немає (за вмістом)
                 let n = 0;
@@ -3274,8 +3274,8 @@
             sync();
             touchVersion();
             toast(added || enriched || merged
-                ? `Update: додано нових ${added}, збагачено ${enriched}` + (merged ? `, злито дублів ${merged}` : '')
-                : 'Update: нових даних немає — у вас уже все актуальне');
+                ? `Update: added new ${added}, enriched ${enriched}` + (merged ? `, merged dupes ${merged}` : '')
+                : 'Update: no new data — you are up to date');
             scheduleNear();
             refreshLocalInfo();
         } finally { _updating = false; }
@@ -3319,12 +3319,12 @@
             const h = hashText(await r.text());
             let prev = null; try { prev = localStorage.getItem(APP_HASH_KEY); } catch (e) { }
                         if (prev && prev !== h) {
-                if (appBusy()) { toast('Вийшла нова версія — оновиться при наступному відкритті'); return false; }
+                if (appBusy()) { toast('New version — updates on next open'); return false; }
                 try {
                     localStorage.setItem(APP_HASH_KEY, h);
                     localStorage.setItem(VER_KEY, String(Date.now()));
                 } catch (e) { }
-                toast('Знайдено нову версію — оновлюю…');
+                toast('New version found — updating…');
                 setTimeout(() => location.replace(base + '?v=' + Date.now()), 500);
                 return true;
             }
@@ -3334,7 +3334,7 @@
                     if (!localStorage.getItem(VER_KEY)) localStorage.setItem(VER_KEY, String(Date.now()));
                 } catch (e) { }
             }
-        } catch (e) { if (manual) toast('Немає зв’язку — працюю з локальною версією'); }
+        } catch (e) { if (manual) toast('No connection — using local version'); }
         return false;
     }
     //document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - _lastAppCheck > 30000) checkAppUpdate(false); });
@@ -3374,7 +3374,7 @@
         async function runUpdate() {
         if (_runUpd) return;
         _runUpd = true;
-        showWait('Оновлюю дані…'); startWaitSound();
+        showWait('Updating data…'); startWaitSound();
         const t0 = Date.now();
         try {
             await updateFromCatalog();
@@ -3412,7 +3412,7 @@
         return touchUser(u);
     }
     const pfNum = v => { const n = parseFloat(String(v ?? '').replace(/\s+/g, '').replace(',', '.')); return isFinite(n) && n >= 0 ? n : NaN; };
-    const pfFmt = (n, d) => n.toFixed(d).replace('.', ',');
+    const pfFmt = (n, d) => n.toFixed(d);
     // літри та вартість для відстані в метрах
     function pfFuel(meters, cons, price) {
         if (!isFinite(cons) || cons <= 0) return null;
@@ -3420,16 +3420,16 @@
         return { liters, cost: isFinite(price) ? liters * price : NaN };
     }
     function pfFuelText(f, cur) {
-        if (!f) return 'вкажіть витрату палива';
-        return '⛽ ' + pfFmt(f.liters, 1) + ' л' + (isFinite(f.cost) ? ' · ' + pfFmt(f.cost, 2) + ' ' + cur : '');
+        if (!f) return 'set fuel use';
+        return '⛽ ' + pfFmt(f.liters, 1) + ' L' + (isFinite(f.cost) ? ' · ' + pfFmt(f.cost, 2) + ' ' + cur : '');
     }
     function pfFormValues() {
         return { name: pfLoad().name, cons: pf$('pfCons').value.trim(), price: pf$('pfPrice').value.trim(), cur: pf$('pfCur').value.trim() || '€' };
     }
     function pfRefreshHeader(p) {
-        pf$('pfTitle').textContent = p.name ? p.name : 'Особистий кабінет';
-        pf$('pfSub').textContent = p.name ? 'Особистий кабінет' : '';
-        document.querySelectorAll('.btn-profile').forEach(b => { b.title = p.name ? 'Особистий кабінет — ' + p.name : 'Особистий кабінет'; });
+        pf$('pfTitle').textContent = p.name ? p.name : 'Profile';
+        pf$('pfSub').textContent = p.name ? 'Profile' : '';
+        document.querySelectorAll('.btn-profile').forEach(b => { b.title = p.name ? 'Profile — ' + p.name : 'Profile'; });
         document.querySelectorAll('.app-user').forEach(el => { el.textContent = p.name || ''; el.hidden = !p.name; });   // ім'я під назвою додатку
     }
     function pfSaveProfile() {
@@ -3437,7 +3437,7 @@
         u.cons = p.cons; u.price = p.price; u.cur = p.cur;
         if (!touchUser(u)) return;
         pfRefreshHeader(p); pfRender();
-        toast(p.name ? '✅ Збережено, ' + p.name : '✅ Збережено');
+        toast(p.name ? '✅ Saved, ' + p.name : '✅ Saved');
     }
     // точки поточного маршруту (вибрані місця)
     function pfSelected() { return places.filter(p => p.selected); }
@@ -3451,28 +3451,28 @@
         const cons = pfNum(p.cons), price = pfNum(p.price);
         // каталог
         const list = pfRoutesLoad();
-        pf$('pfRoutesHead').textContent = '📁 Збережені маршрути' + (list.length ? ' (' + list.length + ')' : '');
+        pf$('pfRoutesHead').textContent = '📁 Saved routes' + (list.length ? ' (' + list.length + ')' : '');
         pf$('pfRoutes').innerHTML = list.length ? list.map(r => {
             const f = pfFuel(r.dist || 0, cons, price);
             const d = new Date(r.ts || 0);
             const pad = n => String(n).padStart(2, '0');
             const when = isNaN(d.getTime()) ? '' : pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
             return '<div class="pf-route"><div class="pf-route-name">' + esc(r.name) + '</div>' +
-                '<div class="pf-route-meta">' + (r.ids || []).length + ' точок · ' + (r.est ? '≈ ' : '') + esc(fmtKm(r.dist || 0)) + ' · ' + esc(fmtTime(r.dur || 0)) + (r.ret ? ' · туди й назад' : '') + (when ? ' · ' + when : '') + '</div>' +
+                '<div class="pf-route-meta">' + (r.ids || []).length + ' points · ' + (r.est ? '≈ ' : '') + esc(fmtKm(r.dist || 0)) + ' · ' + esc(fmtTime(r.dur || 0)) + (r.ret ? ' · round trip' : '') + (when ? ' · ' + when : '') + '</div>' +
                 '<div class="pf-route-fuel">' + esc(pfFuelText(f, p.cur)) + '</div>' +
-                '<div class="pf-route-acts"><button type="button" onclick="pfRouteAct(\'open\',\'' + esc(r.id) + '\')">▶ Відкрити</button>' +
-                '<button type="button" class="sec" title="Редагувати" aria-label="Редагувати" onclick="pfRouteAct(\'rename\',\'' + esc(r.id) + '\')">✎</button>' +
-                '<button type="button" class="del" title="Видалити" aria-label="Видалити" onclick="pfRouteAct(\'del\',\'' + esc(r.id) + '\')">🗑</button></div></div>';
-        }).join('') : '<div class="pf-empty">Ще немає збережених маршрутів</div>';
+                '<div class="pf-route-acts"><button type="button" onclick="pfRouteAct(\'open\',\'' + esc(r.id) + '\')">▶ Open</button>' +
+                '<button type="button" class="sec" title="Edit" aria-label="Edit" onclick="pfRouteAct(\'rename\',\'' + esc(r.id) + '\')">✎</button>' +
+                '<button type="button" class="del" title="Delete" aria-label="Delete" onclick="pfRouteAct(\'del\',\'' + esc(r.id) + '\')">🗑</button></div></div>';
+        }).join('') : '<div class="pf-empty">No saved routes yet</div>';
     }
     // Збереження: кнопка 💾 (список, карта) -> діалог із назвою -> запис у каталог
     function openSaveRoute() {
         const sel = pfSelected();
         const eff = sel.length + (startFromMe && startSnap ? 1 : 0);
-        if (!routeTotals || eff < 2) { toast('Спочатку позначте щонайменше 2 місця'); return; }
+        if (!routeTotals || eff < 2) { toast('Select at least 2 places first'); return; }
         closeCtx();
         pf$('srmName').value = pfDefaultName();
-        pf$('srmMeta').textContent = sel.length + ' точок · ' + (routeTotals.estimated ? '≈ ' : '') + fmtKm(routeTotals.distance) + ' · ' + fmtTime(routeTotals.duration);
+        pf$('srmMeta').textContent = sel.length + ' points · ' + (routeTotals.estimated ? '≈ ' : '') + fmtKm(routeTotals.distance) + ' · ' + fmtTime(routeTotals.duration);
         pf$('saveRouteModal').classList.add('open');
         setTimeout(() => { const i = pf$('srmName'); i.focus(); i.select(); }, 50);
     }
@@ -3480,7 +3480,7 @@
     function confirmSaveRoute() {
         const sel = pfSelected();
         if (!routeTotals || sel.length < 1) { closeSaveRoute(); return; }
-        const name = pf$('srmName').value.trim() || pfDefaultName() || 'Маршрут';
+        const name = pf$('srmName').value.trim() || pfDefaultName() || 'Route';
         const list = pfRoutesLoad();
         list.unshift({
             id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -3490,7 +3490,7 @@
         });
         if (!pfRoutesSave(list)) return;
         closeSaveRoute();
-        toast('📁 Маршрут «' + name + '» збережено');
+        toast('📁 Route «' + name + '» saved');
     }
     document.addEventListener('keydown', e => {
         const m = document.getElementById('saveRouteModal');
@@ -3511,15 +3511,15 @@
     }
     function closeEditRoute() { pf$('editRouteModal').classList.remove('open'); ermId = null; }
     function ermRender() {
-        pf$('ermLab').textContent = 'Точки маршруту (' + ermIds.length + ') — порядок як у списку місць';
+        pf$('ermLab').textContent = 'Route points (' + ermIds.length + ') — same order as place list';
         pf$('ermList').innerHTML = ermIds.length ? ermIds.map((pid, k) => {
             const p = places.find(x => x.id === pid);
-            return '<div class="erm-row"><span class="n">' + (k + 1) + '</span><span class="t' + (p ? '' : ' gone') + '">' + (p ? esc(p.name) : 'місце вже видалено') + '</span>' +
-                '<button type="button" title="Прибрати з маршруту" aria-label="Прибрати з маршруту" onclick="ermRemove(' + k + ')">✕</button></div>';
-        }).join('') : '<div class="erm-empty">У маршруті немає точок</div>';
+            return '<div class="erm-row"><span class="n">' + (k + 1) + '</span><span class="t' + (p ? '' : ' gone') + '">' + (p ? esc(p.name) : 'place deleted') + '</span>' +
+                '<button type="button" title="Remove from route" aria-label="Remove from route" onclick="ermRemove(' + k + ')">✕</button></div>';
+        }).join('') : '<div class="erm-empty">No points in route</div>';
         const sel = pf$('ermAdd');
         const rest = places.filter(p => !ermIds.includes(p.id));
-        sel.innerHTML = '<option value="">＋ Додати точку…</option>' + rest.map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('');
+        sel.innerHTML = '<option value="">＋ Add point…</option>' + rest.map(p => '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>').join('');
     }
     function ermRemove(k) { ermIds.splice(k, 1); ermRender(); }
     function ermAddPoint(sel) {
@@ -3531,9 +3531,9 @@
         const list = pfRoutesLoad();
         const r = list.find(x => x.id === ermId); if (!r) { closeEditRoute(); return; }
         const ids = ermIds.filter(pid => places.some(p => p.id === pid));
-        if (!ids.length) { toast('Додайте хоча б одну точку'); return; }
-        const btn = pf$('ermSave'); btn.disabled = true; btn.textContent = 'Рахую…';
-        r.name = pf$('ermName').value.trim() || r.name || 'Маршрут';
+        if (!ids.length) { toast('Add at least one point'); return; }
+        const btn = pf$('ermSave'); btn.disabled = true; btn.textContent = 'Calculating…';
+        r.name = pf$('ermName').value.trim() || r.name || 'Route';
         r.ids = ids; r.ret = pf$('ermRet').checked;
         const pts = ids.map(pid => parseCoords(places.find(p => p.id === pid).coords)).filter(Boolean);
         if (r.ret && pts.length >= 2) pts.push(pts[0]);
@@ -3542,10 +3542,10 @@
             const e = sum(estimateRoute(pts)); r.dist = e.dist; r.dur = e.dur; r.est = true;
             try { const real = await fetchRoute(pts); if (real) { const q = sum(real); r.dist = q.dist; r.dur = q.dur; r.est = false; } } catch (err) { }
         } else { r.dist = 0; r.dur = 0; r.est = false; }
-        btn.disabled = false; btn.textContent = 'Зберегти';
+        btn.disabled = false; btn.textContent = 'Save';
         if (!pfRoutesSave(list)) return;
         closeEditRoute(); pfRender();
-        toast('✔ Маршрут «' + r.name + '» оновлено');
+        toast('✔ Route «' + r.name + '» updated');
     }
     document.addEventListener('keydown', e => {
         const m = document.getElementById('editRouteModal');
@@ -3559,7 +3559,7 @@
         if (i < 0) return;
         const r = list[i];
         if (kind === 'del') {
-            if (!confirm('Видалити маршрут «' + r.name + '»?')) return;
+            if (!confirm('Delete route «' + r.name + '»?')) return;
             list.splice(i, 1); pfRoutesSave(list); pfRender();
         } else if (kind === 'rename') {
             openEditRoute(id);
@@ -3572,7 +3572,7 @@
             if (rt) { rt.checked = !!r.ret; onReturnToggle(rt); }
             persistSelection(); refreshSelectionUI();
             closeProfile();
-            toast(missing ? '▶ Маршрут відкрито (' + missing + ' місць уже немає в списку)' : '▶ Маршрут відкрито: ' + r.name);
+            toast(missing ? '▶ Route opened (' + missing + ' places no longer in list)' : '▶ Route opened: ' + r.name);
             if (window.matchMedia && window.matchMedia('(max-width: 700px)').matches) {
                 try { openMobileMap(); } catch (e) { }
             }
@@ -3615,7 +3615,7 @@
             : '';
         el.textContent = (startFromMe && startSnap ? '🚩 ' : '') + n + '/' + places.length + tm;     // + загальний час і відстань
         el.classList.toggle('start-on', !!(startFromMe && startSnap));
-        el.title = 'Вибрано / усього місць' + (tm ? ' · загальний час і відстань' : '') + (startFromMe ? ' · торкніться, щоб скасувати старт від моєї позиції' : '');
+        el.title = 'Selected / total places' + (tm ? ' · total time & distance' : '') + (startFromMe ? ' · tap to cancel start from my location' : '');
         fitListCount();
     }
     // Лічильник у сірій смузі завжди в ОДИН рядок: якщо не вміщається — зменшуємо шрифт (до 8 px)
@@ -3685,7 +3685,7 @@
         document.body.classList.toggle('filtering', !!set);
         const raw = searchQuery().trim();
         const info = document.getElementById('searchInfo');
-        if (info) info.textContent = set ? ((filterActive() ? 'Показано: ' : 'Знайдено: ') + m.length + ' з ' + places.length) : (raw ? 'Введіть щонайменше 3 символи' : '');
+        if (info) info.textContent = set ? ((filterActive() ? 'Shown: ' : 'Found: ') + m.length + ' of ' + places.length) : (raw ? 'Type at least 3 characters' : '');
         updateFilterBadge();
         syncMainToggle();
         const clr = document.getElementById('searchClear');
@@ -3853,7 +3853,7 @@
         }
     }
     async function exportData() {
-        toast('Готую файл обміну…');
+        toast('Preparing export…');
         try {
             recomputeDeleted();
             const items = [];                              // кожне місце — вже готовий JSON-рядок і його розмір у байтах
@@ -3863,7 +3863,7 @@
                     // фото, що вже лежить у каталозі, експортуємо посиланням (ref) — файл обміну лишається легким; власні фото — повністю
                     if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !m.data.includes('..')) { media.push({ type: m.type, ref: m.data.slice(DATA_BASE.length) }); continue; }
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
-                    catch (e) { throw new Error(`фото місця «${p.name}» не вдалося прочитати (${e.message})`); }
+                    catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
                 }
                 const s = JSON.stringify({ id: p.id, order: items.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}), media });
                 items.push({ s, size: new Blob([s]).size });
@@ -3886,12 +3886,12 @@
                 // Перевірка повного JSON, а не лише суми розмірів карток.
                 if (candidate.length && makeBlob(candidate, groups.length + 1, 999).size > EXPORT_PART_MAX) {
                     if (!cur.length) {
-                        throw new Error(`Картка «${it.s ? JSON.parse(it.s).name : 'без назви'}» сама перевищує 24 МБ. Зменште/видаліть частину її фото або відео й повторіть експорт.`);
+                        throw new Error(`Card «${it.s ? JSON.parse(it.s).name : 'untitled'}» alone exceeds 24 MB. Shrink/remove some photos or videos and export again.`);
                     }
                     groups.push(cur);
                     cur = [it];
                     if (makeBlob(cur, groups.length + 1, 999).size > EXPORT_PART_MAX) {
-                        throw new Error(`Картка «${JSON.parse(it.s).name}» сама перевищує 24 МБ. Зменште/видаліть частину її фото або відео й повторіть експорт.`);
+                        throw new Error(`Card «${JSON.parse(it.s).name}» alone exceeds 24 MB. Shrink/remove some photos or videos and export again.`);
                     }
                 } else {
                     cur = candidate;
@@ -3906,7 +3906,7 @@
                 const total = groups.length;
                 for (let i = 0; i < groups.length; i++) {
                     if (makeBlob(groups[i], i + 1, total).size > EXPORT_PART_MAX) {
-                        if (groups[i].length <= 1) throw new Error(`Одна картка у частині ${i + 1} перевищує 24 МБ. Зменште/видаліть частину її фото або відео.`);
+                        if (groups[i].length <= 1) throw new Error(`One card in part ${i + 1} exceeds 24 MB. Shrink/remove some photos or videos.`);
                         const moved = groups[i].pop();
                         if (i + 1 === groups.length) groups.push([]);
                         groups[i + 1].unshift(moved);
@@ -3918,12 +3918,12 @@
             const N = groups.length, w = String(N).length;
             const files = groups.map((g, k) => {
                 const blob = makeBlob(g, k + 1, N);
-                if (blob.size > EXPORT_PART_MAX) throw new Error(`Не вдалося вкласти частину ${k + 1} у ліміт 24 МБ.`);
+                if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 24 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
-            if (N > 1) toast(`Експорт: ${N} файлів (кожен менше 25 МБ)`);
+            if (N > 1) toast(`Export: ${N} files (each under 25 MB)`);
             await deliverFiles(files);
-        } catch (err) { console.error(err); alert('Не вдалося підготувати файл обміну: ' + err.message); }
+        } catch (err) { console.error(err); alert('Could not prepare export: ' + err.message); }
     }
 
     function applyImportedTypes(defs, del) {                 // → Map(id із файлу → id у вашому списку)
@@ -3984,11 +3984,11 @@
             const wrap = document.createElement('div');
             wrap.className = 'imp-modal';
             wrap.innerHTML = `<div class="imp-box">
-                <h3>Імпорт даних</h3>
-                <p>У файлі знайдено місць: <b>${n}</b>${skipped ? ` (пропущено некоректних: ${skipped})` : ''}. Зараз у реєстрі: <b>${places.length}</b>.</p>
-                <button type="button" class="imp-b imp-g" data-m="merge">Об'єднати: додати нові, оновити наявні</button>
-                <button type="button" class="imp-b imp-r" data-m="replace">Замінити все даними з файлу</button>
-                <button type="button" class="imp-b" data-m="cancel">Скасувати</button>
+                <h3>Import data</h3>
+                <p>Places in file: <b>${n}</b>${skipped ? ` (skipped invalid: ${skipped})` : ''}. Currently in registry: <b>${places.length}</b>.</p>
+                <button type="button" class="imp-b imp-g" data-m="merge">Merge: add new, update existing</button>
+                <button type="button" class="imp-b imp-r" data-m="replace">Replace all with file data</button>
+                <button type="button" class="imp-b" data-m="cancel">Cancel</button>
             </div>`;
             wrap.addEventListener('click', e => {
                 const m = e.target && e.target.dataset && e.target.dataset.m;
@@ -4008,7 +4008,7 @@
             for (const f of fl) {
                 const raw = JSON.parse(await readFileAsText(f));
                 const part = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.places) ? raw.places : null);
-                if (!part) throw new Error('у файлі «' + f.name + '» немає списку місць');
+                if (!part) throw new Error('in file «' + f.name + '» no places list');
                 list = list.concat(part);
                 if (raw && !Array.isArray(raw)) {
                     if (Array.isArray(raw.types)) impTypes = impTypes.concat(raw.types);
@@ -4017,7 +4017,7 @@
                 }
             }
             const items = sanitizeImported(list);
-            if (!items.length) throw new Error('не знайдено жодного коректного місця');
+            if (!items.length) throw new Error('no valid places found');
             const mode = await askImportMode(items.length, list.length - items.length);
             if (mode === 'cancel') return;
             items.forEach(it => { it.dirty = true; });
@@ -4040,10 +4040,10 @@
             if (impUsers.length) { usersPersist(); applyUserSettings(); pfFillForm(); }
             clearForm();
             sync();
-            toast('Імпортовано місць: ' + items.length);
+            toast('Places imported: ' + items.length);
         } catch (err) {
             console.error(err);
-            alert('Не вдалося імпортувати файл: ' + err.message);
+            alert('Could not import file: ' + err.message);
         }
     }
 
@@ -4127,10 +4127,10 @@
             let ok = false;
             try { ok = document.execCommand('copy'); } catch (e) { }
             ta.remove();
-            if (ok) toast('Координати скопійовано'); else prompt('Скопіюйте координати:', t);
+            if (ok) toast('Coordinates copied'); else prompt('Copy coordinates:', t);
         };
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(t).then(() => toast('Координати скопійовано'), fallback);
+            navigator.clipboard.writeText(t).then(() => toast('Coordinates copied'), fallback);
         } else fallback();
     }
     const gUrl = (p) => safeUrl(p.gmapsUrl) || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(String(p.coords).replace(/\s+/g, '')));
@@ -4141,7 +4141,7 @@
         if (isOfflineRoute()) { openOfflineRoute(); return; }   // без інтернету — ділянками, напряму в застосунок
         if (ROUTE_CHOOSER_ENABLED) { openNavPick(); return; }
         const links = buildRouteLinks();
-        if (!links.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
+        if (!links.length) { toast('Tick places for the route first'); return; }
         closeCtx();
         openUrl(links[0]);                                   // дуже довгий маршрут — частина 1, решта — кнопки Ч2, Ч3…
     }
@@ -4180,21 +4180,21 @@
     function openMapMenu(ll, x, y) {
         const lat = ll.lat.toFixed(6), lng = ll.lng.toFixed(6), cs = lat + ', ' + lng;
         openCtx(x, y, cs, [
-            { label: '➕ Додати місце тут', action: () => addPlaceAt(ll) },
-            { label: '📋 Копіювати координати', action: () => copyText(cs) },
-            { label: '🗺 Відкрити в Google Maps', action: () => isOfflineRoute() ? openApp(gmapsAppPoint([ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cs)) },
-            { label: '🧭 Маршрут сюди (Google Maps)', action: () => isOfflineRoute() ? openApp(gmapsAppLeg(null, [ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') },
-            { label: '📍 Відкрити в Maps.me', action: () => openMapsme(mapsmePointUrl(ll.lat, ll.lng, '')) }
+            { label: '➕ Add place here', action: () => addPlaceAt(ll) },
+            { label: '📋 Copy coordinates', action: () => copyText(cs) },
+            { label: '🗺 Open in Google Maps', action: () => isOfflineRoute() ? openApp(gmapsAppPoint([ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cs)) },
+            { label: '🧭 Route here (Google Maps)', action: () => isOfflineRoute() ? openApp(gmapsAppLeg(null, [ll.lat, ll.lng])) : openUrl('https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(cs) + '&travelmode=driving') },
+            { label: '📍 Open in Maps.me', action: () => openMapsme(mapsmePointUrl(ll.lat, ll.lng, '')) }
         ]);
     }
     function openMarkerMenu(i, x, y) {
         const p = places[i];
         openCtx(x, y, (i + 1) + '. ' + p.name, [
-            { label: p.selected ? '☐ Зняти вибір' : '☑ Вибрати для маршруту', action: () => togglePlace(i) },
-            { label: '✎ Редагувати', action: () => handleEdit(i) },
-            { label: '🗺 Відкрити в Google Maps', action: () => { const c = parseCoords(p.coords); if (isOfflineRoute() && c) openApp(gmapsAppPoint(c)); else openUrl(gUrl(p)); } },
-            { label: '📍 Відкрити в Maps.me', action: () => { const c = parseCoords(p.coords); if (c) openMapsme(mapsmePointUrl(c[0], c[1], p.name)); } },
-            { label: '✕ Видалити', danger: true, action: () => handleDelete(i) }
+            { label: p.selected ? '☐ Deselect' : '☑ Add to route', action: () => togglePlace(i) },
+            { label: '✎ Edit', action: () => handleEdit(i) },
+            { label: '🗺 Open in Google Maps', action: () => { const c = parseCoords(p.coords); if (isOfflineRoute() && c) openApp(gmapsAppPoint(c)); else openUrl(gUrl(p)); } },
+            { label: '📍 Open in Maps.me', action: () => { const c = parseCoords(p.coords); if (c) openMapsme(mapsmePointUrl(c[0], c[1], p.name)); } },
+            { label: '✕ Delete', danger: true, action: () => handleDelete(i) }
         ]);
     }
 
@@ -4219,7 +4219,7 @@
             draggable: true, zIndexOffset: 1000, keyboard: false,
             icon: L.divIcon({ className: '', html: '<div class="pending-pin">＋</div>', iconSize: [34, 34], iconAnchor: [17, 17] })
         }).addTo(map);
-        pendingMarker.bindTooltip('Нове місце — можна перетягнути', { direction: 'top', offset: [0, -16] });
+        pendingMarker.bindTooltip('New place — drag to move', { direction: 'top', offset: [0, -16] });
         pendingMarker.on('dragend', () => {
             const q = pendingMarker.getLatLng();
             $('placeCoords').value = q.lat.toFixed(6) + ', ' + q.lng.toFixed(6);
@@ -4241,7 +4241,7 @@
         const si = document.querySelector('.sidebar-inner');
         if (si) si.scrollTop = 0;
         setTimeout(() => { try { $('placeName').focus({ preventScroll: true }); } catch (e) { } }, 60);
-        toast('Введіть назву й натисніть «Додати місце»');
+        toast('Enter a name and press «Add place»');
     }
     // Ручна зміна координат у формі переміщує зелений маркер
     $('placeCoords').addEventListener('change', () => { normalizeCoordsField(); });
@@ -4276,14 +4276,14 @@
             if (++tileErrors >= 6) { usingFallback = true; map.removeLayer(esriStreet); esriTopo.addTo(map); }
         });
         esriStreet.addTo(map);
-        L.control.layers({ 'Схема (Esri)': esriStreet, 'Супутник (Esri)': esriSat, 'Топо (Esri)': esriTopo, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
+        L.control.layers({ 'Streets (Esri)': esriStreet, 'Satellite (Esri)': esriSat, 'Topo (Esri)': esriTopo, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
         markersLayer = L.layerGroup().addTo(map);
 
         setupWheelAndGestures(el);
         addLocateControl();
         addResetControl();
         startGps();
-        map.attributionControl.addAttribution('Назви населених пунктів © OpenStreetMap (Nominatim)');
+        map.attributionControl.addAttribution('Place names © OpenStreetMap (Nominatim)');
         setupContextAndLongPress(el);
         map.on('movestart zoomstart', closeCtx);
         // Під час щипка/колеса маршрут перемальовується на КОЖНОМУ кадрі за поточним дробовим масштабом
@@ -4372,9 +4372,9 @@
         if (window.matchMedia && window.matchMedia('(hover: hover)').matches) {
             const labels = { auto: 'A', pan: '✋', zoom: '🔍' };
             const titles = {
-                auto: 'Режим скролу: авто (тачпад — рух, колесо миші — масштаб). Натисніть, щоб змінити',
-                pan: 'Режим скролу: завжди рух карти (щипок / ⌘ + скрол — масштаб)',
-                zoom: 'Режим скролу: завжди масштаб'
+                auto: 'Scroll: auto (touchpad pans, wheel zooms). Tap to change',
+                pan: 'Scroll: always pan (pinch / ⌘ + scroll — zoom)',
+                zoom: 'Scroll: always zoom'
             };
             const Ctl = L.Control.extend({
                 options: { position: 'topleft' },
@@ -4415,9 +4415,9 @@
         stopIdx = i; stopOpenAt = Date.now(); markerHoldAt = Date.now();
         const x = stopExtras[p.id] || {}, cur = (pfLoad().cur || '€');
         $('stopTitle').textContent = '⏱ ' + (i + 1) + '. ' + p.name;
-        $('stopCostLbl').textContent = 'Гроші, ' + cur;
-        $('stopMin').value = x.min ? String(x.min).replace('.', ',') : '';
-        $('stopCost').value = x.cost ? String(x.cost).replace('.', ',') : '';
+        $('stopCostLbl').textContent = 'Money, ' + cur;
+        $('stopMin').value = x.min ? String(x.min) : '';
+        $('stopCost').value = x.cost ? String(x.cost) : '';
         $('stopModal').classList.add('open');
         try { if (navigator.vibrate) navigator.vibrate([20, 40, 20]); } catch (e) { }
     }
@@ -4432,7 +4432,7 @@
         saveExtras();
         $('stopModal').classList.remove('open'); stopIdx = -1;
         refreshExtras();
-        toast(min || cost ? '✔ Додано до маршруту' : 'Витрати на точці скинуто');
+        toast(min || cost ? '✔ Added to route' : 'Stop costs reset');
     }
     function refreshExtras() { updateListCount(); renderRouteSummary(); }
     const shownNames = new Set();
@@ -4444,13 +4444,13 @@
         try { if (navigator.vibrate) navigator.vibrate(16); } catch (e) { }
         const on = !p.selected;
         togglePlace(i);
-        toast(on ? '✔ Вибрано: ' + p.name : '✖ Знято з маршруту: ' + p.name);
+        toast(on ? '✔ Selected: ' + p.name : '✖ Removed: ' + p.name);
     }
     function resetAllPoints() {
         const had = places.some(p => p.selected);
         shownNames.clear();
-        if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); refreshSelectionUI(); toast('⟲ Усі точки скинуто'); }
-        else { updateMapMarkers(); toast('Немає вибраних точок'); }
+        if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); refreshSelectionUI(); toast('⟲ All points reset'); }
+        else { updateMapMarkers(); toast('No points selected'); }
     }
     function addResetControl() {
         const Ctl = L.Control.extend({
@@ -4458,7 +4458,7 @@
             onAdd() {
                 const box = L.DomUtil.create('div', 'leaflet-bar map-reset');
                 const a = L.DomUtil.create('a', '', box);
-                a.href = '#'; a.textContent = '⟲'; a.title = 'Скинути всі точки'; a.setAttribute('role', 'button'); a.setAttribute('aria-label', 'Скинути всі точки');
+                a.href = '#'; a.textContent = '⟲'; a.title = 'Reset all points'; a.setAttribute('role', 'button'); a.setAttribute('aria-label', 'Reset all points');
                 L.DomEvent.disableClickPropagation(box);
                 L.DomEvent.on(a, 'click', ev => { L.DomEvent.stop(ev); resetAllPoints(); });
                 return box;
@@ -4514,20 +4514,20 @@
         return L.divIcon({ className: '', html: `<div class="gps-hit"><div class="gps-dot${startFromMe ? ' start' : ''}"></div></div>`, iconSize: [40, 40], iconAnchor: [20, 20] });
     }
     function setStartFromMe(on) {
-        if (on && !lastGps) { toast('Ще немає GPS-позиції — дозвольте доступ до місцезнаходження'); return; }
+        if (on && !lastGps) { toast('No GPS fix yet — allow location access'); return; }
         startFromMe = !!on;
         startSnap = on ? lastGps.ll.slice() : null;           // фіксуємо позицію на момент вибору; «Оновити» — щоб узяти нову
         if (gpsMarker) gpsMarker.setIcon(gpsIcon());
         routeKey = '';
         updateLinks(); updateListCount();
-        toast(on ? '🚩 Старт маршруту — ваше місцезнаходження' : 'Старт маршруту — перша вибрана точка');
+        toast(on ? '🚩 Start: your location' : 'Start: first selected point');
     }
     function openGpsMenu(x, y) {
-        openCtx(x, y, 'Ви тут (GPS)', [
+        openCtx(x, y, 'You are here (GPS)', [
             startFromMe
-                ? { label: '✖ Не починати маршрут звідси', action: () => setStartFromMe(false) }
-                : { label: '🚩 Почати маршрут звідси', action: () => setStartFromMe(true) },
-            { label: '↻ Оновити мою позицію' + (startFromMe ? ' як старт' : ''), action: () => { autoStart = null; startGps(); updateLinks(); if (startFromMe) setStartFromMe(true); else if (lastGps && map) map.setView(lastGps.ll, Math.max(map.getZoom(), 15)); } }
+                ? { label: '✖ Do not start here', action: () => setStartFromMe(false) }
+                : { label: '🚩 Start route here', action: () => setStartFromMe(true) },
+            { label: '↻ Refresh my location' + (startFromMe ? ' as start' : ''), action: () => { autoStart = null; startGps(); updateLinks(); if (startFromMe) setStartFromMe(true); else if (lastGps && map) map.setView(lastGps.ll, Math.max(map.getZoom(), 15)); } }
         ]);
     }
     function startGps() {
@@ -4591,8 +4591,8 @@
         document.querySelectorAll('.offline-ic').forEach(e => { if (off) e.removeAttribute('hidden'); else e.setAttribute('hidden', ''); });   // SVG не має властивості hidden
         document.documentElement.classList.toggle('is-offline', off);
     }
-    window.addEventListener('offline', () => { updateOfflineIcon(); toast('Немає інтернету — працюю офлайн'); });
-    window.addEventListener('online', () => { updateOfflineIcon(); toast('Інтернет відновлено'); });
+    window.addEventListener('offline', () => { updateOfflineIcon(); toast('No internet — offline mode'); });
+    window.addEventListener('online', () => { updateOfflineIcon(); toast('Back online'); });
     updateOfflineIcon();
 
     // ===== Спідометр (GPS) =====
@@ -4636,7 +4636,7 @@
                 SPD.smooth = sm; SPD.speedAt = now;
             }
             speedoEnsureTimer(); speedoRender();
-        } catch (e) { console.warn('Спідометр:', e); }
+        } catch (e) { console.warn('Speedometer:', e); }
     }
     function speedoError(err) {
         SPD.err = (err && err.code === 1) ? 'denied' : 'nosig';     // 1 — немає дозволу; 2/3 — позиція недоступна / час очікування
@@ -4662,7 +4662,7 @@
         const pill = document.getElementById('speedoPill');
         if (pill) {
             pill.className = 'spd-sq ' + cls;
-            const lbl = 'Спідометр: ' + (v === null ? 'швидкість невідома' : v + ' км/год');
+            const lbl = 'Speedometer: ' + (v === null ? 'speed unknown' : v + ' km/h');
             pill.setAttribute('aria-label', lbl); pill.title = lbl;
             const nd = document.getElementById('spdNeedle');
             if (nd) nd.style.transform = 'rotate(' + (v === null ? -135 : -135 + Math.min(v, 180) / 180 * 270) + 'deg)';   // 0…180 км/год → дуга 270°
@@ -4673,11 +4673,11 @@
         if (band) scr.dataset.band = band; else delete scr.dataset.band;
         const val = document.getElementById('spdVal'); val.textContent = txt; val.classList.toggle('none', v === null);
         document.getElementById('spdGps').className = 'spd-gps ' + cls;
-        document.getElementById('spdGpsTxt').textContent = st === 'ok' ? 'GPS активний' : st === 'wait' ? 'Очікування GPS' : 'Немає сигналу GPS';
-        const msg = { denied: 'Немає доступу до місцезнаходження. Дозвольте доступ для цього сайту в налаштуваннях браузера (на iPhone: Налаштування → Конфіденційність → Служби геолокації), потім натисніть «Спробувати знову».',
-            unsupported: 'Цей браузер не підтримує геолокацію, тому швидкість недоступна.',
-            lost: 'Сигнал GPS втрачено — швидкість не показується. Вийдіть на відкрите місце або натисніть «Спробувати знову».',
-            ok: v === null ? 'Швидкість визначається…' : '', wait: 'Шукаю сигнал GPS… якщо браузер запитає, дозвольте доступ до місцезнаходження.' }[st] || '';
+        document.getElementById('spdGpsTxt').textContent = st === 'ok' ? 'GPS active' : st === 'wait' ? 'Waiting for GPS' : 'No GPS signal';
+        const msg = { denied: 'No location access. Allow it for this site in browser settings (iPhone: Settings → Privacy → Location Services), then tap «Retry».',
+            unsupported: 'This browser has no geolocation, so speed is unavailable.',
+            lost: 'GPS signal lost — speed hidden. Move to open sky or tap «Retry».',
+            ok: v === null ? 'Measuring speed…' : '', wait: 'Looking for GPS… allow location access if the browser asks.' }[st] || '';
         document.getElementById('spdMsg').textContent = msg;
         document.getElementById('spdRetry').hidden = !(st === 'denied' || st === 'lost');
     }
@@ -4795,7 +4795,7 @@
             onAdd() {
                 const box = L.DomUtil.create('div', 'leaflet-bar');
                 const a = L.DomUtil.create('a', '', box);
-                a.href = '#'; a.title = 'Моє місцезнаходження'; a.setAttribute('role', 'button');
+                a.href = '#'; a.title = 'My location'; a.setAttribute('role', 'button');
                 a.style.cssText = 'font-size:18px;line-height:30px;text-align:center;color:#27ae60;';
                 a.textContent = '◉';
                 L.DomEvent.disableClickPropagation(box);
@@ -4803,7 +4803,7 @@
                     L.DomEvent.stop(ev);
                     startGps();
                     if (lastGps) map.setView(lastGps.ll, Math.max(map.getZoom(), 15));
-                    else toast('Шукаю ваше місцезнаходження… дозвольте доступ до GPS');
+                    else toast('Locating you… allow GPS access');
                 });
                 return box;
             }
@@ -4816,12 +4816,12 @@
     // Поки йде запит або якщо сервіс недоступний — пунктирна лінія по прямій з оцінкою (×1,3 до відстані, 50 км/год).
     const ROUTE_SERVERS = ['https://routing.openstreetmap.de/routed-car/route/v1/driving/', 'https://router.project-osrm.org/route/v1/driving/'];
     let routeLayer = null, routeCtl = null, routeKey = '', routeTimer = 0, lastRouteFetch = 0;
-    const fmtKm = m => (m / 1000).toFixed(m < 100000 ? 1 : 0).replace('.', ',') + ' км';
+    const fmtKm = m => (m / 1000).toFixed(m < 100000 ? 1 : 0) + ' km';
     const fmtTime = s => {
         const m = Math.max(1, Math.round(s / 60));
-        if (m < 60) return m + ' хв';
+        if (m < 60) return m + ' min';
         const h = Math.floor(m / 60), r = m % 60;
-        return h + ' год' + (r ? ' ' + r + ' хв' : '');
+        return h + ' h' + (r ? ' ' + r + ' min' : '');
     };
     function haversine(a, b) {
         const R = 6371000, t = Math.PI / 180;
@@ -5003,7 +5003,7 @@
         const total = routeSum.t + ex.min * 60;
         routeSumEl.innerHTML = `🧭 <b>${fmtKm(routeSum.d)}</b> · <b>${fmtTime(total)}</b>` +
             (hasEx ? `<small style="font-size:16px;color:#2d3748">🚗 ${fmtTime(routeSum.t)}${ex.min ? ' + ⏱ ' + fmtTime(ex.min * 60) : ''}${ex.cost ? ' · 💰 ' + pfFmt(ex.cost, ex.cost % 1 ? 2 : 0) + ' ' + esc(cur) : ''}</small>` : '') +
-            `<small>${routeSum.n} точок${routeSum.est ? ' · оцінка по прямій' : ' · авто · маршрути OSRM, © OpenStreetMap'}</small>`;
+            `<small>${routeSum.n} points${routeSum.est ? ' · straight-line est.' : ' · car · OSRM routes, © OpenStreetMap'}</small>`;
     }
     function drawRoute(r, pts, skipLast) {
         if (!map) return;
@@ -5220,7 +5220,7 @@
         if (!box) return;
         formTypes = formTypes.filter(id => typeById(id));
         box.innerHTML = typeDefs.length ? typeDefs.map(t => `<button type="button" class="tchip${formTypes.includes(t.id) ? ' on' : ''}" data-id="${esc(t.id)}">${esc(typeLabel(t))}</button>`).join('')
-            : '<span class="tm-empty">Типів ще немає — додайте їх у ⚙ → Типи місць</span>';
+            : '<span class="tm-empty">No types yet — add them in ⚙ → Place types</span>';
         box.querySelectorAll('.tchip').forEach(b => b.onclick = () => {
             const id = b.dataset.id, i = formTypes.indexOf(id);
             if (i >= 0) formTypes.splice(i, 1); else formTypes.push(id);
@@ -5237,15 +5237,15 @@
     function renderTypesModal() {
         const box = document.getElementById('typesList');
         const used = id => places.filter(p => (p.types || []).includes(id)).length;
-        box.innerHTML = _tmRows.map((r, i) => r.del ? '' : `<div class="tm-row" data-i="${i}"><input class="tm-ico" maxlength="4" value="${esc(r.icon)}" placeholder="🙂" aria-label="Значок"><input class="tm-name" maxlength="40" value="${esc(r.name)}" placeholder="Назва типу" aria-label="Назва типу">${r.id ? `<span class="tm-cnt" title="Місць із цим типом">${used(r.id)}</span>` : '<span class="tm-cnt"></span>'}<button type="button" class="tm-del" title="Видалити тип" aria-label="Видалити тип">🗑</button></div>`).join('')
-            || '<div class="tm-empty">Типів немає. Натисніть «＋ Додати тип».</div>';
+        box.innerHTML = _tmRows.map((r, i) => r.del ? '' : `<div class="tm-row" data-i="${i}"><input class="tm-ico" maxlength="4" value="${esc(r.icon)}" placeholder="🙂" aria-label="Icon"><input class="tm-name" maxlength="40" value="${esc(r.name)}" placeholder="Type name" aria-label="Type name">${r.id ? `<span class="tm-cnt" title="Places with this type">${used(r.id)}</span>` : '<span class="tm-cnt"></span>'}<button type="button" class="tm-del" title="Delete type" aria-label="Delete type">🗑</button></div>`).join('')
+            || '<div class="tm-empty">No types. Press «＋ Add type».</div>';
         box.querySelectorAll('.tm-row').forEach(row => {
             const i = +row.dataset.i;
             row.querySelector('.tm-ico').oninput = e => { _tmRows[i].icon = e.target.value.trim(); };
             row.querySelector('.tm-name').oninput = e => { _tmRows[i].name = e.target.value; };
             row.querySelector('.tm-del').onclick = () => {
                 const r = _tmRows[i], n = r.id ? used(r.id) : 0;
-                if (n && !confirm('Видалити тип «' + (r.name || '') + '»? Його буде прибрано з ' + n + ' місць.')) return;
+                if (n && !confirm('Delete type «' + (r.name || '') + '»? It will be removed from ' + n + ' places.')) return;
                 if (!r.id) _tmRows.splice(i, 1); else r.del = true;
                 renderTypesModal();
             };
@@ -5255,7 +5255,7 @@
     function saveTypesModal() {
         const live = _tmRows.filter(r => !r.del && r.name.trim());
         const seen = new Set();
-        for (const r of live) { const k = normText(r.name).trim(); if (seen.has(k)) { toast('Назви типів мають бути різними: «' + r.name.trim() + '»'); return; } seen.add(k); }
+        for (const r of live) { const k = normText(r.name).trim(); if (seen.has(k)) { toast('Type names must differ: «' + r.name.trim() + '»'); return; } seen.add(k); }
         const next = [];
         for (const r of live) {
             const old = r.id ? typeById(r.id) : null;
@@ -5273,7 +5273,7 @@
         flt.types = flt.types.filter(id => id === '__none__' || typeById(id)); saveFilter();
         persistPlaces(); touchVersion();
         closeTypes(); renderFormTypes(); render();
-        toast('✅ Типи збережено');
+        toast('✅ Types saved');
     }
 
     // ===== Країна за координатами (англійською), автоматично у формі =====
@@ -5285,7 +5285,7 @@
         const c = parseCoords(document.getElementById('placeCoords').value.trim());
         if (!c) return;
         const seq = ++_cSeq, ph = inp.placeholder;
-        inp.placeholder = 'визначаю країну…';
+        inp.placeholder = 'detecting country…';
         const g = await fetchGeo(c, 8000);
         if (seq !== _cSeq) return;
         inp.placeholder = ph;
@@ -5318,8 +5318,8 @@
     let _fltGps = false;
     const hasMetricFilter = () => isFinite(fnum(flt.tMin)) || isFinite(fnum(flt.tMax)) || isFinite(fnum(flt.dMin)) || isFinite(fnum(flt.dMax));
     function filterRef() {
-        if (startFromMe && startSnap) return { c: startSnap, label: 'моя позиція' };
-        if (lastGps) return { c: lastGps.ll, label: 'моя позиція' };
+        if (startFromMe && startSnap) return { c: startSnap, label: 'my location' };
+        if (lastGps) return { c: lastGps.ll, label: 'my location' };
         const f = places.find(p => parseCoords(p.coords));
         return f ? { c: parseCoords(f.coords), label: f.name } : null;
     }
@@ -5356,9 +5356,9 @@
     function renderFilter() {
         const countries = [...new Set(places.map(p => p.country || ''))].sort((a, b) => (a || '\uffff').localeCompare(b || '\uffff'));
         const chip = (cls, val, label, on) => `<button type="button" class="tchip${on ? ' on' : ''}" data-k="${cls}" data-v="${esc(val)}">${esc(label)}</button>`;
-        document.getElementById('fltCountries').innerHTML = countries.map(c => chip('c', c, c || 'не визначено', flt.countries.includes(c))).join('') || '<span class="tm-empty">Немає даних</span>';
+        document.getElementById('fltCountries').innerHTML = countries.map(c => chip('c', c, c || 'unknown', flt.countries.includes(c))).join('') || '<span class="tm-empty">No data</span>';
         const hasNone = places.some(p => !(p.types || []).length);
-        document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabel(t), flt.types.includes(t.id))).join('') + (hasNone ? chip('t', '__none__', 'без типу', flt.types.includes('__none__')) : '') || '<span class="tm-empty">Типів ще немає</span>';
+        document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabel(t), flt.types.includes(t.id))).join('') + (hasNone ? chip('t', '__none__', 'no type', flt.types.includes('__none__')) : '') || '<span class="tm-empty">No types yet</span>';
         ['tMin', 'tMax', 'dMin', 'dMax'].forEach(k => { document.getElementById('flt_' + k).value = flt[k]; });
         document.querySelectorAll('#filterModal .tchip').forEach(b => b.onclick = () => {
             const arr = b.dataset.k === 'c' ? flt.countries : flt.types, v = b.dataset.v, i = arr.indexOf(v);
@@ -5371,7 +5371,7 @@
     function onFilterChange() { saveFilter(); if (hasMetricFilter()) { try { startGps(); } catch (e) { } } applySearch(); updateFilterInfo(); }   // час/відстань рахуються від мене — потрібен GPS
     function updateFilterInfo() {
         const m = matchIdx();
-        document.getElementById('fltInfo').textContent = filterActive() ? 'Показано ' + (m ? m.length : places.length) + ' з ' + places.length : 'Фільтр вимкнено — показано всі місця (' + places.length + ')';
+        document.getElementById('fltInfo').textContent = filterActive() ? 'Shown ' + (m ? m.length : places.length) + ' of ' + places.length : 'Filter off — showing all places (' + places.length + ')';
     }
     function resetFilter() { flt = { countries: [], types: [], tMin: '', tMax: '', dMin: '', dMax: '' }; saveFilter(); renderFilter(); applySearch(); }
     (function initFilter() {
@@ -5409,7 +5409,7 @@
         }
         return _usersMem = m;
     }
-    function usersPersist() { try { localStorage.setItem(USERS_KEY, JSON.stringify(_usersMem || {})); return true; } catch (e) { toast('Не вдалося зберегти (браузер забороняє)'); return false; } }
+    function usersPersist() { try { localStorage.setItem(USERS_KEY, JSON.stringify(_usersMem || {})); return true; } catch (e) { toast('Could not save (browser blocks it)'); return false; } }
     function curUserId() { usersAll(); try { return localStorage.getItem(CUR_USER_KEY) || ''; } catch (e) { return ''; } }
     function curRec() { const m = usersAll(), id = curUserId() || ANON; if (!m[id]) m[id] = newUserRec(id, ''); return m[id]; }
     function touchUser(rec) { rec.ts = Date.now(); return usersPersist(); }
@@ -5439,19 +5439,19 @@
     async function pfLogin() {
         if (_loginBusy) return;
         const input = pf$('pfLoginName'), name = input.value.trim().replace(/\s+/g, ' ');
-        if (!name) { toast('Введіть ім’я користувача'); input.focus(); return; }
+        if (!name) { toast('Enter a username'); input.focus(); return; }
         _loginBusy = true; pf$('pfLoginBtn').disabled = true;
         try {
             const m = usersAll(), key = userKey(name);
             let id = Object.keys(m).find(k => k !== ANON && userKey(m[k].name) === key) || null, msg;
             if (id) {                                       // такий користувач уже є в цьому браузері — просто входимо
-                msg = 'Вхід: ' + m[id].name;
+                msg = 'Login: ' + m[id].name;
             } else {                                        // нового користувача створюємо; дані, введені до входу, переходять до нього
                 id = slugName(name); let n = 2; while (m[id]) id = slugName(name) + '-' + (n++);
                 const rec = newUserRec(id, name), an = m[ANON];
                 if (an) { rec.cons = an.cons || ''; rec.price = an.price || ''; rec.cur = an.cur || '€'; rec.routes = (an.routes || []).slice(); rec.settings = { ...(an.settings || {}) }; m[ANON] = newUserRec(ANON, ''); }
                 m[id] = rec;
-                msg = 'Створено нового користувача ' + name;
+                msg = 'New user created ' + name;
             }
             m[id].ts = Date.now();
             try { localStorage.setItem(CUR_USER_KEY, id); } catch (e) { }
@@ -5462,7 +5462,7 @@
     function pfLogout() {
         try { localStorage.setItem(CUR_USER_KEY, ''); } catch (e) { }
         applyUserSettings(); pfFillForm();
-        toast('Ви вийшли. Введіть ім’я, щоб увійти або створити нового користувача');
+        toast('Logged out. Enter a name to sign in or create a user');
         setTimeout(() => { try { pf$('pfLoginName').focus(); } catch (e) { } }, 60);
     }
     function pfFillForm() {                                 // форма кабінету за даними поточного користувача
@@ -5535,17 +5535,17 @@
         if (m !== 'group' && m !== 'manual') return;
         sortMode = m;
         try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
-        if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Список впорядковано: за групою й відстанню від вас'); }
-        else if (!quiet) toast('Ручний порядок: утримуйте картку, щоб перетягнути');
+        if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
+        else if (!quiet) toast('Manual order: hold a card to drag');
         renderSortChips();
     }
     function renderSortChips() {
         const box = document.getElementById('fltSort');
         if (!box) return;
-        box.innerHTML = [['group', '🧭 За групою й відстанню'], ['manual', '✋ Мій порядок']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
+        box.innerHTML = [['group', '🧭 By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
-        if (hint) hint.textContent = sortMode === 'manual' ? 'Порядок задаєте ви: утримуйте картку й перетягніть.' : (sortRef() ? 'Групи — за порядком типів; у групі — від найближчого до вашого місця.' : 'GPS ще не визначено — поки місця впорядковані лише за групами.');
+        if (hint) hint.textContent = sortMode === 'manual' ? 'You set the order: hold a card and drag.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
     }
     function sortOnFix(ll) {                                 // викликається з GPS-підписки
         const now = Date.now();
@@ -5571,7 +5571,7 @@
         const r = await fetch(DATA_BASE + 'index.json', { cache: 'no-cache' });
         if (!r.ok) throw new Error('data/index.json: HTTP ' + r.status);
         const idxJson = await r.json();
-        if (!idxJson || !Array.isArray(idxJson.places)) throw new Error('data/index.json має неочікуваний формат');
+        if (!idxJson || !Array.isArray(idxJson.places)) throw new Error('data/index.json has unexpected format');
         const cards = await Promise.all(idxJson.places.map(async e => {
             const rr = await fetch(DATA_BASE + 'places/' + encodeURIComponent(e.id) + '.json', { cache: 'no-cache' });
             if (!rr.ok) throw new Error(`data/places/${e.id}.json: HTTP ${rr.status}`);
@@ -5593,14 +5593,14 @@
     }
     function showLoadError(err) {
         const box = document.getElementById('placesTable');
-        box.innerHTML = `<div class="load-msg load-err"><b>Не вдалося завантажити каталог.</b><br>${esc(err.message)}<br>
-            <small>Сайт читає файли з теки data/. Відкрийте його за адресою GitHub Pages або через локальний сервер (наприклад, <code>npx serve</code>): відкриття index.html просто з диска браузер забороняє.</small><br>
-            <button type="button" class="load-retry" onclick="init()">Спробувати ще раз</button></div>`;
+        box.innerHTML = `<div class="load-msg load-err"><b>Could not load catalog.</b><br>${esc(err.message)}<br>
+            <small>The site reads files from data/. Open it via GitHub Pages or a local server (e.g., <code>npx serve</code>): opening index.html straight from disk is blocked.</small><br>
+            <button type="button" class="load-retry" onclick="init()">Try again</button></div>`;
     }
     async function init() {
-        document.getElementById('placesTable').innerHTML = '<div class="load-msg">Завантажую місця…</div>';
+        document.getElementById('placesTable').innerHTML = '<div class="load-msg">Loading places…</div>';
         let cat = null, catErr = null, st = null, sl = null;
-        try { cat = await loadCatalog(); } catch (e) { catErr = e; console.error('Каталог:', e); }
+        try { cat = await loadCatalog(); } catch (e) { catErr = e; console.error('Catalog:', e); }
         try {
             await idbOpen(); st = await idbGet('state'); sl = await idbGet('selection');
             if (st && Array.isArray(st.places)) for (const p of st.places) if (p && p.mediaKey) {          // фото, збережені окремо (запасний режим)
@@ -5608,7 +5608,7 @@
                 delete p.mediaKey;
             }
         }
-        catch (err) { console.warn('IndexedDB недоступна, працюємо без збереження в браузері:', err); }
+        catch (err) { console.warn('IndexedDB unavailable, working without browser storage:', err); }
         const localList = st && Array.isArray(st.places) ? st.places : null;
         deletedNames = st && Array.isArray(st.deletedNames) ? st.deletedNames : [];
         typeDefs = st && Array.isArray(st.types) ? st.types : [];
@@ -5638,7 +5638,7 @@
             } else places = cat;
         } else if (localList) {
             places = localList; places.forEach(normalize);
-            toast('Каталог недоступний — показано вашу локальну копію');
+            toast('Catalog unavailable — showing your local copy');
         } else { showLoadError(catErr); window.splashHide && window.splashHide(); return; }
         places.forEach(normalize);
         mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
