@@ -960,6 +960,21 @@
         html[data-theme="dark"] .ms-row { color: #e2e8f0; border-color: #3a4558; }
         html[data-theme="dark"] .ms-row small { color: #9fb0c6; }
         html[data-theme="dark"] .ms-addr { color: #75a3f0; }
+        /* ===== View logs ===== */
+        #logsModal { position: fixed; inset: 0; z-index: 3800; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 12px; }
+        #logsModal .srm-box { width: min(640px, 100%); max-height: 88vh; display: flex; flex-direction: column; overflow: hidden; }
+        #logsModal .lg-meta { font-size: 12px; opacity: .75; margin: 2px 0 8px; line-height: 1.4; }
+        #logsModal .lg-list { flex: 1; overflow-y: auto; border-top: 1px solid rgba(128,128,128,.3); margin-bottom: 10px; min-height: 80px; }
+        #logsModal .lg-row { padding: 8px 2px; border-bottom: 1px solid rgba(128,128,128,.25); font-size: 13px; }
+        #logsModal .lg-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px; opacity: .85; }
+        #logsModal .lg-k { background: #c0392b; color: #fff; border-radius: 6px; padding: 1px 7px; font-weight: 700; }
+        #logsModal .lg-top i { font-style: normal; color: #e67e22; }
+        #logsModal .lg-m { margin: 3px 0 2px; word-break: break-word; }
+        #logsModal small { opacity: .6; word-break: break-word; }
+        #logsModal .lg-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        #logsModal .lg-btns button { flex: 1 1 auto; border: 0; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-weight: 600; cursor: pointer; background: #4285F4; color: #fff; }
+        #logsModal .lg-btns button#lgX, #logsModal .lg-btns button#lgBack { background: #718096; }
+        #logsModal .lg-btns button#lgClr { background: #c0392b; }
     </style>
 </head>
 <body>
@@ -1015,6 +1030,164 @@
   }
   window.splashHide = function(){ ready=true; tryHide(); };
   setTimeout(window.splashHide, 12000);   // страховка
+})();
+</script>
+<script>
+(function () {
+  // ===== Failure log: collects errors / failed operations; Alex can view and upload them to GitHub =====
+  const LOG_KEY = 'app_logs', CFG_KEY = 'logs_cfg', MAX_LOCAL = 200, MAX_FILE = 1000;
+  const _fetch = window.fetch.bind(window);
+  let q = [], last = { k: '', m: '', t: 0 }, flushing = false, timer = null, lastErr = '';
+  try { q = JSON.parse(localStorage.getItem(LOG_KEY) || '[]') || []; } catch (e) { q = []; }
+  const save = () => { try { localStorage.setItem(LOG_KEY, JSON.stringify(q.slice(-MAX_LOCAL))); } catch (e) { } };
+  const who = () => { try { return (typeof pfLoad === 'function' && pfLoad().name) || ''; } catch (e) { return ''; } };
+  const isAlex = () => who().trim().toLowerCase() === 'alex';
+  window.isAlexUser = isAlex;
+  const cfg = () => {
+    let c = {}; try { c = JSON.parse(localStorage.getItem(CFG_KEY) || '{}') || {}; } catch (e) { }
+    let repo = '';
+    if (/\.github\.io$/.test(location.hostname)) repo = location.hostname.split('.')[0] + '/' + (location.pathname.split('/')[1] || location.hostname);
+    return { repo: c.repo || repo, branch: c.branch || 'main', path: c.path || 'data/logs.json', token: c.token || '' };
+  };
+  const fmt = x => { if (x == null) return ''; if (typeof x === 'string') return x; if (x.message) return x.message; try { return JSON.stringify(x); } catch (e) { return String(x); } };
+
+  function log(kind, msg) {
+    try {
+      msg = fmt(msg).replace(/\s+/g, ' ').slice(0, 300);
+      if (!msg) return;
+      const now = Date.now();
+      if (last.k === kind && last.m === msg && now - last.t < 30000) return;   // the same message is not repeated within 30 s
+      last = { k: kind, m: msg, t: now };
+      q.push({ id: now.toString(36) + Math.random().toString(36).slice(2, 5), t: new Date(now).toISOString(), k: kind, m: msg, u: who(),
+               ua: navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 90), p: location.pathname.split('/').pop() || '/' });
+      if (q.length > MAX_LOCAL) q = q.slice(-MAX_LOCAL);
+      save(); schedule();
+    } catch (e) { }
+  }
+  window.appLog = log;
+
+  // --- hooks: script errors, rejected promises, failed resources, console.error/warn, alert, failed fetch ---
+  window.addEventListener('error', e => {
+    if (e.target && e.target !== window && (e.target.src || e.target.href)) log('resource', 'failed to load ' + (e.target.src || e.target.href));
+    else log('error', (e.message || 'error') + ' @ ' + String(e.filename || '').split('/').pop() + ':' + (e.lineno || 0));
+  }, true);
+  window.addEventListener('unhandledrejection', e => log('promise', fmt(e.reason) || 'rejected promise'));
+  ['error', 'warn'].forEach(n => { const o = console[n].bind(console); console[n] = (...a) => { o(...a); log('console.' + n, a.map(fmt).join(' ')); }; });
+  const _alert = window.alert.bind(window);
+  window.alert = m => { log('alert', m); _alert(m); };
+  const quiet = u => /generate_204|api\.github\.com|logs\.json/.test(u);
+  window.fetch = async function (input, init) {
+    const url = typeof input === 'string' ? input : ((input && input.url) || '');
+    try {
+      const r = await _fetch(input, init);
+      if (!r.ok && r.type !== 'opaque' && !quiet(url)) log('http', r.status + ' ' + url);
+      return r;
+    } catch (e) {
+      if (!(e && e.name === 'AbortError') && !quiet(url)) log('network', url + ' — ' + fmt(e));
+      throw e;
+    }
+  };
+  window.addEventListener('load', () => {            // failed operations that the app reports through toasts
+    const ot = window.toast;
+    if (typeof ot === 'function') window.toast = function (m) { if (/could not|cannot|failed|error|unavailable|no gps|no connection|not built|blocked/i.test(String(m))) log('toast', m); return ot.apply(this, arguments); };
+  });
+
+  // --- upload to GitHub (Contents API). Needs a fine-grained token with Contents: read & write, stored only in this browser ---
+  const b64e = s => { const b = new TextEncoder().encode(s); let r = ''; for (let i = 0; i < b.length; i += 8192) r += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(r); };
+  const b64d = s => new TextDecoder().decode(Uint8Array.from(atob(String(s).replace(/\s/g, '')), c => c.charCodeAt(0)));
+  const hdr = c => ({ Authorization: 'Bearer ' + c.token, Accept: 'application/vnd.github+json' });
+  const apiUrl = c => 'https://api.github.com/repos/' + c.repo + '/contents/' + c.path;
+  async function apiGet(c) {
+    const r = await _fetch(apiUrl(c) + '?ref=' + encodeURIComponent(c.branch) + '&_=' + Date.now(), { headers: hdr(c), cache: 'no-store' });
+    if (r.status === 404) return { sha: null, logs: [] };
+    if (!r.ok) throw new Error('GitHub HTTP ' + r.status);
+    const j = await r.json();
+    let logs = []; try { logs = JSON.parse(b64d(j.content)).logs || []; } catch (e) { }
+    return { sha: j.sha, logs };
+  }
+  function schedule() { clearTimeout(timer); timer = setTimeout(() => flush(), 8000); }
+  async function flush() {
+    const c = cfg();
+    if (flushing || !c.token || !c.repo || !q.length || navigator.onLine === false) return false;
+    flushing = true; lastErr = '';
+    try {
+      const batch = q.slice();
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const cur = await apiGet(c);
+        const seen = new Set(cur.logs.map(x => x.id));
+        const merged = cur.logs.concat(batch.filter(x => !seen.has(x.id))).slice(-MAX_FILE);
+        const body = { message: 'logs: +' + batch.length, content: b64e(JSON.stringify({ logs: merged }, null, 1)), branch: c.branch };
+        if (cur.sha) body.sha = cur.sha;
+        const r = await _fetch(apiUrl(c), { method: 'PUT', headers: { ...hdr(c), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (r.ok) { const sent = new Set(batch.map(x => x.id)); q = q.filter(x => !sent.has(x.id)); save(); return true; }
+        if (r.status !== 409 && r.status !== 422) throw new Error('GitHub HTTP ' + r.status);
+      }
+      throw new Error('GitHub conflict, try again');
+    } catch (e) { lastErr = e.message || String(e); return false; }
+    finally { flushing = false; }
+  }
+  window.addEventListener('online', () => flush());
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+  setTimeout(flush, 5000);
+
+  // --- "View logs" window (Alex only) ---
+  const E = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function closeLogs() { const m = document.getElementById('logsModal'); if (m) m.remove(); }
+  async function readRemote() {
+    const c = cfg();
+    try {
+      if (c.token && c.repo) return { logs: (await apiGet(c)).logs, src: c.repo + '/' + c.path + ' (GitHub)' };
+      const r = await _fetch('data/logs.json?_=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('data/logs.json: HTTP ' + r.status + ' — create it in the repo or set a token in Settings');
+      return { logs: (await r.json()).logs || [], src: 'data/logs.json (site)' };
+    } catch (e) { return { logs: [], err: e.message || String(e), src: c.repo ? c.repo + '/' + c.path : 'data/logs.json' }; }
+  }
+  async function renderLogs(box) {
+    box.innerHTML = '<h3>📋 Logs</h3><div class="lg-meta">Loading…</div>';
+    const rem = await readRemote();
+    const ids = new Set(rem.logs.map(x => x.id));
+    const pend = q.filter(x => !ids.has(x.id));
+    const all = rem.logs.map(x => ({ ...x, pend: 0 })).concat(pend.map(x => ({ ...x, pend: 1 }))).sort((a, b) => String(b.t).localeCompare(String(a.t))).slice(0, 300);
+    const c = cfg();
+    let meta = 'Source: ' + E(rem.src) + ' · ' + rem.logs.length + ' saved · ' + pend.length + ' not uploaded';
+    if (rem.err) meta += '<br><b>⚠ ' + E(rem.err) + '</b>';
+    if (lastErr) meta += '<br><b>⚠ Upload: ' + E(lastErr) + '</b>';
+    if (!c.token) meta += '<br>Upload is off: add a GitHub token in Settings.';
+    const rows = all.map(x => '<div class="lg-row"><div class="lg-top"><span class="lg-k">' + E(x.k) + '</span><time>' + E(new Date(x.t).toLocaleString()) + '</time>' + (x.pend ? '<i>⏳ not uploaded</i>' : '') + '</div><div class="lg-m">' + E(x.m) + '</div><small>' + E(x.u || 'guest') + ' · ' + E(x.ua || '') + '</small></div>').join('');
+    box.innerHTML = '<h3>📋 Logs</h3><div class="lg-meta">' + meta + '</div><div class="lg-list">' + (rows || '<div class="lg-row"><small>No failures recorded.</small></div>') + '</div>' +
+      '<div class="lg-btns"><button type="button" id="lgRef">Refresh</button><button type="button" id="lgUp">Upload now</button><button type="button" id="lgClr">Clear local</button><button type="button" id="lgSet">Settings</button><button type="button" id="lgX">Close</button></div>';
+    box.querySelector('#lgRef').onclick = () => renderLogs(box);
+    box.querySelector('#lgUp').onclick = async () => { box.querySelector('#lgUp').textContent = 'Uploading…'; await flush(); renderLogs(box); };
+    box.querySelector('#lgClr').onclick = () => { if (confirm('Clear local (not uploaded) entries?')) { q = []; save(); renderLogs(box); } };
+    box.querySelector('#lgSet').onclick = () => renderSettings(box);
+    box.querySelector('#lgX').onclick = closeLogs;
+  }
+  function renderSettings(box) {
+    const c = cfg();
+    box.innerHTML = '<h3>⚙ Logs settings</h3>' +
+      '<label class="pf-field"><span>Repository (owner/name)</span><input class="pf-input" id="lgRepo" value="' + E(c.repo) + '" autocapitalize="off" spellcheck="false"></label>' +
+      '<label class="pf-field"><span>Branch</span><input class="pf-input" id="lgBranch" value="' + E(c.branch) + '" autocapitalize="off" spellcheck="false"></label>' +
+      '<label class="pf-field"><span>File path</span><input class="pf-input" id="lgPath" value="' + E(c.path) + '" autocapitalize="off" spellcheck="false"></label>' +
+      '<label class="pf-field"><span>GitHub token</span><input class="pf-input" id="lgTok" type="password" value="' + E(c.token) + '" autocomplete="off" placeholder="fine-grained, Contents: read &amp; write"></label>' +
+      '<div class="lg-meta">The token stays only in this browser. Use a fine-grained token limited to this one repository.</div>' +
+      '<div class="lg-btns"><button type="button" id="lgOk">Save</button><button type="button" id="lgBack">Back</button></div>';
+    box.querySelector('#lgOk').onclick = () => {
+      const v = id => box.querySelector(id).value.trim();
+      try { localStorage.setItem(CFG_KEY, JSON.stringify({ repo: v('#lgRepo'), branch: v('#lgBranch') || 'main', path: v('#lgPath') || 'data/logs.json', token: v('#lgTok') })); } catch (e) { }
+      flush(); renderLogs(box);
+    };
+    box.querySelector('#lgBack').onclick = () => renderLogs(box);
+  }
+  window.openLogs = function () {
+    if (!isAlex()) return;
+    closeLogs();
+    const m = document.createElement('div');
+    m.id = 'logsModal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Logs');
+    m.innerHTML = '<div class="srm-box"></div>';
+    m.addEventListener('click', e => { if (e.target === m) closeLogs(); });
+    document.body.appendChild(m);
+    renderLogs(m.firstChild);
+  };
 })();
 </script>
 
@@ -1143,6 +1316,7 @@
             <div id="pfLoggedIn" hidden>
                 <div class="pf-user-row"><span class="pf-user-name" id="pfUserName"></span><button type="button" class="pf-out" onclick="pfLogout()">Log out</button></div>
                 <div class="set-note" style="margin:8px 0 0">After logging out, sign in as another user or create a new one.</div>
+                <button type="button" class="pf-btn" id="pfViewLogs" style="display:none;margin-top:12px" onclick="openLogs()">📋 View logs</button>
             </div>
             <div id="pfLoggedOut">
                 <label class="pf-field"><span>Username</span><input class="pf-input" id="pfLoginName" type="text" maxlength="40" autocomplete="username" autocapitalize="words" enterkeyhint="go" placeholder="Enter name"></label>
@@ -5649,6 +5823,7 @@
         pf$('pfCons').value = p.cons; pf$('pfPrice').value = p.price; pf$('pfCur').value = p.cur;
         pf$('pfLoggedIn').hidden = !li; pf$('pfLoggedOut').hidden = li;
         pf$('pfUserName').textContent = p.name;
+        { const lb = pf$('pfViewLogs'); if (lb) lb.style.display = (li && window.isAlexUser && window.isAlexUser()) ? '' : 'none'; }   // View logs — only for Alex
         pfRefreshHeader(p); pfRender();
     }
     function usersForExport() {                             // кабінети для data/users/: усі іменовані користувачі пристрою
