@@ -2897,8 +2897,28 @@
     // ЗАСТОСУНОК Google Maps напряму (а не сайт у браузері, який офлайн не завантажується).
     const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const IS_ANDROID = /Android/i.test(navigator.userAgent);
-    function offlineAlways() { try { return localStorage.getItem('offlineRoute') === '1'; } catch (e) { return false; } }
-    function isOfflineRoute() { return navigator.onLine === false || offlineAlways(); }
+    // Слабкий/відсутній інтернет визначається автоматично: офлайн, 2G/дуже повільна мережа або «пінг» не пройшов за 2,5 с
+    let NET_WEAK = navigator.onLine === false;
+    function isOfflineRoute() { return NET_WEAK; }
+    function applyNetState() {
+        document.querySelectorAll('a[data-off]').forEach(a => { a.style.display = NET_WEAK ? '' : 'none'; });   // 📴 видно лише при слабкому інтернеті
+    }
+    async function checkNet() {
+        let weak = navigator.onLine === false;
+        const c = navigator.connection;
+        if (!weak && c) weak = /(^|-)2g$/.test(c.effectiveType || '') || (c.downlink > 0 && c.downlink < 0.3) || c.rtt > 1500;
+        if (!weak) {
+            const ctl = new AbortController(), t0 = Date.now(), to = setTimeout(() => ctl.abort(), 2500);
+            try { await fetch('https://www.gstatic.com/generate_204?_=' + t0, { mode: 'no-cors', cache: 'no-store', signal: ctl.signal }); weak = Date.now() - t0 > 2000; }
+            catch (e) { weak = true; }
+            clearTimeout(to);
+        }
+        if (weak !== NET_WEAK) { NET_WEAK = weak; applyNetState(); }
+    }
+    addEventListener('online', checkNet); addEventListener('offline', () => { NET_WEAK = true; applyNetState(); });
+    if (navigator.connection && navigator.connection.addEventListener) navigator.connection.addEventListener('change', checkNet);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkNet(); });
+    setTimeout(checkNet, 2500); setInterval(() => { if (document.visibilityState === 'visible') checkNet(); }, 20000);
     function openApp(u) { _extNavAt = Date.now(); _extAway = false; window.location.href = u; }   // перехід у застосунок (не нова вкладка)
     const _ll = c => Number(c[0]).toFixed(6) + ',' + Number(c[1]).toFixed(6);
     function gmapsAppLeg(from, to) {                        // from: [lat,lng] або null («моя позиція»), to: [lat,lng]
@@ -2929,21 +2949,37 @@
         for (let i = 0; i + 1 < pts.length; i++) legs.push({ from: pts[i].ll, to: pts[i + 1].ll, title: 'Ділянка ' + (legs.length + 1), sub: (pts[i].name || 'точка') + ' → ' + (pts[i + 1].name || 'точка') });
         return legs;
     }
+    // Слабкий інтернет: маршрут будується одразу, без питань — напряму в застосунку Google Maps (з завантаженою картою).
+    // Якщо точок кілька, відкривається перша ділянка, а після повернення на сайт з'являється панель «Далі» для наступної.
+    let offlineRun = null;
     function openOfflineRoute() {
         const legs = offlineLegs();
         if (!legs.length) { toast('Спочатку позначте галочками місця для маршруту'); return; }
         closeCtx();
-        if (legs.length === 1) { openApp(gmapsAppLeg(legs[0].from, legs[0].to)); return; }
-        document.getElementById('navPickMeta').textContent = 'Офлайн: Google Maps будує одну ділянку за раз. Проїдьте її й натисніть наступну.';
-        document.getElementById('navGoogleBtn').style.display = 'none';
-        document.getElementById('navMapsmeBtn').style.display = 'none';
-        const box = document.getElementById('navPickParts');
-        box.innerHTML = legs.map((l, k) => '<button type="button" class="nav-opt g" data-k="' + k + '"><span>🧭</span><span>' + esc(l.title) + '<small>' + esc(l.sub) + '</small></span></button>').join('') +
-            '<label style="display:flex;gap:8px;align-items:center;margin:10px 2px 0;font-size:13px"><input type="checkbox" id="offRouteAlways"' + (offlineAlways() ? ' checked' : '') + '> Завжди будувати ділянками (слабкий інтернет)</label>';
-        box.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => { const l = legs[+b.dataset.k]; openApp(gmapsAppLeg(l.from, l.to)); });
-        document.getElementById('offRouteAlways').onchange = e => { try { localStorage.setItem('offlineRoute', e.target.checked ? '1' : '0'); } catch (x) { } toast(e.target.checked ? 'Маршрут завжди ділянками' : 'Звичайний маршрут Google Maps'); };
-        document.getElementById('navPickModal').classList.add('open');
+        offlineRun = legs.length > 1 ? { legs, i: 0, left: false } : null;
+        hideLegBar();
+        openApp(gmapsAppLeg(legs[0].from, legs[0].to));
     }
+    function hideLegBar() { const b = document.getElementById('legBar'); if (b) b.remove(); }
+    function showLegBar() {
+        if (!offlineRun || offlineRun.i + 1 >= offlineRun.legs.length) { offlineRun = null; return; }
+        hideLegBar();
+        const l = offlineRun.legs[offlineRun.i + 1];
+        const bar = document.createElement('div');
+        bar.id = 'legBar';
+        bar.style.cssText = 'position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:5000;display:flex;gap:8px;align-items:center;padding:10px 12px;border-radius:12px;background:#2c3e50;color:#fff;box-shadow:0 4px 18px rgba(0,0,0,.35);font-size:14px';
+        bar.innerHTML = '<div style="flex:1;min-width:0"><div style="opacity:.75;font-size:12px">Наступна ділянка (' + (offlineRun.i + 2) + ' з ' + offlineRun.legs.length + ')</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(l.sub) + '</div></div>' +
+            '<button type="button" id="legGo" style="border:0;border-radius:8px;padding:8px 14px;background:#4a90d9;color:#fff;font-weight:600">Далі ▶</button>' +
+            '<button type="button" id="legX" aria-label="Закрити" style="border:0;background:transparent;color:#fff;font-size:18px;padding:4px 8px">✕</button>';
+        document.body.appendChild(bar);
+        document.getElementById('legGo').onclick = () => { offlineRun.i++; offlineRun.left = false; hideLegBar(); openApp(gmapsAppLeg(l.from, l.to)); };
+        document.getElementById('legX').onclick = () => { offlineRun = null; hideLegBar(); };
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (!offlineRun) return;
+        if (document.visibilityState === 'hidden') offlineRun.left = true;
+        else if (offlineRun.left) { offlineRun.left = false; showLegBar(); }
+    });
 
 
     // ===== Вибір, де будувати маршрут: Google Maps або Maps.me =====
@@ -3087,7 +3123,7 @@
         document.querySelectorAll('.route-parts').forEach(box => {
             box.innerHTML = (links.length > 1
                 ? links.map((u, k) => `<a class="link-btn part-btn" target="_blank" rel="noopener" href="${esc(u)}">Ч${k + 1}</a>`).join('')
-                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1" title="Маршрут офлайн (ділянками)" aria-label="Маршрут офлайн">📴</a>' : '');
+                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1"' + (NET_WEAK ? '' : ' style="display:none"') + ' title="Маршрут без інтернету" aria-label="Маршрут без інтернету">📴</a>' : '');
             box.querySelectorAll('a').forEach(a => a.onclick = e => { if (a.dataset.off || isOfflineRoute()) { e.preventDefault(); openOfflineRoute(); } });
         });
     }
