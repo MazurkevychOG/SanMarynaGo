@@ -1978,9 +1978,20 @@
 
     // ===== Галерея: свайп / дотик вліво-вправо, розсування пальців, червоний «палець» закриває =====
     let galZoom = { s: 1, x: 0, y: 0 };
+    function clampGal() {                                   // not zoomed → centered; zoomed → pan only within the photo edges
+        const img = document.querySelector('#mediaContainer img'), st = document.getElementById('mediaContainer');
+        if (!img || !st) return;
+        if (galZoom.s <= 1) { galZoom.s = 1; galZoom.x = 0; galZoom.y = 0; return; }
+        const mx = Math.max(0, (img.offsetWidth * galZoom.s - st.clientWidth) / 2);
+        const my = Math.max(0, (img.offsetHeight * galZoom.s - st.clientHeight) / 2);
+        galZoom.x = Math.max(-mx, Math.min(mx, galZoom.x));
+        galZoom.y = Math.max(-my, Math.min(my, galZoom.y));
+    }
     function applyGalTransform() {
         const img = document.querySelector('#mediaContainer img');
-        if (img) img.style.transform = `translate(${galZoom.x}px, ${galZoom.y}px) scale(${galZoom.s})`;
+        if (!img) return;
+        clampGal();
+        img.style.transform = `translate(${galZoom.x}px, ${galZoom.y}px) scale(${galZoom.s})`;
     }
     function openGallery(idx) {
         if (!places[idx].media || places[idx].media.length === 0) return;
@@ -2029,7 +2040,7 @@
         document.getElementById('galPrev').onclick = () => galleryGo(-1);
         document.getElementById('galNext').onclick = () => galleryGo(1);
         const ptrs = new Map();
-        let startDist = 1, startScale = 1, down = null, pinched = false;
+        let startDist = 1, startScale = 1, down = null, pinched = false, pinch0 = null;
         const isVideo = () => !!stage.querySelector('video');
         stage.addEventListener('pointerdown', e => {
             const vid = stage.querySelector('video');
@@ -2045,6 +2056,11 @@
                 const [p, q] = [...ptrs.values()];
                 startDist = Math.hypot(p.x - q.x, p.y - q.y) || 1;
                 startScale = galZoom.s; pinched = true;
+                const r0 = stage.getBoundingClientRect();
+                pinch0 = { mx: (p.x + q.x) / 2 - (r0.left + r0.width / 2), my: (p.y + q.y) / 2 - (r0.top + r0.height / 2), tx: galZoom.x, ty: galZoom.y };
+                if (down) { down.vert = false; down.moved = true; }
+                document.getElementById('mediaModal').style.removeProperty('background');
+                if (!isVideo()) applyGalTransform();
             }
         });
         stage.addEventListener('pointermove', e => {
@@ -2053,8 +2069,14 @@
             ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
             if (ptrs.size >= 2) {                                   // розсування / зведення пальців = масштаб
                 const [p, q] = [...ptrs.values()];
-                galZoom.s = Math.max(1, Math.min(6, startScale * Math.hypot(p.x - q.x, p.y - q.y) / startDist));
-                if (galZoom.s === 1) { galZoom.x = 0; galZoom.y = 0; }
+                if (!pinch0) return;
+                const r1 = stage.getBoundingClientRect();
+                const mx = (p.x + q.x) / 2 - (r1.left + r1.width / 2), my = (p.y + q.y) / 2 - (r1.top + r1.height / 2);
+                const ns = Math.max(1, Math.min(6, startScale * Math.hypot(p.x - q.x, p.y - q.y) / startDist));
+                const k = ns / startScale;
+                galZoom.s = ns;
+                galZoom.x = mx - k * (pinch0.mx - pinch0.tx);        // the photo point under the fingers stays under the fingers
+                galZoom.y = my - k * (pinch0.my - pinch0.ty);
                 applyGalTransform();
                 return;
             }
@@ -2077,6 +2099,7 @@
         const up = e => {
             if (!ptrs.has(e.pointerId)) return;
             ptrs.delete(e.pointerId);
+            if (ptrs.size === 1) { const [rp] = [...ptrs.values()]; down = { x: rp.x, y: rp.y, moved: true }; return; }
             if (ptrs.size > 0 || !down) return;
             const d = down; down = null;
             if (d.vert) {                                                           // свайп вниз = натиснути червоний відбиток
