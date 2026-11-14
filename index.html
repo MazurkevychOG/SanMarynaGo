@@ -1161,7 +1161,8 @@
   window.addEventListener('unhandledrejection', e => log('promise', fmt(e.reason) || 'rejected promise'));
   ['error', 'warn'].forEach(n => { const o = console[n].bind(console); console[n] = (...a) => { o(...a); log('console.' + n, a.map(fmt).join(' ')); }; });
   const _alert = window.alert.bind(window);
-  window.alert = m => { log('alert', m); _alert(m); };
+  const FAIL = /could not|cannot|failed|error|unavailable|no gps|no connection|not built|blocked/i;   // only real failures are logged, not hints
+  window.alert = m => { if (FAIL.test(String(m))) log('alert', m); _alert(m); };
   const quiet = u => /generate_204|api\.github\.com|logs\.json/.test(u);
   window.fetch = async function (input, init) {
     const url = typeof input === 'string' ? input : ((input && input.url) || '');
@@ -1176,7 +1177,7 @@
   };
   window.addEventListener('load', () => {            // failed operations that the app reports through toasts
     const ot = window.toast;
-    if (typeof ot === 'function') window.toast = function (m) { if (/could not|cannot|failed|error|unavailable|no gps|no connection|not built|blocked/i.test(String(m))) log('toast', m); return ot.apply(this, arguments); };
+    if (typeof ot === 'function') window.toast = function (m) { if (FAIL.test(String(m))) log('toast', m); return ot.apply(this, arguments); };
   });
 
   // --- upload to GitHub (Contents API). Needs a fine-grained token with Contents: read & write, stored only in this browser ---
@@ -1307,24 +1308,43 @@
 
   // ---------- IndexedDB (separate database: places / JSON are not touched) ----------
   let dbp = null;
+  function dropDb() { const p = dbp; dbp = null; if (p) p.then(d => { try { d.close(); } catch (e) { } }, () => { }); }
   function db() {
     if (dbp) return dbp;
-    dbp = new Promise((res, rej) => {
+    const mine = dbp = new Promise((res, rej) => {
       if (!window.indexedDB) return rej(new Error('IndexedDB unavailable'));
       const r = indexedDB.open(DB_NAME, 1);
       r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('trips', { keyPath: 'id' }); d.createObjectStore('active', { keyPath: 'k' }); };
-      r.onsuccess = () => res(r.result);
+      r.onsuccess = () => {                                  // iOS Safari closes idle connections: forget it so the next call reopens
+        const d = r.result;
+        d.onclose = () => { if (dbp === mine) dbp = null; };
+        d.onversionchange = () => { try { d.close(); } catch (e) { } if (dbp === mine) dbp = null; };
+        res(d);
+      };
       r.onerror = () => rej(r.error || new Error('IndexedDB open failed'));
       r.onblocked = () => rej(new Error('database blocked'));
     });
-    dbp.catch(() => { dbp = null; });
-    return dbp;
+    mine.catch(() => { if (dbp === mine) dbp = null; });
+    return mine;
   }
-  const tx = (store, mode, fn) => db().then(d => new Promise((res, rej) => {
-    const t = d.transaction(store, mode); const req = fn(t.objectStore(store));
-    t.oncomplete = () => res(req ? req.result : undefined);
-    t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transaction aborted'));
-  }));
+  const retryable = e => !e || /InvalidState|Unknown|Abort|TransactionInactive|NotFound/i.test(String(e.name || '')) || /clos|lost|connection|server|internal/i.test(String(e.message || ''));
+  const tx = async (store, mode, fn) => {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const d = await db();
+        return await new Promise((res, rej) => {
+          let t, req;
+          try { t = d.transaction(store, mode); req = fn(t.objectStore(store)); } catch (e) { return rej(e); }
+          t.oncomplete = () => res(req ? req.result : undefined);
+          t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transaction aborted'));
+        });
+      } catch (e) {
+        if (attempt >= 3 || !retryable(e)) throw e;
+        dropDb();                                            // closing / internal error → open a fresh connection and try again
+        await new Promise(r => setTimeout(r, 150 * (attempt + 1)));
+      }
+    }
+  };
   const dbPut = (s, o) => tx(s, 'readwrite', st => st.put(o));
   const dbGet = (s, k) => tx(s, 'readonly', st => st.get(k));
   const dbAll = s => tx(s, 'readonly', st => st.getAll());
@@ -1437,17 +1457,60 @@
   }
 
   // ---------- persistence ----------
+  // A finished trip that could not be written to IndexedDB is kept in memory, copied to localStorage (emergency) and retried.
+  const pending = new Map(); let pendTimer = 0;
+  const STASH = 'trk_stash_', ASTASH = 'trk_active_stash';
+  const lsSet = (k, v) => { try { const j = JSON.stringify(v); if (j.length < 2500000) { localStorage.setItem(k, j); return true; } } catch (e) { } return false; };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) { } };
+  async function saveTrip(t) {
+    try {
+      await dbPut('trips', t); pending.delete(t.id); lsDel(STASH + t.id);
+      dbDel('active', 'cur').catch(() => { }); lsDel(ASTASH);
+      return true;
+    } catch (e) { dbFail('save', e); pending.set(t.id, t); lsSet(STASH + t.id, t); schedulePending(); return false; }
+  }
+  function schedulePending() { if (!pendTimer && pending.size) pendTimer = setInterval(retryPending, 8000); }
+  async function retryPending() {
+    for (const t of [...pending.values()]) {
+      const n = (retryCount.get(t.id) || 0) + 1; retryCount.set(t.id, n);
+      try { await dbPut('trips', t); pending.delete(t.id); lsDel(STASH + t.id); say('✔ Track saved (' + (t.dist / 1000).toFixed(2) + ' km)'); }
+      catch (e) { if (n <= 3) dbFail('retry save', e); }
+    }
+    if (!pending.size && pendTimer) { clearInterval(pendTimer); pendTimer = 0; }
+  }
+  const retryCount = new Map();
+  function recoverStash() {                                   // trips saved to localStorage in an earlier session
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(STASH)) { const t = JSON.parse(localStorage.getItem(k)); if (t && t.id && !pending.has(t.id)) pending.set(t.id, t); }
+      }
+    } catch (e) { }
+    if (pending.size) { retryPending(); schedulePending(); }
+  }
   function persistActive() {
     if (S.state === 'idle' || !S.t) return Promise.resolve();
-    return dbPut('active', { k: 'cur', state: S.state, resumeAt: S.resumeAt, savedAt: Date.now(), t: S.t }).catch(e => dbFail('autosave', e));
+    const rec = { k: 'cur', state: S.state, resumeAt: S.resumeAt, savedAt: Date.now(), t: S.t };
+    return dbPut('active', rec).then(() => lsDel(ASTASH)).catch(e => {
+      dbFail('autosave', e);
+      if (Date.now() - (S.stashAt || 0) > 30000) { S.stashAt = Date.now(); lsSet(ASTASH, rec); }   // emergency copy (at most every 30 s)
+    });
+  }
+  function stashNow() {                                       // synchronous emergency copy: survives the page being suspended/closed right now
+    if (S.state === 'idle' || !S.t) return;
+    lsSet(ASTASH, { k: 'cur', state: S.state, resumeAt: S.resumeAt, savedAt: Date.now(), t: S.t });
   }
   function persistSoon(now) {
     clearTimeout(S.saveT);
-    if (now) persistActive(); else S.saveT = setTimeout(persistActive, 5000);
+    if (now) { stashNow(); persistActive(); } else S.saveT = setTimeout(persistActive, 5000);
   }
   async function restore() {
     try {
-      const a = await dbGet('active', 'cur');
+      let a = null, b = null;
+      try { a = await dbGet('active', 'cur'); } catch (e) { dbFail('restore read', e); }
+      try { b = JSON.parse(localStorage.getItem(ASTASH) || 'null'); } catch (e) { }
+      if (b && b.t && (!a || (b.savedAt || 0) > (a.savedAt || 0))) a = b;           // take the newer of IndexedDB / emergency copy
+      recoverStash();
       if (!a || !a.t || S.state !== 'idle' || S.t) return;
       const t = a.t; if (a.state === 'rec') t.activeMs += Math.max(0, a.savedAt - a.resumeAt);
       S.t = t; S.state = 'pause'; S.needSeg = true; S.anchor = null;
@@ -1492,13 +1555,13 @@
     const n = t.segs.reduce((k, s) => k + s.length, 0);
     if (n < 2) {
       S.t = null; drawAll(false); render();
-      dbDel('active', 'cur').catch(() => { });
+      dbDel('active', 'cur').catch(() => { }); lsDel(ASTASH);
       say('Track too short — not saved'); return;
     }
     t.end = now; t.done = true;
     drawAll(true); render();
-    try { await dbPut('trips', t); await dbDel('active', 'cur'); say('✔ Track saved (' + (t.dist / 1000).toFixed(2) + ' km)'); }
-    catch (e) { dbFail('save', e); say('Could not save track on this device'); }
+    const ok = await saveTrip(t);
+    say(ok ? '✔ Track saved (' + (t.dist / 1000).toFixed(2) + ' km)' : '⚠ Not saved on this device yet — retrying. Tap GPX to export it now.');
   }
   async function clearCur() {
     if (!S.t) return;
@@ -1507,6 +1570,7 @@
     const id = S.t.id, wasDone = S.t.done;
     S.state = 'idle'; stopTimer(); clearTimeout(S.saveT); wake(false); S.t = null;
     drawAll(false); render();
+    pending.delete(id); lsDel(STASH + id); lsDel(ASTASH);
     try { await dbDel('active', 'cur'); if (wasDone) await dbDel('trips', id); } catch (e) { dbFail('delete', e); }
     say('Track deleted');
   }
@@ -1560,7 +1624,7 @@
     setTimeout(() => { drawAll(true); render(); }, 350);
   }
   window.trkViewById = async function (id) {
-    try { const tr = await dbGet('trips', id); if (!tr) { say('Track not found on this device'); return false; } viewTrip(tr); return true; }
+    try { const tr = pending.get(id) || await dbGet('trips', id); if (!tr) { say('Track not found on this device'); return false; } viewTrip(tr); return true; }
     catch (e) { dbFail('open', e); say('Could not open track'); return false; }
   };
 
@@ -1577,12 +1641,12 @@
     const box = $('trkBtns'); if (!box) return;
     let h = '';
     if (S.state === 'idle') {
-      h += BTN('rec', '<u class="trk-dot"></u>', 'Rec', 'Start recording', 'rec');
+      h += BTN('rec', '⏺', 'Rec', 'Start recording', 'rec');
       if (S.t && S.t.done) h += BTN('save', '💾', 'Save', 'Save as route in Profile') + BTN('gpx', '⬇', 'GPX', 'Export GPX') + BTN('clear', '🗑', 'Clear', 'Delete this track');
       h += BTN('trips', '🗂', 'Trips', 'Recorded trips');
     } else {
-      h += S.state === 'rec' ? BTN('pause', '<u class="trk-pause"></u>', 'Pause', 'Pause recording', 'live') : BTN('resume', '<u class="trk-play"></u>', 'Resume', 'Resume recording', 'paused');
-      h += BTN('finish', '<u class="trk-stop"></u>', 'Finish', 'Finish and save') + BTN('clear', '🗑', 'Clear', 'Delete current recording');
+      h += S.state === 'rec' ? BTN('pause', '⏸', 'Pause', 'Pause recording', 'live') : BTN('resume', '▶', 'Resume', 'Resume recording', 'paused');
+      h += BTN('finish', '⏹', 'Finish', 'Finish and save') + BTN('clear', '🗑', 'Clear', 'Delete current recording');
     }
     if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
     const card = $('trkStats'); if (card) { card.hidden = !S.t; card.classList.toggle('fold', S.fold); }
@@ -1643,7 +1707,7 @@
       const b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
       const act = b.dataset.act, id = b.dataset.id;
       if (act === 'x') { closeTrips(); return; }
-      let tr; try { tr = await dbGet('trips', id); } catch (er) { dbFail('read', er); }
+      let tr = pending.get(id); if (!tr) { try { tr = await dbGet('trips', id); } catch (er) { dbFail('read', er); } }
       if (!tr) { say('Track not found'); return; }
       if (act === 'view') { closeTrips(); viewTrip(tr); }
       else if (act === 'gpx') exportGpx(tr);
@@ -1663,8 +1727,9 @@
     async function fill() {
       let list = [];
       try { list = await dbAll('trips'); } catch (e) { dbFail('list', e); }
+      const have = new Set(list.map(t => t.id)); pending.forEach(t => { if (!have.has(t.id)) list.push(t); });
       list.sort((a, b) => b.start - a.start);
-      const rows = list.map(t => '<div class="lg-row"><div class="lg-top"><b>' + he(t.name) + '</b></div><small>' + he(new Date(t.start).toLocaleString()) + ' · ' + (t.dist / 1000).toFixed(2) + ' km · ' + fmtDur(t.activeMs) + '</small>' +
+      const rows = list.map(t => '<div class="lg-row"><div class="lg-top"><b>' + he(t.name) + '</b></div><small>' + he(new Date(t.start).toLocaleString()) + ' · ' + (t.dist / 1000).toFixed(2) + ' km · ' + fmtDur(t.activeMs) + (pending.has(t.id) ? ' · ⚠ not saved on device yet' : '') + '</small>' +
         '<div class="trk-row-acts"><button data-act="view" data-id="' + he(t.id) + '">View</button><button data-act="gpx" data-id="' + he(t.id) + '">GPX</button><button data-act="route" data-id="' + he(t.id) + '">Save route</button>' +
         '<button data-act="ren" data-id="' + he(t.id) + '" title="Rename">✎</button><button data-act="del" data-id="' + he(t.id) + '" class="del" title="Delete">🗑</button></div></div>').join('');
       m.firstChild.innerHTML = '<h3>🗂 Trips</h3><div class="lg-list">' + (rows || '<div class="lg-row"><small>No recorded trips yet.</small></div>') + '</div><div class="lg-btns"><button type="button" data-act="x" id="lgX">Close</button></div>';
@@ -1673,7 +1738,7 @@
   }
 
   window.trkFeed = feed; window.trkGpsError = gpsError;
-  if (window.__TRK_TEST) window.__trk = { S, feed, start, pause, resume, finish, toGpx, stats, gpsError };
+  if (window.__TRK_TEST) window.__trk = { S, feed, start, pause, resume, finish, toGpx, stats, gpsError, pending, retryPending, dbAll, dropDb };
   restore();
 })();
 </script>
