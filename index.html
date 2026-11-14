@@ -879,49 +879,54 @@
         html.native-snap .content-area { scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
         html.native-snap .place-row { scroll-snap-align: start; }
 
-        /* ===== Заставка: Вльора і дороги (карта розповзається на весь екран) ===== */
-        #splash{position:fixed;inset:0;z-index:9000;background:var(--sp-bg);overflow:hidden;transition:opacity .7s ease;
+        /* ===== Splash: Vlorë and growing roads ===== */
+        #splash{position:fixed;inset:0;z-index:9000;background-color:var(--sp-bg);overflow:hidden;transition:opacity 1.3s ease .1s,background-color 1.1s ease;
           --sp-bg:#f8f9fa;--sp-edge:#d3d9e1;--sp-r1:#2c3e50;--sp-r2:#6b7a8d;--sp-acc:#4a90d9;--sp-lab:#4a5568}
         html[data-theme="dark"] #splash{--sp-bg:#252d3a;--sp-edge:#3d495c;--sp-r1:#d3dae5;--sp-r2:#8294ab;--sp-acc:#75a3f0;--sp-lab:#aeb9ca}
-        #splash.out{opacity:0;pointer-events:none}
-        #spArt{position:absolute;inset:0;transform-origin:6% 50%;transition:transform .9s ease-out}
-        #splash.out #spArt{transform:scale(1.05)}
+        #splash.out{opacity:0;pointer-events:none;background-color:var(--sp-card,#fff)}
+        #spArt{position:absolute;inset:0;transform-origin:6% 50%;transition:filter 1.2s ease,transform 1.3s ease-out;will-change:filter,transform}
+        #splash.out #spArt{filter:blur(14px);transform:scale(1.05)}
         #spIn{width:100%;height:100%;opacity:0;transform-origin:6% 50%}
-        #splash.draw #spIn{animation:spPop .9s ease-out forwards}
+        #splash.draw #spIn{animation:spPop 1.1s ease-out forwards}
         @keyframes spPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
         #spArt svg{display:block;width:100%;height:100%}
         #splash .land{fill:none;stroke:var(--sp-edge);stroke-width:.8;stroke-linejoin:round;
-          transform-origin:40px 360px;transform-box:view-box;transform:scale(.75);opacity:0}
-        #splash.draw .land{animation:spLand 1.1s ease-out forwards}
+          transform-origin:40px 360px;transform-box:view-box;transform:scale(.75);opacity:0;transition:stroke 1s ease}
+        #splash.draw .land{animation:spLand 2.2s ease-out forwards}
         @keyframes spLand{to{transform:scale(1);opacity:1}}
         #splash .alb{fill:none;stroke:var(--sp-acc);stroke-width:1.1;stroke-linejoin:round;opacity:0}
-        #splash.draw .alb{animation:spFade .6s ease-out .6s forwards}
+        #splash.draw .alb{animation:spFade .8s ease-out 1.2s forwards}
         @keyframes spFade{to{opacity:.55}}
-        #splash .r{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1}
+        #splash .r{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke 1s ease}
         #splash .t{stroke:var(--sp-r1);stroke-width:2.4}
         #splash .b{stroke:var(--sp-r1);stroke-width:1.7}
         #splash .w{stroke:var(--sp-r2);stroke-width:1.2}
         #splash.draw .r{animation:spDraw var(--u) cubic-bezier(.3,.6,.3,1) var(--d) forwards}
         @keyframes spDraw{to{stroke-dashoffset:0}}
-        #splash .nd{fill:var(--sp-bg);stroke:var(--sp-acc);stroke-width:1.6;opacity:0;transform-box:fill-box;transform-origin:center}
-        #splash.draw .nd{animation:spNode .3s ease-out var(--d) forwards}
+        #splash.out .t,#splash.out .b,#splash.out .w,#splash.out .land{stroke:var(--sp-card,#fff)}
+        #splash .cd{fill:var(--sp-acc);opacity:0;transform-box:fill-box;transform-origin:center;transition:fill 1s ease}
+        #splash.draw .cd{animation:spNode .35s ease-out var(--d) forwards}
         @keyframes spNode{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+        #splash .cr{fill:none;stroke:var(--sp-acc);stroke-width:1.4;opacity:0;transform-box:fill-box;transform-origin:center}
+        #splash.draw .cr{animation:spRing .9s ease-out var(--d) 2}
+        #splash.out .cd{fill:var(--sp-card,#fff)}
         #splash .c{fill:var(--sp-acc)}
         #splash .ring{fill:none;stroke:var(--sp-acc);stroke-width:1.4;opacity:0;transform-box:fill-box;transform-origin:center}
-        #splash.draw .ring{animation:spRing .8s ease-out infinite}
+        #splash.draw .ring{animation:spRing .9s ease-out infinite}
         @keyframes spRing{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(4)}}
         #splash .lb{font-size:var(--sp-fs,6px);fill:var(--sp-lab);opacity:0;paint-order:stroke;stroke:var(--sp-bg);stroke-width:2.5px}
         #splash .lb.v{font-size:calc(var(--sp-fs,6px)*1.25);font-weight:600;fill:var(--sp-r1)}
-        #splash.draw .lb{opacity:1;transition:opacity .3s ease var(--d)}
+        #splash.draw .lb{opacity:1;transition:opacity .4s ease var(--d)}
+        #splash.out .lb{opacity:0;transition:opacity .5s ease 0s}
         @keyframes spRow{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-        body.app-in .place-row{animation:spRow .5s ease-out backwards}
-        body.app-in .place-row:nth-child(2){animation-delay:.05s}
-        body.app-in .place-row:nth-child(3){animation-delay:.10s}
-        body.app-in .place-row:nth-child(4){animation-delay:.15s}
-        body.app-in .place-row:nth-child(5){animation-delay:.20s}
-        body.app-in .place-row:nth-child(6){animation-delay:.25s}
-        body.app-in .place-row:nth-child(7){animation-delay:.30s}
-        body.app-in .place-row:nth-child(n+8){animation-delay:.35s}
+        body.app-in .place-row{animation:spRow .6s ease-out backwards}
+        body.app-in .place-row:nth-child(2){animation-delay:.08s}
+        body.app-in .place-row:nth-child(3){animation-delay:.16s}
+        body.app-in .place-row:nth-child(4){animation-delay:.24s}
+        body.app-in .place-row:nth-child(5){animation-delay:.32s}
+        body.app-in .place-row:nth-child(6){animation-delay:.40s}
+        body.app-in .place-row:nth-child(7){animation-delay:.48s}
+        body.app-in .place-row:nth-child(n+8){animation-delay:.55s}
         @media (prefers-reduced-motion:reduce){
           #splash *,#spArt{animation-duration:.01s!important;transition-duration:.01s!important}
           body.app-in .place-row{animation:none}
@@ -975,6 +980,54 @@
         #logsModal .lg-btns button { flex: 1 1 auto; border: 0; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-weight: 600; cursor: pointer; background: #4285F4; color: #fff; }
         #logsModal .lg-btns button#lgX, #logsModal .lg-btns button#lgBack { background: #718096; }
         #logsModal .lg-btns button#lgClr { background: #c0392b; }
+        /* ===== GPS track recorder ===== */
+        .trk-box { position: absolute; inset: 0; z-index: 1000; pointer-events: none; }
+        .trk-btns { position: absolute; top: 58px; right: 10px; display: flex; flex-direction: column; gap: 5px; pointer-events: auto; }
+        .trk-b { position: relative; width: 46px; height: 46px; border: none; border-radius: 10px; background: #fff; color: #2d3748; box-shadow: 0 1px 4px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; cursor: pointer; line-height: 1; -webkit-tap-highlight-color: transparent; }
+        .trk-b:active { transform: scale(.94); }
+        .trk-b i { font-style: normal; font-size: 17px; }
+        .trk-b span { font-size: 9px; margin-top: 2px; font-weight: 600; }
+        .trk-b.rec i { color: #fff; }
+        .trk-b u { display: block; text-decoration: none; }
+        .trk-dot { width: 18px; height: 18px; border-radius: 50%; background: #e74c3c; box-shadow: 0 0 0 3px rgba(231,76,60,.25); }
+        .trk-b.rec, html[data-theme="dark"] .trk-b.rec { background: #e74c3c; color: #fff; }
+        .trk-b.rec .trk-dot { background: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.35); }
+        .trk-pause { position: relative; width: 16px; height: 16px; }
+        .trk-pause::before, .trk-pause::after { content: ''; position: absolute; top: 1px; width: 5px; height: 14px; background: currentColor; border-radius: 1px; }
+        .trk-pause::before { left: 2px; } .trk-pause::after { right: 2px; }
+        .trk-play { width: 0; height: 0; margin-left: 3px; border-left: 14px solid currentColor; border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+        .trk-stop { width: 14px; height: 14px; background: currentColor; border-radius: 2px; }
+        .trk-b.live { background: #e74c3c; color: #fff; }
+        .trk-b.live::after { content: ''; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: trkBlink 1s infinite; }
+        .trk-b.paused { background: #f39c12; color: #fff; }
+        @keyframes trkBlink { 50% { opacity: .25; } }
+        .trk-stats { position: absolute; right: 10px; bottom: 28px; width: 180px; background: rgba(255,255,255,.95); color: #2d3748; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.35); padding: 6px 8px; pointer-events: auto; font-size: 12px; }
+        .trk-stats[hidden] { display: none; }
+        .trk-hd { display: flex; align-items: center; gap: 6px; }
+        .trk-chip { flex: 1; min-width: 0; font-weight: 700; font-size: 12px; border-radius: 6px; padding: 3px 6px; color: #fff; background: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .trk-chip.rec { background: #e74c3c; animation: trkBlink 1.4s infinite; }
+        .trk-chip.pause { background: #f39c12; } .trk-chip.lost { background: #c0392b; } .trk-chip.weak { background: #e67e22; } .trk-chip.done { background: #2f80ed; }
+        .trk-mini { width: 30px; height: 30px; border: none; border-radius: 8px; background: rgba(128,128,128,.18); color: inherit; padding: 0; font-size: 14px; cursor: pointer; }
+        .trk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; margin-top: 6px; }
+        .trk-grid b { display: block; font-size: 15px; }
+        .trk-grid small { opacity: .65; font-size: 10px; }
+        .trk-note { font-size: 10px; opacity: .7; margin-top: 4px; }
+        .trk-stats.fold .trk-grid, .trk-stats.fold .trk-note { display: none; }
+        html[data-theme="dark"] .trk-b { background: #2b3445; color: #e2e8f0; }
+        html[data-theme="dark"] .trk-b.live { background: #e74c3c; color: #fff; }
+        html[data-theme="dark"] .trk-b.paused { background: #f39c12; color: #fff; }
+        html[data-theme="dark"] .trk-stats { background: rgba(37,45,58,.95); color: #e2e8f0; }
+        #trkModal { position: fixed; inset: 0; z-index: 3750; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 12px; }
+        #trkModal .srm-box { width: min(560px, 100%); max-height: 86vh; display: flex; flex-direction: column; overflow: hidden; }
+        #trkModal .lg-meta { font-size: 12px; opacity: .75; }
+        #trkModal .lg-list { flex: 1; overflow-y: auto; border-top: 1px solid rgba(128,128,128,.3); margin-bottom: 10px; }
+        #trkModal .lg-row { padding: 8px 2px; border-bottom: 1px solid rgba(128,128,128,.25); font-size: 13px; }
+        #trkModal small { opacity: .65; }
+        .trk-row-acts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .trk-row-acts button { border: 0; border-radius: 8px; padding: 8px 11px; font-size: 13px; font-weight: 600; background: #4285F4; color: #fff; cursor: pointer; }
+        .trk-row-acts button.del { background: #c0392b; }
+        #trkModal .lg-btns { display: flex; gap: 8px; }
+        #trkModal .lg-btns button { flex: 1; border: 0; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 600; background: #718096; color: #fff; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -994,42 +1047,76 @@
 <script>
 (function () {
   var sp = document.getElementById('splash'); if (!sp) return;
-  var VX=40, VY=360, W=700, H=720;
+  var VX=40, VY=360, W=700, H=720, KX=115*Math.cos(40.5*Math.PI/180);
   var R=["b|40 362 37 342","b|40 362 39 379 53 396 62 403","w|41 364 53 367 58 375 69 374 94 385","w|37 342 39 337 47 328","b|51 340 46 328","b|51 340 59 343 63 346 70 359 71 370 87 383 93 401 104 413 106 422","t|47 328 55 309 55 296 51 291","w|83 359 85 365 91 365 97 370 101 379","w|83 359 87 350 79 330 71 325","w|71 325 65 313 59 310","w|62 403 74 406 80 410 88 420 92 429 95 427 96 422 101 423 107 421","w|94 385 105 384 113 385 130 401 138 403 142 397 140 387 147 381 147 374 144 364 150 347","b|53 292 65 295 73 292 82 292 85 288","b|51 291 47 281 44 278 42 268","w|87 289 83 284 84 279 79 275","b|87 289 91 288 98 281 110 279 114 281","b|107 421 120 426 139 426 140 432","t|42 268 44 261 54 255 58 244","b|73 273 74 267 68 262 63 252 58 248","w|76 459 74 463 76 476 85 481 90 481 93 485","b|114 281 130 293 137 292","w|113 280 118 272 126 272 127 271 126 260 128 252 121 244 121 240 126 237 125 229 122 223 118 223 114 226 113 223 115 212 114 202 120 194 122 177","b|146 337 146 327 148 318 146 314 139 312 138 298","b|146 337 151 347 161 334 165 335 174 344 177 343 182 340","b|137 298 137 282 140 279 148 280","b|58 244 54 226 53 202 44 184 39 167 35 158 36 147","b|142 419 149 409 154 395 158 390 167 388 186 393 192 390 204 379 209 378","b|140 432 158 453","b|107 467 106 471 109 480","b|107 467 118 470 129 454 135 452 137 446 145 450 155 449","w|93 244 96 246 101 245 106 241 120 241","w|92 243 86 229 83 229","t|107 474 116 478 119 478 124 472 130 473 136 468 145 468 154 461 160 463 164 462","b|148 281 153 285 159 278 163 278 167 281 177 293 194 292 201 296","b|148 281 154 262 156 247 163 244 167 238 165 229 157 221 156 217 157 213 162 207","b|55 225 62 221 64 211 68 209","b|107 479 118 486 128 498 130 508 143 521 147 530","w|83 229 76 226 76 224 72 224 67 220 63 220","b|155 449 161 448 166 452","t|189 353 206 370 210 380","b|188 326 199 323 210 324","w|69 210 93 195","t|168 449 166 459 164 462","t|168 449 174 445 193 441","w|164 462 160 475 156 482 161 486 158 499 163 508","w|30 196 18 191","t|209 378 218 387 224 388","b|18 191 14 188 9 177","b|200 296 208 275 216 267 220 258 225 257","t|204 414 205 421 193 441","t|204 414 218 392 224 389","b|209 323 221 325 228 337 232 340 238 338 247 327 251 328 253 326 265 327 269 329 275 325 287 323 289 325 293 324 309 329 323 330","b|93 195 112 178 118 176 127 178 129 177 133 168","b|201 296 208 309","w|210 322 210 317 208 309","w|64 187 58 184 50 185 45 182 42 177","w|64 187 73 180 78 181","b|196 440 202 439 211 442 216 447 222 447 228 449 242 469","w|78 181 84 180 90 175 94 174 97 176 103 173 112 176 121 177","w|9 177 6 167 3 165","b|150 509 149 524 147 531","b|150 509 159 512 163 508","t|224 389 229 383 245 375 264 375 270 373 280 355 301 344 303 344 309 352 313 352","t|162 509 174 513","b|233 356 235 342","t|233 356 242 377","t|162 207 166 200 170 183","b|-0 164 3 158 15 149 21 133","b|148 530 150 536 156 541","b|242 377 256 388 257 394 254 400 255 405 270 413 271 418 276 421 277 428 288 443 288 448 295 453 299 461","b|174 513 184 525","b|225 257 233 257 243 248 258 249","b|28 149 25 141 19 136","b|132 169 137 165 148 159","w|225 257 226 251 230 250 230 247 235 241 232 232","b|154 540 156 545 154 548 146 549 145 553 139 555 136 559 135 573","b|154 540 170 541 178 548 183 542 185 544","w|156 178 149 161","w|156 178 161 178 169 184","w|184 525 187 533 185 546","t|170 183 186 189 194 187 204 180","b|171 182 178 176 182 168 187 166 193 159","b|19 136 6 124 -6 107","b|19 134 25 128 28 120 28 102 30 93 38 92 41 90 46 79 46 73","b|149 160 140 146 137 144 126 143 114 131 109 120 110 114 114 109","w|148 159 155 147","b|242 469 251 486 267 489 274 496 279 496 282 500 287 499","b|243 469 248 465 257 467 289 459 296 459 299 461","b|232 232 242 214","w|185 546 191 565","t|203 180 215 184 225 192","t|246 229 242 214 235 208 232 198 225 192","t|246 229 261 236 277 253 281 254 290 251 295 254 300 265 302 280 310 285 312 290","t|200 175 199 166 193 159 186 139 186 121","t|226 193 232 179 235 163","b|242 213 245 210 262 206 268 207 273 211 273 218 276 222 281 225 300 229 308 237 313 247","w|163 139 171 136 177 140 183 134 185 127 187 125","b|225 534 230 534 238 541 243 543 255 536 262 538 273 536 287 542 299 542","t|192 565 191 578 204 591","w|225 536 225 544 209 556 209 569 207 575","w|192 566 200 569 207 575","b|132 118 122 111","b|132 118 143 117 156 120 166 117 173 118 184 111","b|114 109 109 97 94 90","t|306 385 307 410 315 420 312 427","t|306 385 311 371 309 358 311 353","b|72 91 78 88 84 91 88 88 94 90","b|72 91 74 82 72 75 70 72 53 69 48 70 45 72","w|207 575 204 591","t|313 352 316 349 324 345","b|234 167 244 165 255 169 281 166 292 160 301 161 311 157","b|302 438 305 432 312 426","t|302 440 304 466","b|273 211 276 206 282 200 291 195 304 193 309 182 318 183 331 187 353 180","b|235 163 235 139","w|299 260 306 256 310 249 312 247","w|314 303 317 309 318 321 323 331 323 346","b|186 121 184 117 184 110 176 96 171 92 165 90","w|102 86 117 76","w|129 626 141 630 144 628","b|2 82 3 81 4 75 10 71 8 55 11 51 24 55 28 59 34 69 45 72 47 75","b|284 502 285 518 297 534 299 542","b|301 469 292 493","b|204 592 207 599 210 603 222 601 231 603 236 600","t|324 345 334 337 337 336","t|304 465 307 470 318 477 322 483 328 486","b|292 493 306 493 317 503 323 505","w|184 112 184 100 185 92","w|185 110 196 101 202 102 211 98 214 93 222 92 225 82 254 71","b|60 69 60 65 65 57 64 49 63 46 59 44 57 37 52 32 51 24 54 17 66 19 69 17 60 1 60 -5","w|147 88 159 91 165 90","b|117 76 127 73 134 73 139 77 140 82","b|235 139 238 131 253 117 263 112 264 109","t|334 337 336 333 355 329 361 330 368 335 377 331 383 331 402 335 409 327 414 323 421 322 427 325 433 324 454 312 463 311 472 302","b|312 247 319 247 336 252 343 252","t|335 335 344 344 346 350 345 358 351 373 369 384 374 391","b|122 75 122 69 126 64 126 56 129 53","b|172 92 160 77 156 56 139 32","t|344 329 353 310 363 300","b|185 92 189 79 196 76 198 73 197 53 201 50 207 41 222 42","w|347 354 354 355 365 360 380 360","b|346 326 350 329 356 338 366 342 375 339 384 339 393 344 396 343 402 339 408 327 416 323 421 315 429 311 446 285","b|236 600 241 611","b|236 600 244 597 254 596 263 598 273 603 280 602 289 603 291 596 295 589 292 572 299 561 301 551","t|324 495 324 507 336 523 338 531 336 536 329 543 322 543 309 539 298 541","t|324 495 330 490 328 486","b|144 657 147 658 151 666 163 672 169 678","w|324 501 330 496 338 494 341 487","w|128 53 132 45 134 45 136 41","b|240 610 247 609 256 610 271 623 284 627 293 631 305 634 336 657","w|343 252 361 251 369 237","b|212 632 197 649 195 653 195 660 198 668 204 676 222 691 224 699 230 708 233 726","b|212 632 226 630","t|241 611 234 625","t|301 551 319 555 328 559 346 560 352 573 362 573 365 575 364 579 360 585 359 589 365 595 368 601 378 603 391 600 395 602","b|338 487 363 498","b|299 561 310 570 314 571 317 574 322 575 335 589 340 591 346 600 375 605","b|363 300 386 286","b|136 41 143 21 138 16 138 6 134 -2 135 -6","b|374 391 376 396 383 405 380 414","b|264 109 264 98 271 88 270 85 262 81","b|237 633 232 647 231 656 228 660 229 663 236 666 251 662 274 668 277 670 278 677","b|311 157 320 151 325 150 342 129 344 119 349 118","w|205 661 215 661 220 657 228 659","b|296 590 306 591 310 589 332 595 342 594","w|380 414 382 416 393 419 398 422","t|377 276 378 264","t|377 276 385 286","w|320 153 338 155 348 153 357 155","w|360 220 358 212 358 192 356 187","w|360 220 368 232","b|378 264 377 254 368 232","b|385 286 392 291 398 290 426 299 429 298 439 285 446 284 451 286 456 295 469 306","w|378 252 380 248 388 241","w|356 198 359 198 364 192 381 199 386 199","b|204 676 214 682 242 687 245 681 249 678 262 682 267 686 275 686 276 677 279 677 295 692","b|262 81 260 78 259 65 247 54","b|350 541 360 535 364 529 371 530 374 528 377 530","w|224 51 234 54 247 53","w|353 180 351 162","b|222 42 227 41 241 30","w|388 241 393 235 398 238 404 232","b|351 162 357 153 356 144 357 138","t|247 53 242 41 241 17 235 9 222 -4","w|335 594 340 594 344 598 372 607","w|377 530 383 552 389 557 403 584","w|357 155 365 154 372 148 381 145 393 146","w|386 198 389 203 399 205 404 209 408 221 410 223 411 234","w|386 199 395 197 401 184 412 176 415 179 420 179 420 176 424 176 429 180 441 180 442 173 447 164","w|169 -1 173 -0 181 3 200 3","b|163 -3 178 2 187 3 201 1 207 -5","t|357 138 358 116","t|243 30 250 32 257 31","w|427 325 432 328 444 328 458 319 458 315 467 304","w|411 234 422 235 429 229 434 229 439 226 446 227 448 226","w|349 118 356 117 368 108","b|258 31 263 25 277 16 277 10 282 3 284 -12","b|258 31 266 29 273 30 282 42 289 45 302 42 306 43 320 68 334 72 359 95","b|290 672 302 663 306 665","w|306 665 314 664 322 668","w|310 51 310 46 306 42 307 40 296 25 294 16 285 9 283 3","w|376 596 381 592 389 590","w|394 150 400 154 405 152 408 149 424 150","w|393 146 392 135 393 129 390 124 383 122 380 115","b|368 109 379 114 383 114","b|368 108 368 101 376 92 384 97 386 104","b|375 605 375 616 378 624 384 627 384 633 392 639","t|303 682 298 688 293 699 287 706 283 714 270 718 265 726","t|303 682 318 670 332 662 336 657","w|367 102 382 115","b|389 590 398 591 414 598 444 601 449 615 455 622 456 632 469 640","b|375 110 386 102 382 105","w|323 670 324 672 321 682 322 687","t|336 658 344 652 354 653 364 647 379 646 384 640 390 640","b|336 658 346 665 356 667 352 675 357 682 358 685 354 690 334 694 331 693","w|370 100 361 85 356 69 357 65 356 60 359 48 358 44 361 43 360 36 366 25","w|294 696 295 741","b|382 108 398 109","t|386 111 410 124 425 141","w|376 97 377 88 382 86 380 77 375 72 377 62 382 58 386 59 391 63 405 59","w|448 226 451 226 457 222 463 222 466 219 470 219 471 216","b|304 699 314 700 319 697","t|395 602 411 613 420 616 422 618 421 629 414 636 404 652","t|386 104 387 102 399 102 411 96 414 92 417 84 420 81","t|471 303 477 302 490 295 503 292 519 286 546 286","w|425 157 423 151 424 140","w|425 157 431 162 443 162 455 165 466 163 488 165 497 165 501 167","b|398 109 415 102 430 107 458 99 473 104 485 104 517 116 521 116 530 111 538 112","t|425 141 434 147 445 148 454 151","t|393 637 397 634 414 637 423 643 429 643","b|392 640 398 639 401 644 405 643 408 646","w|471 216 481 221 486 222 493 231","w|359 695 359 698 363 701 361 707","b|346 13 341 6 335 2","b|346 13 353 14 357 19 363 21 406 54 407 56 405 68 415 76 414 80 417 84","t|454 151 470 160 484 162 509 159 539 161 548 160 564 150 576 146 579 142 576 131 566 117","w|462 154 457 138 453 135 450 131 451 118 445 105","t|420 81 442 71 446 63","w|366 20 366 10 368 4 369 -4","b|419 641 413 656","w|396 46 397 41 404 36 408 28 415 18 415 6 422 -5","b|423 643 429 663 438 670 436 681 430 680 423 667 415 663 413 656","w|499 233 500 236 507 242 513 238","w|494 219 496 209 494 203 494 199 508 191 510 187 509 181 502 172 500 166","w|494 219 500 223 502 235 509 234 515 248 520 251 536 252 558 241","w|496 222 498 220 502 227 503 233","w|510 284 527 296 537 300 544 290 548 290","w|409 55 421 57 426 54 429 54 431 51 439 50 447 54","w|513 238 530 236 534 233 538 233 552 229 555 226","w|493 173 506 120 504 112","w|499 166 505 177 508 180 510 186","b|503 172 508 160","b|501 167 531 170 542 176 563 183 578 193 592 191 600 194","b|446 63 447 49 451 37 481 19 501 21 526 19 546 23 576 20","b|447 63 469 65 508 62 528 65 569 59 574 60 576 63","t|546 286 558 288 563 295","w|547 286 549 273 552 263","w|490 104 490 92 494 85 498 83 496 74","w|552 263 557 241","t|563 295 567 300 578 304 585 313 591 316 608 308 618 310 632 307","w|558 255 560 250 556 238","b|557 241 552 220 552 210 554 207 566 202 574 191","w|499 65 499 60 496 55 496 47 487 29 488 21","w|480 21 481 14 493 -2","w|538 112 545 111 556 114","b|570 190 581 154 578 143","b|549 102 551 83 567 66","b|549 102 556 115","w|531 67 533 68 542 80 547 81 548 84","b|566 117 573 113 588 113 599 107 611 110 621 110","w|493 -2 497 -1 503 -8","w|602 510 605 503 612 499 619 498 630 502 646 514","w|578 135 615 123 637 110","t|600 194 604 199 622 205 629 211","w|600 194 610 186 623 183 641 172 651 172 659 166 665 166 676 169 692 161 705 158","w|623 438 623 457 619 464 619 470 620 472 629 472 631 470 637 472 637 466 644 460","w|623 438 629 437 637 438","w|629 306 633 287","b|632 307 639 308 646 314 656 314","b|634 420 636 432 643 453 650 462 661 465 689 461 695 463 694 470 680 486 673 490 670 497 671 499 678 504 680 510 690 518 703 521 700 531 701 544 693 551 693 555","b|634 420 636 414 643 405 645 398","b|633 287 634 270 649 262 655 251 655 241 650 229 654 223","w|579 91 575 70 577 62","w|579 91 593 115 598 120 607 125 613 134 615 148 622 157 617 174 627 188 629 194 628 201 624 207","w|637 438 640 440 645 441 662 436 665 433 666 429 685 416 686 412","b|567 66 587 60 602 50 611 50 625 52 637 57 643 56 652 50 658 38 665 38 670 32 680 31","w|646 384 662 370","w|646 398 671 376","w|635 215 649 218","w|651 396 654 398 655 404 657 407 664 409 667 409 671 411 680 410 686 412","b|577 60 574 52 577 42 579 18","b|656 314 672 316 685 311 697 314 720 306","w|602 615 607 618 609 618 618 608","w|575 50 581 55 586 61","w|618 584 620 592 619 596","b|662 370 670 358 682 348 684 343 682 339 667 324 664 314","w|553 6 560 9 565 15 570 22","w|619 596 620 603 618 608","b|664 315 664 294 667 285 668 266 671 262 678 257 682 232","w|551 -2 561 -0 566 4 568 10 579 11 580 18","w|654 224 655 221 664 217 670 203 668 195 663 191","t|655 223 681 231 703 242","b|671 376 676 373 694 374 705 378","b|621 110 635 111 648 108 655 110 686 109 689 111","b|658 223 667 233 681 240","b|576 20 590 15 592 4 601 -10","w|587 20 592 20 597 22 609 33 624 30 630 32","t|634 611 639 615 645 616 669 613 689 603 704 602","b|662 189 658 171","w|658 171 663 157 657 141 660 135","w|686 412 701 414","b|681 240 703 251","w|651 131 660 122 665 111","w|651 131 664 138 666 141 675 144 696 141 706 143","b|682 232 686 225 700 222 711 216","b|660 135 661 129 659 122 667 110 663 96","b|694 463 699 463 703 466 711 466","w|648 83 648 78 645 72 644 64 645 60 644 58","w|648 83 658 96 663 98 667 107 665 111","w|663 96 662 80 665 64 668 61 676 57 687 47 694 35","b|693 555 703 570 699 583","w|688 103 685 94 689 89 689 75 691 72 700 69 702 65 699 56 699 50 689 39","t|694 116 702 118 720 115","w|657 30 654 18 656 9","w|669 669 672 668 682 668 692 675 694 673 695 675 691 680","w|669 669 675 677 691 680","w|655 7 654 -6","b|680 31 694 35","b|689 34 689 7 696 -1 701 -4","t|694 35 706 33"];
-  var C=[["Shkodër",41,177,1],["Tirana",68,262,1],["Durrës",36,263,0],["Elbasan",91,286,1],["Fier",47,331,0],["Berat",81,333,1],["Korçë",151,344,1],["Gjirokastër",97,406,1],["Himarë",62,403,0],["Sarandë",84,429,1],["Podgorica",19,134,1],["Pristina",186,108,1],["Skopje",209,185,1],["Ioannina",158,453,1],["Thessaloniki",341,341,1]];
+  var DEF=[["Shkodër",41,177],["Tirana",68,262],["Durrës",36,263],["Elbasan",91,286],["Fier",47,331],["Berat",81,333],["Korçë",151,344],["Gjirokastër",97,406],["Himarë",62,403],["Sarandë",84,429],["Podgorica",19,134],["Pristina",186,108],["Skopje",209,185],["Ioannina",158,453],["Thessaloniki",341,341]];                                   // default cities (very first visit only)
   var NS='http://www.w3.org/2000/svg', rd=document.getElementById('spRd'), nd=document.getElementById('spNd');
   function mk(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+  var SLOW=1.9;                                  // growth time of the roads, s (bigger = slower)
   R.forEach(function(s){
     var q=s.split('|'), n=q[1].split(' '), d='M'+n[0]+' '+n[1];
     for(var i=2;i<n.length;i+=2) d+=' L'+n[i]+' '+n[i+1];
     var p=mk('path',{'class':'r '+q[0],pathLength:1,d:d},rd);
     var L=p.getTotalLength(), d0=Math.hypot(n[0]-VX,n[1]-VY);
-    p.style.setProperty('--d',(0.05+0.75*Math.min(1,d0/700)).toFixed(2)+'s');
-    p.style.setProperty('--u',(0.3+0.3*Math.min(1,L/260)).toFixed(2)+'s');
+    p.style.setProperty('--d',(0.1+SLOW*Math.min(1,d0/700)).toFixed(2)+'s');
+    p.style.setProperty('--u',(0.5+0.9*Math.min(1,L/260)).toFixed(2)+'s');
   });
-  C.forEach(function(c){
-    var d=(0.4+0.75*Math.min(1,Math.hypot(c[1]-VX,c[2]-VY)/700)).toFixed(2)+'s';
-    var o=mk('circle',{'class':'nd',cx:c[1],cy:c[2],r:3},nd); o.style.setProperty('--d',d);
-    var t=mk('text',{'class':'lb',x:c[1]+(c[3]?6:-6),y:c[2]+2.5,'text-anchor':c[3]?'start':'end'},nd);
-    t.textContent=c[0]; t.style.setProperty('--d',d);
+  // Cities come from the cards: built ONCE by the app (localStorage "splash_cities_v1") and reused on every visit.
+  var cities=DEF.map(function(c){return [c[0],c[1],c[2]]});
+  try{
+    var cc=JSON.parse(localStorage.getItem('splash_cities_v1')||'null');
+    if(cc&&cc.cities&&cc.cities.length) cities=cc.cities.map(function(c){return [String(c[0]),Math.round((c[2]-19.498)*KX+40),Math.round(360-(c[1]-40.477)*115)]});
+  }catch(e){}
+  var kk=Math.max(innerWidth/W,innerHeight/H), fs=Math.max(6,10/kk);
+  cities=cities.filter(function(c){
+    return c[1]>6&&c[1]<W-6&&c[2]>6&&c[2]<H-6&&Math.hypot(c[1]-VX,c[2]-VY)>14&&!/^vlor/i.test(c[0]);
+  }).sort(function(a,b){return Math.hypot(a[1]-VX,a[2]-VY)-Math.hypot(b[1]-VX,b[2]-VY)});
+  var placed=[{x1:VX-6,y1:VY-12,x2:VX+fs*4.4+14,y2:VY+4}];
+  function hit(r){return placed.some(function(o){return r.x1<o.x2&&r.x2>o.x1&&r.y1<o.y2&&r.y2>o.y1})}
+  var dots=[];
+  cities.forEach(function(c){                              // pass 1: dots first, so a label never hides a neighbouring city
+    var x=c[1],y=c[2],dot={x1:x-5,y1:y-5,x2:x+5,y2:y+5};
+    if(hit(dot)) return;                                   // too close to a city that is already drawn
+    placed.push(dot); dots.push([c[0],x,y,null]);
+  });
+  dots.forEach(function(c){                                // pass 2: labels (right, else left, else none)
+    var x=c[1],y=c[2],w=c[0].length*fs*0.6,opts=[{s:1,x1:x+7,x2:x+7+w},{s:0,x1:x-7-w,x2:x-7}];
+    for(var i=0;i<opts.length;i++){var r={x1:opts[i].x1,x2:opts[i].x2,y1:y-fs*0.85,y2:y+fs*0.3};
+      if(r.x1>2&&r.x2<W-2&&!hit(r)){c[3]=opts[i].s;placed.push(r);break}}
+  });
+  dots.forEach(function(c){
+    // the dot appears when the roads reach the city: same dot + pulse as on Vlorë
+    var d=(0.1+SLOW*Math.min(1,Math.hypot(c[1]-VX,c[2]-VY)/700)+0.55).toFixed(2)+'s';
+    var r=mk('circle',{'class':'cr',cx:c[1],cy:c[2],r:5},nd); r.style.setProperty('--d',d);
+    var o=mk('circle',{'class':'cd',cx:c[1],cy:c[2],r:4.5},nd); o.style.setProperty('--d',d);
+    if(c[3]!==null){
+      var t=mk('text',{'class':'lb',x:c[1]+(c[3]?7:-7),y:c[2]+2.5,'text-anchor':c[3]?'start':'end'},nd);
+      t.textContent=c[0]; t.style.setProperty('--d',d);
+    }
   });
   var rm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var T_MIN = rm ? 0 : 1900;   // мс: мінімум, поки заставка не може зникнути
+  var T_MIN = rm ? 0 : 3900;   // ms: the roads need ~3.4 s to reach everything
   var art = document.getElementById('spArt'), ready=false, minDone=false, done=false;
-  function fit(){ var k=Math.max(innerWidth/W, innerHeight/H); art.style.setProperty('--sp-fs',Math.max(6,10/k).toFixed(1)+'px'); }
-  fit(); addEventListener('resize', fit);
+  art.style.setProperty('--sp-fs',fs.toFixed(1)+'px');
+  addEventListener('resize', function(){ var k=Math.max(innerWidth/W,innerHeight/H); art.style.setProperty('--sp-fs',Math.max(6,10/k).toFixed(1)+'px'); });
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ sp.classList.add('draw'); }); });
   setTimeout(function(){ minDone=true; tryHide(); }, T_MIN);
+  function cardColor(){                                   // colour of the cards the splash dissolves into
+    var col=''; try{ var row=document.querySelector('.place-row'); if(row) col=getComputedStyle(row).backgroundColor; }catch(e){}
+    if(!col||/rgba\(0, 0, 0, 0\)|transparent/.test(col)) col = document.documentElement.getAttribute('data-theme')==='dark' ? '#1e2530' : '#ffffff';
+    return col;
+  }
   function tryHide(){
     if (done || !ready || !minDone) return;
     done = true;
+    sp.style.setProperty('--sp-card', cardColor());
     document.body.classList.add('app-in');
-    sp.classList.add('out');
-    setTimeout(function(){ sp.remove(); }, 800);
-    setTimeout(function(){ document.body.classList.remove('app-in'); }, 1800);
+    sp.classList.add('out');                              // dissolve: blur + fade + grey → card colour
+    setTimeout(function(){ sp.remove(); }, 1700);
+    setTimeout(function(){ document.body.classList.remove('app-in'); }, 2300);
   }
   window.splashHide = function(){ ready=true; tryHide(); };
-  setTimeout(window.splashHide, 12000);   // страховка
+  setTimeout(window.splashHide, 12000);   // safety
 })();
 </script>
 <script>
@@ -1188,6 +1275,406 @@
     document.body.appendChild(m);
     renderLogs(m.firstChild);
   };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  // ===== GPS track recorder =====
+  // Uses the app's existing GPS stream: startGps() → watchPosition → trkFeed(pos) / trkGpsError(err). No second watchPosition.
+  const MAX_ACC = 50;          // m: fixes worse than this are not recorded
+  const MAX_MS = 70;           // m/s (252 km/h): faster implied movement = GPS jump
+  const GAP_MS = 15000;        // no valid fix for this long → the line is broken (no invented path across the gap)
+  const STALE_MS = 8000;       // cached/old fix = not current
+  const LOST_MS = 10000;       // no fix for this long while recording → "GPS lost"
+  const DB_NAME = 'gps_tracks_v1';
+  const COLOR = '#e91e63';     // actual track (planned OSRM route is blue/orange)
+
+  const $ = id => document.getElementById(id);
+  const getMap = () => { try { return (typeof map !== 'undefined' && map) ? map : null; } catch (e) { return null; } };
+  const pad = n => String(n).padStart(2, '0');
+  const say = m => { try { if (typeof toast === 'function') toast(m); } catch (e) { } };
+  const xe = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
+  const he = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function hav(a, b) {
+    const R = 6371000, t = Math.PI / 180, dLat = (b[0] - a[0]) * t, dLng = (b[1] - a[1]) * t;
+    const x = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * t) * Math.cos(b[0] * t) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(x));
+  }
+  const fmtDur = ms => { const s = Math.max(0, Math.round(ms / 1000)); return pad(Math.floor(s / 3600)) + ':' + pad(Math.floor(s / 60) % 60) + ':' + pad(s % 60); };
+  const fmtDate = ms => { const d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  const defName = ms => { const d = new Date(ms); return 'Trip ' + fmtDate(ms) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+
+  // ---------- IndexedDB (separate database: places / JSON are not touched) ----------
+  let dbp = null;
+  function db() {
+    if (dbp) return dbp;
+    dbp = new Promise((res, rej) => {
+      if (!window.indexedDB) return rej(new Error('IndexedDB unavailable'));
+      const r = indexedDB.open(DB_NAME, 1);
+      r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('trips', { keyPath: 'id' }); d.createObjectStore('active', { keyPath: 'k' }); };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error || new Error('IndexedDB open failed'));
+      r.onblocked = () => rej(new Error('database blocked'));
+    });
+    dbp.catch(() => { dbp = null; });
+    return dbp;
+  }
+  const tx = (store, mode, fn) => db().then(d => new Promise((res, rej) => {
+    const t = d.transaction(store, mode); const req = fn(t.objectStore(store));
+    t.oncomplete = () => res(req ? req.result : undefined);
+    t.onerror = () => rej(t.error); t.onabort = () => rej(t.error || new Error('transaction aborted'));
+  }));
+  const dbPut = (s, o) => tx(s, 'readwrite', st => st.put(o));
+  const dbGet = (s, k) => tx(s, 'readonly', st => st.get(k));
+  const dbAll = s => tx(s, 'readonly', st => st.getAll());
+  const dbDel = (s, k) => tx(s, 'readwrite', st => st.delete(k));
+  const dbFail = (what, e) => console.warn('GPS track: ' + what + ' failed:', (e && e.message) || e);
+
+  // ---------- state ----------
+  const S = { state: 'idle', t: null, resumeAt: 0, needSeg: true, anchor: null, lastValidT: 0, lastFixAt: 0, lastKmh: null, bad: 0, weak: 0, err: '',
+              line: null, marks: null, hidden: false, fold: false, timer: 0, saveT: 0 };
+
+  const stats = () => {
+    const t = S.t; if (!t) return null;
+    const dur = t.activeMs + (S.state === 'rec' ? Date.now() - S.resumeAt : 0);
+    return { km: t.dist / 1000, dur, avg: t.moveMs > 0 ? (t.dist / (t.moveMs / 1000)) * 3.6 : 0, max: t.maxMs * 3.6 };
+  };
+
+  // ---------- drawing (only the line coordinates are updated, never the whole map) ----------
+  function ensureLine() {
+    const m = getMap(); if (!m) return null;
+    if (!S.line) S.line = L.polyline([], { color: COLOR, weight: 5, opacity: 0.9, lineJoin: 'round', lineCap: 'round', smoothFactor: 0.5, interactive: false });
+    if (!S.hidden && !m.hasLayer(S.line)) S.line.addTo(m);
+    return S.line;
+  }
+  function lineAdd(ll, newSeg) {
+    const l = ensureLine(); if (!l) return;
+    const rings = l.getLatLngs();
+    if (!rings.length || !Array.isArray(rings[0])) { l.setLatLngs([[L.latLng(ll)]]); return; }
+    if (newSeg) { rings.push([L.latLng(ll)]); l.setLatLngs(rings); }
+    else l.addLatLng(ll, rings[rings.length - 1]);
+  }
+  function clearMarks() { const m = getMap(); if (S.marks && m) m.removeLayer(S.marks); S.marks = null; }
+  function drawAll(fit) {                                   // rebuild from data (view / restore / map created later)
+    const m = getMap(); if (!m) return;
+    const l = ensureLine(); if (!l) return;
+    clearMarks();
+    const t = S.t;
+    l.setLatLngs(t ? t.segs.filter(s => s.length).map(s => s.map(p => [p[0], p[1]])) : []);
+    if (t && t.done && t.segs.some(s => s.length)) {
+      const first = t.segs.find(s => s.length)[0], lastSeg = [...t.segs].reverse().find(s => s.length), last = lastSeg[lastSeg.length - 1];
+      S.marks = L.layerGroup([
+        L.circleMarker([first[0], first[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#2ecc71', fillOpacity: 1, interactive: false }),
+        L.circleMarker([last[0], last[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#e74c3c', fillOpacity: 1, interactive: false })
+      ]);
+      if (!S.hidden) S.marks.addTo(m);
+    }
+    if (fit && t && l.getLatLngs().length) { try { m.invalidateSize(); m.fitBounds(l.getBounds(), { padding: [40, 40], maxZoom: 17 }); } catch (e) { } }
+  }
+  function setHidden(h) {
+    S.hidden = h; const m = getMap(); if (!m) return;
+    if (S.line) { if (h) m.removeLayer(S.line); else S.line.addTo(m); }
+    if (S.marks) { if (h) m.removeLayer(S.marks); else S.marks.addTo(m); }
+    render();
+  }
+
+  // ---------- GPS feed (called from the existing watchPosition callback) ----------
+  function feed(pos) {
+    try {
+      const c = pos && pos.coords, now = Date.now();
+      if (!c || !isFinite(c.latitude) || !isFinite(c.longitude)) return;
+      if (Math.abs(c.latitude) > 90 || Math.abs(c.longitude) > 180 || (c.latitude === 0 && c.longitude === 0)) return;
+      let ts = (typeof pos.timestamp === 'number' && pos.timestamp > 1e12) ? pos.timestamp : now;
+      if (ts > now + 5000) ts = now;
+      if (now - ts > STALE_MS) return;                       // cached fix — never shown as current
+      S.lastFixAt = now; S.err = '';
+      if (S.errSince && now - S.errSince > 5000) S.needSeg = true;      // signal was really gone (>5 s): break the line
+      S.errSince = 0;
+      if (S.state !== 'rec') { renderStats(); return; }      // paused / idle: nothing is added
+      const acc = c.accuracy;
+      if (!(typeof acc === 'number' && isFinite(acc)) || acc > MAX_ACC) { S.weak = isFinite(acc) ? Math.round(acc) : 999; S.lastKmh = null; renderStats(); return; }
+      S.weak = 0;
+      const t = S.t, ll = [c.latitude, c.longitude], a = S.anchor;
+      const sp = (typeof c.speed === 'number' && isFinite(c.speed) && c.speed >= 0 && c.speed <= MAX_MS) ? c.speed : null;
+      let newSeg = S.needSeg || !a || !t.segs.length, d = 0, dtFix = 0, moved = true, vEst = sp;
+      if (!newSeg) {
+        dtFix = (ts - S.lastValidT) / 1000;
+        if (ts - S.lastValidT > GAP_MS) newSeg = true;       // signal was lost: break the line
+        else if (dtFix <= 0) return;                         // out-of-order / duplicate timestamp
+        else {
+          d = hav(a.ll, ll);
+          const dt = (ts - a.t) / 1000;
+          if (dt > 0 && d / dt > MAX_MS) { if (++S.bad < 3) return; newSeg = true; d = 0; }   // unrealistic jump (3 in a row = real relocation → new segment)
+          else {
+            const floor = Math.max(2, Math.min(acc, a.acc) * 0.5);      // GPS jitter while standing still
+            moved = d >= floor || (sp !== null && sp >= 1.0);
+            if (vEst === null && dt >= 1) vEst = moved ? d / dt : 0;
+          }
+        }
+      }
+      if (!newSeg && !moved) { S.lastValidT = ts; S.lastKmh = sp !== null ? sp * 3.6 : 0; renderStats(); return; }   // duplicate / jitter: not added
+      S.bad = 0;
+      if (newSeg) { t.segs.push([]); S.needSeg = false; d = 0; }
+      const seg = t.segs[t.segs.length - 1];
+      seg.push([+ll[0].toFixed(6), +ll[1].toFixed(6), ts, Math.round(acc), sp !== null ? +sp.toFixed(1) : null]);
+      if (!newSeg) {
+        t.dist += d;
+        if (dtFix > 0 && dtFix <= GAP_MS / 1000 && ((vEst !== null && vEst >= 0.5) || d > 0)) t.moveMs += dtFix * 1000;
+        if (vEst !== null && vEst <= MAX_MS && acc <= 30 && vEst > t.maxMs) t.maxMs = vEst;
+      }
+      S.anchor = { ll, t: ts, acc }; S.lastValidT = ts;
+      S.lastKmh = vEst !== null ? vEst * 3.6 : null;
+      lineAdd(ll, newSeg);
+      persistSoon(false); renderStats();
+    } catch (e) { console.warn('GPS track feed:', e); }
+  }
+  function gpsError(err) {
+    S.err = (err && err.code === 1) ? 'denied' : 'lost';
+    S.lastKmh = null;                                        // a short error does not break the line; a gap of >5 s does (see feed)
+    if (!S.errSince) S.errSince = Date.now();
+    renderStats();
+  }
+
+  // ---------- persistence ----------
+  function persistActive() {
+    if (S.state === 'idle' || !S.t) return Promise.resolve();
+    return dbPut('active', { k: 'cur', state: S.state, resumeAt: S.resumeAt, savedAt: Date.now(), t: S.t }).catch(e => dbFail('autosave', e));
+  }
+  function persistSoon(now) {
+    clearTimeout(S.saveT);
+    if (now) persistActive(); else S.saveT = setTimeout(persistActive, 5000);
+  }
+  async function restore() {
+    try {
+      const a = await dbGet('active', 'cur');
+      if (!a || !a.t || S.state !== 'idle' || S.t) return;
+      const t = a.t; if (a.state === 'rec') t.activeMs += Math.max(0, a.savedAt - a.resumeAt);
+      S.t = t; S.state = 'pause'; S.needSeg = true; S.anchor = null;
+      drawAll(false); startTimer(); render();
+      say('Recording restored — tap Resume');
+    } catch (e) { dbFail('restore', e); }
+  }
+
+  // ---------- actions ----------
+  function wake(on) {
+    try {
+      if (on) { if (typeof wakeAcquire === 'function') { const p = wakeAcquire(); if (p && p.catch) p.catch(() => { }); } }
+      else if (typeof wakeRelease === 'function' && !(typeof SPD !== 'undefined' && SPD.open)) wakeRelease();
+    } catch (e) { }
+  }
+  function start() {
+    if (S.state !== 'idle') return;
+    if (!navigator.geolocation) { say('No geolocation in this browser'); return; }
+    try { startGps(); } catch (e) { }                        // existing single GPS stream (no-op if already running)
+    const now = Date.now();
+    S.t = { id: 't' + now.toString(36) + Math.random().toString(36).slice(2, 5), name: defName(now), start: now, end: 0, segs: [], dist: 0, moveMs: 0, activeMs: 0, maxMs: 0, done: false };
+    S.state = 'rec'; S.resumeAt = now; S.needSeg = true; S.anchor = null; S.lastValidT = 0; S.bad = 0; S.lastKmh = null; S.weak = 0; S.err = '';
+    drawAll(false); wake(true); persistSoon(true); startTimer(); render();
+    say('● Recording — keep this page open and the screen on');
+  }
+  function pause() {
+    if (S.state !== 'rec') return;
+    S.t.activeMs += Date.now() - S.resumeAt; S.state = 'pause'; S.lastKmh = null;
+    wake(false); persistSoon(true); render();
+  }
+  function resume() {
+    if (S.state !== 'pause') return;
+    S.resumeAt = Date.now(); S.needSeg = true; S.anchor = null; S.bad = 0; S.state = 'rec';
+    try { startGps(); } catch (e) { }
+    wake(true); persistSoon(true); render();
+  }
+  async function finish() {
+    if (S.state === 'idle' || !S.t) return;
+    const t = S.t, now = Date.now();
+    if (S.state === 'rec') t.activeMs += now - S.resumeAt;
+    S.state = 'idle'; stopTimer(); wake(false); clearTimeout(S.saveT);
+    const n = t.segs.reduce((k, s) => k + s.length, 0);
+    if (n < 2) {
+      S.t = null; drawAll(false); render();
+      dbDel('active', 'cur').catch(() => { });
+      say('Track too short — not saved'); return;
+    }
+    t.end = now; t.done = true;
+    drawAll(true); render();
+    try { await dbPut('trips', t); await dbDel('active', 'cur'); say('✔ Track saved (' + (t.dist / 1000).toFixed(2) + ' km)'); }
+    catch (e) { dbFail('save', e); say('Could not save track on this device'); }
+  }
+  async function clearCur() {
+    if (!S.t) return;
+    const rec = S.state !== 'idle';
+    if (!confirm(rec ? 'Delete the current recording?' : 'Delete this track?')) return;
+    const id = S.t.id, wasDone = S.t.done;
+    S.state = 'idle'; stopTimer(); clearTimeout(S.saveT); wake(false); S.t = null;
+    drawAll(false); render();
+    try { await dbDel('active', 'cur'); if (wasDone) await dbDel('trips', id); } catch (e) { dbFail('delete', e); }
+    say('Track deleted');
+  }
+  function saveRoute(t) {
+    t = t || S.t;
+    if (!t || !t.done) { say('Finish the recording first'); return; }
+    const name = prompt('Route name', t.name);
+    if (name === null) return;
+    const nm = name.trim() || t.name;
+    try {
+      const list = pfRoutesLoad();
+      list.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, ts: Date.now(), ids: [], ret: false,
+                     dist: t.dist, dur: Math.round(t.activeMs / 1000), est: false, trk: t.id });
+      if (!pfRoutesSave(list)) return;
+      if (nm !== t.name) { t.name = nm; dbPut('trips', t).catch(e => dbFail('rename', e)); }
+      try { pfRender(); } catch (e) { }
+      say('📁 Saved to Profile: ' + nm);
+    } catch (e) { dbFail('route save', e); say('Could not save route'); }
+  }
+  function toGpx(t) {
+    const iso = ms => new Date(ms).toISOString();
+    let x = '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Albania Trips" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">\n';
+    x += '<metadata><name>' + xe(t.name) + '</name><time>' + iso(t.start) + '</time></metadata>\n<trk>\n<name>' + xe(t.name) + '</name>\n';
+    t.segs.forEach(s => {
+      if (!s.length) return;
+      x += '<trkseg>\n';
+      s.forEach(p => { x += '<trkpt lat="' + Number(p[0]).toFixed(6) + '" lon="' + Number(p[1]).toFixed(6) + '"><time>' + iso(p[2]) + '</time></trkpt>\n'; });
+      x += '</trkseg>\n';
+    });
+    return x + '</trk>\n</gpx>\n';
+  }
+  async function exportGpx(t) {
+    t = t || S.t;
+    if (!t || !t.done) { say('Finish the recording first'); return; }
+    const slug = String(t.name).replace(/[^\p{L}\p{N}_-]+/gu, '_').replace(/^_+|_+$/g, '') || 'track';
+    const fname = fmtDate(t.start) + '_' + slug + '.gpx';
+    const file = new File([toGpx(t)], fname, { type: 'application/gpx+xml' });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: t.name }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    const url = URL.createObjectURL(file), a = document.createElement('a');
+    a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  async function viewTrip(trip) {
+    if (!trip) return;
+    if (S.state !== 'idle') { say('Finish the recording first'); return; }
+    S.t = trip; S.hidden = false;
+    try { if (window.matchMedia && matchMedia('(max-width: 700px)').matches && typeof openMobileMap === 'function') openMobileMap(); } catch (e) { }
+    render();
+    setTimeout(() => { drawAll(true); render(); }, 350);
+  }
+  window.trkViewById = async function (id) {
+    try { const tr = await dbGet('trips', id); if (!tr) { say('Track not found on this device'); return false; } viewTrip(tr); return true; }
+    catch (e) { dbFail('open', e); say('Could not open track'); return false; }
+  };
+
+  // ---------- timer ----------
+  function startTimer() { if (!S.timer) S.timer = setInterval(tick, 1000); }
+  function stopTimer() { if (S.timer) { clearInterval(S.timer); S.timer = 0; } }
+  function tick() { if (document.hidden) return; renderStats(); }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) persistSoon(true); else renderStats(); });
+  window.addEventListener('pagehide', () => persistSoon(true));
+
+  // ---------- UI ----------
+  const BTN = (act, ico, cap, title, cls) => '<button type="button" class="trk-b ' + (cls || '') + '" data-act="' + act + '" title="' + title + '" aria-label="' + title + '"><i>' + ico + '</i><span>' + cap + '</span></button>';
+  function render() {
+    const box = $('trkBtns'); if (!box) return;
+    let h = '';
+    if (S.state === 'idle') {
+      h += BTN('rec', '<u class="trk-dot"></u>', 'Rec', 'Start recording', 'rec');
+      if (S.t && S.t.done) h += BTN('save', '💾', 'Save', 'Save as route in Profile') + BTN('gpx', '⬇', 'GPX', 'Export GPX') + BTN('clear', '🗑', 'Clear', 'Delete this track');
+      h += BTN('trips', '🗂', 'Trips', 'Recorded trips');
+    } else {
+      h += S.state === 'rec' ? BTN('pause', '<u class="trk-pause"></u>', 'Pause', 'Pause recording', 'live') : BTN('resume', '<u class="trk-play"></u>', 'Resume', 'Resume recording', 'paused');
+      h += BTN('finish', '<u class="trk-stop"></u>', 'Finish', 'Finish and save') + BTN('clear', '🗑', 'Clear', 'Delete current recording');
+    }
+    if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
+    const card = $('trkStats'); if (card) { card.hidden = !S.t; card.classList.toggle('fold', S.fold); }
+    const eye = $('trkEye'); if (eye) { eye.textContent = S.hidden ? '🙈' : '👁'; eye.title = S.hidden ? 'Show track' : 'Hide track'; }
+    renderStats();
+  }
+  function renderStats() {
+    const card = $('trkStats'); if (!card || card.hidden) return;
+    const st = stats(); if (!st) return;
+    const now = Date.now(), lost = S.state === 'rec' && (S.err || now - (S.lastFixAt || S.t.start) > LOST_MS);
+    let chip = 'TRACK', cls = 'done';
+    if (S.state === 'rec') { chip = '● REC'; cls = 'rec'; if (S.err === 'denied') { chip = 'GPS denied'; cls = 'lost'; } else if (lost) { chip = '⚠ GPS lost'; cls = 'lost'; } else if (S.weak) { chip = 'weak GPS ±' + S.weak + ' m'; cls = 'weak'; } }
+    else if (S.state === 'pause') { chip = '⏸ PAUSED'; cls = 'pause'; }
+    const c = $('trkChip'); if (c) { c.textContent = chip; c.className = 'trk-chip ' + cls; }
+    const cur = (S.state === 'rec' && !lost && S.lastKmh != null && now - S.lastFixAt < STALE_MS) ? Math.round(S.lastKmh) : null;
+    const set = (id, v) => { const e = $(id); if (e && e.textContent !== v) e.textContent = v; };
+    set('tsKm', st.km.toFixed(2)); set('tsTime', fmtDur(st.dur)); set('tsNow', cur === null ? '—' : String(cur));
+    set('tsAvg', st.avg ? st.avg.toFixed(1) : '—'); set('tsMax', st.max ? Math.round(st.max) + '' : '—');
+    const note = $('trkNote'); if (note) note.textContent = lost ? 'No GPS signal — line is not drawn across the gap.' : (S.state === 'rec' ? 'Keep this page open and the screen on.' : '');
+  }
+  function addTrackUi(el) {
+    if (!el || el.querySelector('.trk-box')) return;                 // one set of handlers only
+    const box = document.createElement('div');
+    box.className = 'trk-box';
+    box.innerHTML = '<div class="trk-btns" id="trkBtns"></div>' +
+      '<div class="trk-stats" id="trkStats" hidden><div class="trk-hd"><span class="trk-chip" id="trkChip"></span>' +
+      '<button type="button" class="trk-mini" id="trkEye" data-act="vis" title="Hide track" aria-label="Hide track">👁</button>' +
+      '<button type="button" class="trk-mini" data-act="fold" title="Collapse" aria-label="Collapse">▾</button></div>' +
+      '<div class="trk-grid"><div><b id="tsKm">0.00</b><small>km</small></div><div><b id="tsTime">00:00:00</b><small>time</small></div>' +
+      '<div><b id="tsNow">—</b><small>km/h now</small></div><div><b id="tsAvg">—</b><small>km/h avg</small></div><div><b id="tsMax">—</b><small>km/h max</small></div></div>' +
+      '<div class="trk-note" id="trkNote"></div></div>';
+    el.appendChild(box);
+    if (window.L && L.DomEvent) { L.DomEvent.disableClickPropagation(box); L.DomEvent.disableScrollPropagation(box); }
+    box.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
+      const a = b.dataset.act;
+      if (a === 'rec') start(); else if (a === 'pause') pause(); else if (a === 'resume') resume();
+      else if (a === 'finish') finish(); else if (a === 'clear') clearCur();
+      else if (a === 'save') saveRoute(); else if (a === 'gpx') exportGpx();
+      else if (a === 'trips') openTrips(); else if (a === 'vis') setHidden(!S.hidden);
+      else if (a === 'fold') { S.fold = !S.fold; render(); }
+    });
+    if (S.t) drawAll(S.state === 'idle');                             // map was created after the track existed
+    render();
+  }
+  window.addTrackUi = addTrackUi;
+
+  // ---------- trips list ----------
+  function closeTrips() { const m = $('trkModal'); if (m) m.remove(); }
+  async function openTrips() {
+    closeTrips();
+    const m = document.createElement('div');
+    m.id = 'trkModal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-label', 'Recorded trips');
+    m.innerHTML = '<div class="srm-box"><h3>🗂 Trips</h3><div class="lg-meta">Loading…</div></div>';
+    document.body.appendChild(m);
+    m.addEventListener('click', async e => {
+      if (e.target === m) { closeTrips(); return; }
+      const b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
+      const act = b.dataset.act, id = b.dataset.id;
+      if (act === 'x') { closeTrips(); return; }
+      let tr; try { tr = await dbGet('trips', id); } catch (er) { dbFail('read', er); }
+      if (!tr) { say('Track not found'); return; }
+      if (act === 'view') { closeTrips(); viewTrip(tr); }
+      else if (act === 'gpx') exportGpx(tr);
+      else if (act === 'route') saveRoute(tr);
+      else if (act === 'ren') {
+        const n = prompt('Trip name', tr.name); if (n === null || !n.trim()) return;
+        tr.name = n.trim(); try { await dbPut('trips', tr); } catch (er) { dbFail('rename', er); }
+        if (S.t && S.t.id === tr.id) S.t.name = tr.name;
+        fill();
+      } else if (act === 'del') {
+        if (!confirm('Delete «' + tr.name + '»?')) return;
+        try { await dbDel('trips', id); } catch (er) { dbFail('delete', er); }
+        if (S.t && S.t.id === id && S.state === 'idle') { S.t = null; drawAll(false); render(); }
+        fill();
+      }
+    });
+    async function fill() {
+      let list = [];
+      try { list = await dbAll('trips'); } catch (e) { dbFail('list', e); }
+      list.sort((a, b) => b.start - a.start);
+      const rows = list.map(t => '<div class="lg-row"><div class="lg-top"><b>' + he(t.name) + '</b></div><small>' + he(new Date(t.start).toLocaleString()) + ' · ' + (t.dist / 1000).toFixed(2) + ' km · ' + fmtDur(t.activeMs) + '</small>' +
+        '<div class="trk-row-acts"><button data-act="view" data-id="' + he(t.id) + '">View</button><button data-act="gpx" data-id="' + he(t.id) + '">GPX</button><button data-act="route" data-id="' + he(t.id) + '">Save route</button>' +
+        '<button data-act="ren" data-id="' + he(t.id) + '" title="Rename">✎</button><button data-act="del" data-id="' + he(t.id) + '" class="del" title="Delete">🗑</button></div></div>').join('');
+      m.firstChild.innerHTML = '<h3>🗂 Trips</h3><div class="lg-list">' + (rows || '<div class="lg-row"><small>No recorded trips yet.</small></div>') + '</div><div class="lg-btns"><button type="button" data-act="x" id="lgX">Close</button></div>';
+    }
+    fill();
+  }
+
+  window.trkFeed = feed; window.trkGpsError = gpsError;
+  if (window.__TRK_TEST) window.__trk = { S, feed, start, pause, resume, finish, toGpx, stats, gpsError };
+  restore();
 })();
 </script>
 
@@ -1358,7 +1845,7 @@
         <div class="search-bar" id="searchBar">
             <div class="search-inner">
                 <span class="search-ico">🔍</span>
-                <input type="search" id="searchInput" placeholder="Search place (3+ chars)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+                <input type="search" id="searchInput" placeholder="Search place (2+ chars)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
                 <button type="button" id="searchClear" class="search-clear" aria-label="Clear"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6L18 18M18 6L6 18" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button>
             </div>
             <div class="search-info" id="searchInfo"></div>
@@ -3692,7 +4179,7 @@
             const pad = n => String(n).padStart(2, '0');
             const when = isNaN(d.getTime()) ? '' : pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
             return '<div class="pf-route"><div class="pf-route-name">' + esc(r.name) + '</div>' +
-                '<div class="pf-route-meta">' + (r.ids || []).length + ' points · ' + (r.est ? '≈ ' : '') + esc(fmtKm(r.dist || 0)) + ' · ' + esc(fmtTime(r.dur || 0)) + (r.ret ? ' · round trip' : '') + (when ? ' · ' + when : '') + '</div>' +
+                '<div class="pf-route-meta">' + (r.trk ? '📍 GPS track · ' : (r.ids || []).length + ' points · ') + (r.est ? '≈ ' : '') + esc(fmtKm(r.dist || 0)) + ' · ' + esc(fmtTime(r.dur || 0)) + (r.ret ? ' · round trip' : '') + (when ? ' · ' + when : '') + '</div>' +
                 '<div class="pf-route-fuel">' + esc(pfFuelText(f, p.cur)) + '</div>' +
                 '<div class="pf-route-acts"><button type="button" onclick="pfRouteAct(\'open\',\'' + esc(r.id) + '\')">▶ Open</button>' +
                 '<button type="button" class="sec" title="Edit" aria-label="Edit" onclick="pfRouteAct(\'rename\',\'' + esc(r.id) + '\')">✎</button>' +
@@ -3800,8 +4287,10 @@
             if (!confirm('Delete route «' + r.name + '»?')) return;
             list.splice(i, 1); pfRoutesSave(list); pfRender();
         } else if (kind === 'rename') {
+            if (r.trk) { const n = prompt('Route name', r.name); if (n && n.trim()) { r.name = n.trim(); list[i] = r; pfRoutesSave(list); pfRender(); } return; }
             openEditRoute(id);
         } else if (kind === 'open') {
+            if (r.trk) { closeProfile(); if (window.trkViewById) trkViewById(r.trk); return; }   // GPS track: show it on the map
             const ids = new Set();
             let missing = 0;
             for (const rid of r.ids || []) { const pl = placeByAnyId(rid); if (pl) ids.add(pl.id); else missing++; }   // id місця міг змінитись (аліас)
@@ -3943,7 +4432,7 @@
     const normText = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     function searchQuery() { const i = document.getElementById('searchInput'); return i ? i.value : ''; }
     function matchIdx() {                                    // індекси видимих карток: пошук (від 3 символів) і/або фільтр; null — обмежень немає
-        const q = normText(searchQuery()).trim(), hasQ = q.length >= 3, hasF = filterActive();
+        const q = normText(searchQuery()).trim(), hasQ = q.length >= 2, hasF = filterActive();
         if (!hasQ && !hasF) return null;
         const ref = hasF ? filterRef() : null, out = [];
         places.forEach((p, i) => {
@@ -3961,7 +4450,7 @@
         document.body.classList.toggle('filtering', !!set);
         const raw = searchQuery().trim();
         const info = document.getElementById('searchInfo');
-        if (info) info.textContent = set ? ((filterActive() ? 'Shown: ' : 'Found: ') + m.length + ' of ' + places.length) : (raw ? 'Type at least 3 characters' : '');
+        if (info) info.textContent = set ? ((filterActive() ? 'Shown: ' : 'Found: ') + m.length + ' of ' + places.length) : (raw ? 'Type at least 2 characters' : '');
         updateFilterBadge();
         syncMainToggle();
         const clr = document.getElementById('searchClear');
@@ -4071,6 +4560,26 @@
     }
     // Лише назва селища (стара назва функції): '' (немає назви) або null (помилка мережі)
     async function fetchNearName(c, ms) { const i = await fetchGeo(c, ms); return i ? i.near : null; }
+    // ===== Splash cities: built ONCE from the current cards (cached in localStorage, not refreshed on every visit) =====
+    function buildSplashCities() {
+        try {
+            const KEY = 'splash_cities_v1';
+            let old = null; try { old = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { }
+            if (old && old.done) return;                            // already built: reuse it forever
+            const withC = places.map(p => ({ p, c: parseCoords(p.coords) })).filter(x => x.c);
+            if (!withC.length) return;
+            const groups = new Map();
+            withC.forEach(({ p, c }) => {
+                const nm = String(p.near || '').trim(); if (!nm) return;
+                const k = nm.toLowerCase(), g = groups.get(k) || { name: nm, n: 0, la: 0, lo: 0 };
+                g.n++; g.la += c[0]; g.lo += c[1]; groups.set(k, g);
+            });
+            if (!groups.size) return;
+            const cities = [...groups.values()].sort((a, b) => b.n - a.n).slice(0, 18).map(g => [g.name, +(g.la / g.n).toFixed(4), +(g.lo / g.n).toFixed(4)]);
+            const named = withC.filter(x => x.p.near).length;
+            localStorage.setItem(KEY, JSON.stringify({ v: 1, done: named >= withC.length * 0.9, cities }));   // done once (almost) all cards have town names
+        } catch (e) { }
+    }
     async function runNear() {
         if (nearBusy) return;
         nearBusy = true;
@@ -4097,6 +4606,7 @@
         } finally {
             nearBusy = false;
             if (done) persistPlaces();
+            buildSplashCities();
         }
     }
 
@@ -4579,7 +5089,7 @@
             const q = normText(inp.value).trim();
             if (q.length < 2) { closeList(); return; }
             let html = find(q).map(r => { const p = places[r.i]; return '<div class="ms-row" data-i="' + r.i + '">' + esc(p.name) + (p.near ? '<small>' + esc(p.near) + '</small>' : '') + '</div>'; }).join('');
-            if (q.length >= 3) html += '<div class="ms-row ms-addr">🌍 Search address: ' + esc(inp.value.trim()) + '</div>';
+            if (q.length >= 2) html += '<div class="ms-row ms-addr">🌍 Search address: ' + esc(inp.value.trim()) + '</div>';
             if (!html) { closeList(); return; }
             list.innerHTML = html; list.classList.add('open');
             list.querySelectorAll('.ms-row[data-i]').forEach(row => row.onclick = () => goPlace(+row.dataset.i));
@@ -4591,7 +5101,7 @@
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const q = normText(inp.value).trim(), res = find(q);
-                if (res.length) goPlace(res[0].i); else if (q.length >= 3) addrSearch(inp.value.trim());
+                if (res.length) goPlace(res[0].i); else if (q.length >= 2) addrSearch(inp.value.trim());
             } else if (e.key === 'Escape') { e.stopPropagation(); inp.value = ''; closeList(); clearPin(); inp.blur(); }
         });
         document.addEventListener('pointerdown', e => { if (!box.contains(e.target)) closeList(); });
@@ -4625,6 +5135,7 @@
         addLocateControl();
         addResetControl();
         addMapSearch(el);
+        if (window.addTrackUi) addTrackUi(el);
         startGps();
         map.attributionControl.addAttribution('Place names © OpenStreetMap (Nominatim)');
         setupContextAndLongPress(el);
@@ -4878,6 +5389,7 @@
         gpsWatch = navigator.geolocation.watchPosition(pos => {
             const ll = [pos.coords.latitude, pos.coords.longitude];
             lastGps = { ll, acc: pos.coords.accuracy };
+            if (window.trkFeed) trkFeed(pos);                      // GPS track recorder uses this same stream
             speedoFeed(pos);                                       // спідометр користується цим самим потоком
             sortOnFix(ll);                                         // сортування «за відстанню до мене»
             if (!_fltGps) { _fltGps = true; if (hasMetricFilter()) applySearch(); }   // перша GPS-позиція: перерахувати фільтр за часом/відстанню від мене
@@ -4891,7 +5403,7 @@
                 gpsMarker.setLatLng(ll);
                 gpsCircle.setLatLng(ll).setRadius(pos.coords.accuracy);
             }
-        }, err => { console.warn('GPS:', err && err.message); speedoError(err); }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+        }, err => { console.warn('GPS:', err && err.message); speedoError(err); if (window.trkGpsError) trkGpsError(err); }, { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
     }
 
 
@@ -6013,6 +6525,7 @@
         syncStickyOffset();
         initMap();
         stateReady = true;
+        buildSplashCities();
         window.splashHide && window.splashHide();
     }
     init();
