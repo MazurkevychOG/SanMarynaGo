@@ -2497,7 +2497,8 @@
         if (Math.abs(v) < 0.9) return;                      // повільний свайп — рідна прокрутка
         const row = document.querySelector('#placesTable .place-row');
         const rowH = (row && row.offsetHeight) || 150;
-        const dist = Math.min(10 * rowH, Math.abs(v) * 900) * Math.sign(v);
+        const FLING_SLOW = 0.5;                             // 0.5 = a flick scrolls 2× less far (2× slower paging through cards); 1 = old speed
+        const dist = Math.min(10 * rowH, Math.abs(v) * 900) * FLING_SLOW * Math.sign(v);
         const from = ca.scrollTop, max = ca.scrollHeight - ca.clientHeight;
         const to = snapScrollTarget(ca, Math.max(0, Math.min(max, from + dist)), Math.sign(v));
         if (Math.abs(to - from) < 40) return;
