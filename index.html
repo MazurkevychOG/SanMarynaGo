@@ -1362,9 +1362,29 @@
   };
 
   // ---------- drawing (only the line coordinates are updated, never the whole map) ----------
+  // The line width grows with the map zoom like the planned route (the app's routeWidthAt), a bit thinner so both stay readable.
+  const TRK_W = 0.85;
+  function trkWidthAt(z) {
+    const w = (typeof routeWidthAt === 'function') ? routeWidthAt(z) : Math.max(4, Math.min(36, 7 * Math.pow(1.45, z - 14)));
+    return Math.max(3, Math.min(30, w * TRK_W));
+  }
+  function applyTrackWeight(targetZoom) {                   // targetZoom: zoom the pinch/animation is heading to
+    const m = getMap(); if (!m || !S.line) return;
+    const z = (typeof targetZoom === 'number') ? targetZoom : m.getZoom();
+    const rend = S.line._renderer; let k = 1;
+    if (rend && typeof rend._zoom === 'number') k = m.getZoomScale(z, rend._zoom) || 1;   // during a pinch Leaflet scales the whole SVG
+    S.line.setStyle({ weight: trkWidthAt(z) / k });
+  }
+  function bindZoom(m) {
+    if (!m || m.__trkZoom) return; m.__trkZoom = true;      // handlers are added once per map
+    m.on('zoom', () => { try { if (S.line && S.line._renderer && S.line._renderer._reset) S.line._renderer._reset(); } catch (e) { } applyTrackWeight(); });
+    m.on('zoomanim', e => applyTrackWeight(e.zoom));
+    m.on('zoomend moveend', () => { applyTrackWeight(); setTimeout(applyTrackWeight, 0); });
+  }
   function ensureLine() {
     const m = getMap(); if (!m) return null;
-    if (!S.line) S.line = L.polyline([], { color: COLOR, weight: 5, opacity: 0.9, lineJoin: 'round', lineCap: 'round', smoothFactor: 0.5, interactive: false });
+    if (!S.line) S.line = L.polyline([], { color: COLOR, weight: trkWidthAt(m.getZoom()), opacity: 0.9, lineJoin: 'round', lineCap: 'round', smoothFactor: 0.5, interactive: false });
+    bindZoom(m);
     if (!S.hidden && !m.hasLayer(S.line)) S.line.addTo(m);
     return S.line;
   }
@@ -1391,6 +1411,7 @@
       if (!S.hidden) S.marks.addTo(m);
     }
     if (fit && t && l.getLatLngs().length) { try { m.invalidateSize(); m.fitBounds(l.getBounds(), { padding: [40, 40], maxZoom: 17 }); } catch (e) { } }
+    applyTrackWeight();
   }
   function setHidden(h) {
     S.hidden = h; const m = getMap(); if (!m) return;
@@ -1566,13 +1587,25 @@
   async function clearCur() {
     if (!S.t) return;
     const rec = S.state !== 'idle';
-    if (!confirm(rec ? 'Delete the current recording?' : 'Delete this track?')) return;
+    const nr = S.t.done ? routesFor(S.t.id) : 0;
+    if (!confirm(rec ? 'Delete the current recording?' : 'Delete this track?' + (nr ? ' Its route in Profile will be removed too.' : ''))) return;
     const id = S.t.id, wasDone = S.t.done;
     S.state = 'idle'; stopTimer(); clearTimeout(S.saveT); wake(false); S.t = null;
     drawAll(false); render();
     pending.delete(id); lsDel(STASH + id); lsDel(ASTASH);
     try { await dbDel('active', 'cur'); if (wasDone) await dbDel('trips', id); } catch (e) { dbFail('delete', e); }
-    say('Track deleted');
+    const dr = wasDone ? dropRoutesFor(id) : 0;
+    say(dr ? 'Track and its route deleted' : 'Track deleted');
+  }
+  function routesFor(id) { try { return pfRoutesLoad().filter(r => r.trk === id).length; } catch (e) { return 0; } }
+  function dropRoutesFor(id) {                              // saved routes in Profile that point to a deleted track
+    try {
+      const list = pfRoutesLoad(), keep = list.filter(r => r.trk !== id);
+      if (keep.length === list.length) return 0;
+      pfRoutesSave(keep);
+      try { pfRender(); } catch (e) { }
+      return list.length - keep.length;
+    } catch (e) { return 0; }
   }
   function saveRoute(t) {
     t = t || S.t;
@@ -1624,7 +1657,14 @@
     setTimeout(() => { drawAll(true); render(); }, 350);
   }
   window.trkViewById = async function (id) {
-    try { const tr = pending.get(id) || await dbGet('trips', id); if (!tr) { say('Track not found on this device'); return false; } viewTrip(tr); return true; }
+    try {
+      const tr = pending.get(id) || await dbGet('trips', id);
+      if (!tr) {
+        if (confirm('This track no longer exists on this device. Remove the route from Profile?')) { dropRoutesFor(id); say('Route removed'); }
+        return false;
+      }
+      viewTrip(tr); return true;
+    }
     catch (e) { dbFail('open', e); say('Could not open track'); return false; }
   };
 
@@ -1718,8 +1758,10 @@
         if (S.t && S.t.id === tr.id) S.t.name = tr.name;
         fill();
       } else if (act === 'del') {
-        if (!confirm('Delete «' + tr.name + '»?')) return;
+        const nr = routesFor(id);
+        if (!confirm('Delete «' + tr.name + '»?' + (nr ? ' Its route in Profile will be removed too.' : ''))) return;
         try { await dbDel('trips', id); } catch (er) { dbFail('delete', er); }
+        pending.delete(id); lsDel(STASH + id); dropRoutesFor(id);
         if (S.t && S.t.id === id && S.state === 'idle') { S.t = null; drawAll(false); render(); }
         fill();
       }
