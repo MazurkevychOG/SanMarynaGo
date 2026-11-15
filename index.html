@@ -1289,6 +1289,11 @@
   const STALE_MS = 8000;       // cached/old fix = not current
   const LOST_MS = 10000;       // no fix for this long while recording → "GPS lost"
   const DB_NAME = 'gps_tracks_v1';
+  // Walking mode: while the average speed of the last fixes is below 5 km/h the limits are relaxed (weak GPS, short signal gaps).
+  const WALK_KMH = 5, WALK_EXIT_KMH = 6.5;          // enter below 5 km/h, leave above 6.5 km/h (no flicker)
+  const MAX_ACC_WALK = 80;                          // m: fixes up to this are kept when walking
+  const GAP_WALK_MS = 90000;                        // walking: a signal gap up to 90 s is bridged (dashed), longer = break
+  const MAX_MS_WALK = 15;                           // m/s: faster implied movement while walking = GPS jump
   const COLOR = '#e91e63';     // actual track (planned OSRM route is blue/orange)
 
   const $ = id => document.getElementById(id);
@@ -1352,7 +1357,7 @@
   const dbFail = (what, e) => console.warn('GPS track: ' + what + ' failed:', (e && e.message) || e);
 
   // ---------- state ----------
-  const S = { state: 'idle', t: null, resumeAt: 0, needSeg: true, anchor: null, lastValidT: 0, lastFixAt: 0, lastKmh: null, bad: 0, weak: 0, err: '',
+  const S = { vw: [], walk: false, gapLine: null, state: 'idle', t: null, resumeAt: 0, needSeg: true, anchor: null, lastValidT: 0, lastFixAt: 0, lastKmh: null, bad: 0, weak: 0, err: '',
               line: null, marks: null, hidden: false, fold: false, timer: 0, saveT: 0 };
 
   const stats = () => {
@@ -1374,6 +1379,7 @@
     const rend = S.line._renderer; let k = 1;
     if (rend && typeof rend._zoom === 'number') k = m.getZoomScale(z, rend._zoom) || 1;   // during a pinch Leaflet scales the whole SVG
     S.line.setStyle({ weight: trkWidthAt(z) / k });
+    if (S.gapLine) S.gapLine.setStyle({ weight: trkWidthAt(z) / k * 0.7 });
   }
   function bindZoom(m) {
     if (!m || m.__trkZoom) return; m.__trkZoom = true;      // handlers are added once per map
@@ -1388,6 +1394,13 @@
     if (!S.hidden && !m.hasLayer(S.line)) S.line.addTo(m);
     return S.line;
   }
+  function ensureGap() {
+    const m = getMap(); if (!m) return null;
+    if (!S.gapLine) S.gapLine = L.polyline([], { color: COLOR, weight: trkWidthAt(m.getZoom()) * 0.7, opacity: 0.8, dashArray: '2 9', lineCap: 'round', interactive: false });
+    if (!S.hidden && !m.hasLayer(S.gapLine)) S.gapLine.addTo(m);
+    return S.gapLine;
+  }
+  function gapAdd(a, b) { const g = ensureGap(); if (!g) return; const rings = g.getLatLngs(); rings.push([L.latLng(a), L.latLng(b)]); g.setLatLngs(rings); }
   function lineAdd(ll, newSeg) {
     const l = ensureLine(); if (!l) return;
     const rings = l.getLatLngs();
@@ -1401,7 +1414,17 @@
     const l = ensureLine(); if (!l) return;
     clearMarks();
     const t = S.t;
-    l.setLatLngs(t ? t.segs.filter(s => s.length).map(s => s.map(p => [p[0], p[1]])) : []);
+    const rings = [], gaps = [];                            // a point with a 6th item follows a bridged gap: dashed link + new solid ring
+    if (t) t.segs.forEach(sg => {
+      let ring = [], prev = null;
+      sg.forEach(p => {
+        if (p[5] && ring.length) { rings.push(ring); ring = []; if (prev) gaps.push([[prev[0], prev[1]], [p[0], p[1]]]); }
+        ring.push([p[0], p[1]]); prev = p;
+      });
+      if (ring.length) rings.push(ring);
+    });
+    l.setLatLngs(rings);
+    const g = ensureGap(); if (g) g.setLatLngs(gaps);
     if (t && t.done && t.segs.some(s => s.length)) {
       const first = t.segs.find(s => s.length)[0], lastSeg = [...t.segs].reverse().find(s => s.length), last = lastSeg[lastSeg.length - 1];
       S.marks = L.layerGroup([
@@ -1416,8 +1439,18 @@
   function setHidden(h) {
     S.hidden = h; const m = getMap(); if (!m) return;
     if (S.line) { if (h) m.removeLayer(S.line); else S.line.addTo(m); }
+    if (S.gapLine) { if (h) m.removeLayer(S.gapLine); else S.gapLine.addTo(m); }
     if (S.marks) { if (h) m.removeLayer(S.marks); else S.marks.addTo(m); }
     render();
+  }
+
+  function updateMode(v) {                                  // v: m/s of the latest fix
+    if (v == null || !isFinite(v)) return;
+    S.vw.push(v); if (S.vw.length > 6) S.vw.shift();
+    if (S.vw.length < 3) return;
+    const kmh = S.vw.reduce((x, y) => x + y, 0) / S.vw.length * 3.6;
+    if (!S.walk && kmh < WALK_KMH) S.walk = true;
+    else if (S.walk && kmh > WALK_EXIT_KMH) S.walk = false;
   }
 
   // ---------- GPS feed (called from the existing watchPosition callback) ----------
@@ -1430,43 +1463,50 @@
       if (ts > now + 5000) ts = now;
       if (now - ts > STALE_MS) return;                       // cached fix — never shown as current
       S.lastFixAt = now; S.err = '';
-      if (S.errSince && now - S.errSince > 5000) S.needSeg = true;      // signal was really gone (>5 s): break the line
+      const walk = S.walk, maxAcc = walk ? MAX_ACC_WALK : MAX_ACC, maxV = walk ? MAX_MS_WALK : MAX_MS, gapBreak = walk ? GAP_WALK_MS : GAP_MS;
+      if (S.errSince && now - S.errSince > (walk ? GAP_WALK_MS : 5000)) S.needSeg = true;      // signal was really gone: break the line
       S.errSince = 0;
       if (S.state !== 'rec') { renderStats(); return; }      // paused / idle: nothing is added
       const acc = c.accuracy;
-      if (!(typeof acc === 'number' && isFinite(acc)) || acc > MAX_ACC) { S.weak = isFinite(acc) ? Math.round(acc) : 999; S.lastKmh = null; renderStats(); return; }
+      if (!(typeof acc === 'number' && isFinite(acc)) || acc > maxAcc) { S.weak = isFinite(acc) ? Math.round(acc) : 999; S.lastKmh = null; renderStats(); return; }
       S.weak = 0;
       const t = S.t, ll = [c.latitude, c.longitude], a = S.anchor;
       const sp = (typeof c.speed === 'number' && isFinite(c.speed) && c.speed >= 0 && c.speed <= MAX_MS) ? c.speed : null;
-      let newSeg = S.needSeg || !a || !t.segs.length, d = 0, dtFix = 0, moved = true, vEst = sp;
+      let newSeg = S.needSeg || !a || !t.segs.length, link = false, d = 0, dtFix = 0, moved = true, vEst = sp;
       if (!newSeg) {
         dtFix = (ts - S.lastValidT) / 1000;
-        if (ts - S.lastValidT > GAP_MS) newSeg = true;       // signal was lost: break the line
+        if (ts - S.lastValidT > gapBreak) newSeg = true;     // signal was lost for too long: break the line
         else if (dtFix <= 0) return;                         // out-of-order / duplicate timestamp
         else {
+          link = walk && ts - S.lastValidT > GAP_MS;         // walking: a short gap is bridged with a dashed link (marked, not hidden)
           d = hav(a.ll, ll);
           const dt = (ts - a.t) / 1000;
-          if (dt > 0 && d / dt > MAX_MS) { if (++S.bad < 3) return; newSeg = true; d = 0; }   // unrealistic jump (3 in a row = real relocation → new segment)
+          if (dt > 0 && d / dt > maxV) { if (++S.bad < 3) return; newSeg = true; link = false; d = 0; }   // unrealistic jump (3 in a row = real relocation → new segment)
           else {
             const floor = Math.max(2, Math.min(acc, a.acc) * 0.5);      // GPS jitter while standing still
-            moved = d >= floor || (sp !== null && sp >= 1.0);
+            moved = d >= floor || (sp !== null && sp >= 1.0 && acc <= 30) || link;      // Doppler speed counts only when the position itself is reasonably accurate
             if (vEst === null && dt >= 1) vEst = moved ? d / dt : 0;
           }
         }
       }
-      if (!newSeg && !moved) { S.lastValidT = ts; S.lastKmh = sp !== null ? sp * 3.6 : 0; renderStats(); return; }   // duplicate / jitter: not added
+      if (!newSeg && !moved) { S.lastValidT = ts; S.lastKmh = sp !== null ? sp * 3.6 : 0; updateMode(sp !== null ? sp : 0); renderStats(); return; }   // duplicate / jitter: not added
       S.bad = 0;
       if (newSeg) { t.segs.push([]); S.needSeg = false; d = 0; }
       const seg = t.segs[t.segs.length - 1];
-      seg.push([+ll[0].toFixed(6), +ll[1].toFixed(6), ts, Math.round(acc), sp !== null ? +sp.toFixed(1) : null]);
+      const pt = [+ll[0].toFixed(6), +ll[1].toFixed(6), ts, Math.round(acc), sp !== null ? +sp.toFixed(1) : null];
+      if (link) pt.push(1);                                  // 6th item = this point follows a bridged gap
+      seg.push(pt);
       if (!newSeg) {
         t.dist += d;
-        if (dtFix > 0 && dtFix <= GAP_MS / 1000 && ((vEst !== null && vEst >= 0.5) || d > 0)) t.moveMs += dtFix * 1000;
-        if (vEst !== null && vEst <= MAX_MS && acc <= 30 && vEst > t.maxMs) t.maxMs = vEst;
+        if (link) t.moveMs += dtFix * 1000;
+        else if (dtFix > 0 && dtFix <= GAP_MS / 1000 && ((vEst !== null && vEst >= 0.5) || d > 0)) t.moveMs += dtFix * 1000;
+        if (!link && vEst !== null && vEst <= maxV && acc <= 30 && vEst > t.maxMs) t.maxMs = vEst;
       }
       S.anchor = { ll, t: ts, acc }; S.lastValidT = ts;
       S.lastKmh = vEst !== null ? vEst * 3.6 : null;
-      lineAdd(ll, newSeg);
+      updateMode(vEst);
+      lineAdd(ll, newSeg || link);
+      if (link) gapAdd(a.ll, ll);
       persistSoon(false); renderStats();
     } catch (e) { console.warn('GPS track feed:', e); }
   }
@@ -1553,7 +1593,7 @@
     try { startGps(); } catch (e) { }                        // existing single GPS stream (no-op if already running)
     const now = Date.now();
     S.t = { id: 't' + now.toString(36) + Math.random().toString(36).slice(2, 5), name: defName(now), start: now, end: 0, segs: [], dist: 0, moveMs: 0, activeMs: 0, maxMs: 0, done: false };
-    S.state = 'rec'; S.resumeAt = now; S.needSeg = true; S.anchor = null; S.lastValidT = 0; S.bad = 0; S.lastKmh = null; S.weak = 0; S.err = '';
+    S.state = 'rec'; S.resumeAt = now; S.needSeg = true; S.anchor = null; S.lastValidT = 0; S.bad = 0; S.lastKmh = null; S.weak = 0; S.err = ''; S.vw = []; S.walk = false;
     drawAll(false); wake(true); persistSoon(true); startTimer(); render();
     say('● Recording — keep this page open and the screen on');
   }
@@ -1564,7 +1604,7 @@
   }
   function resume() {
     if (S.state !== 'pause') return;
-    S.resumeAt = Date.now(); S.needSeg = true; S.anchor = null; S.bad = 0; S.state = 'rec';
+    S.resumeAt = Date.now(); S.needSeg = true; S.anchor = null; S.bad = 0; S.vw = []; S.walk = false; S.state = 'rec';
     try { startGps(); } catch (e) { }
     wake(true); persistSoon(true); render();
   }
@@ -1705,7 +1745,7 @@
     const set = (id, v) => { const e = $(id); if (e && e.textContent !== v) e.textContent = v; };
     set('tsKm', st.km.toFixed(2)); set('tsTime', fmtDur(st.dur)); set('tsNow', cur === null ? '—' : String(cur));
     set('tsAvg', st.avg ? st.avg.toFixed(1) : '—'); set('tsMax', st.max ? Math.round(st.max) + '' : '—');
-    const note = $('trkNote'); if (note) note.textContent = lost ? 'No GPS signal — line is not drawn across the gap.' : (S.state === 'rec' ? 'Keep this page open and the screen on.' : '');
+    const note = $('trkNote'); if (note) note.textContent = lost ? 'No GPS signal — line is not drawn across the gap.' : (S.state === 'rec' ? (S.walk ? '🚶 Walking mode (< 5 km/h): weak GPS and short gaps are bridged. Keep the screen on.' : 'Keep this page open and the screen on.') : '');
   }
   function addTrackUi(el) {
     if (!el || el.querySelector('.trk-box')) return;                 // one set of handlers only
