@@ -1028,6 +1028,25 @@
         .trk-row-acts button.del { background: #c0392b; }
         #trkModal .lg-btns { display: flex; gap: 8px; }
         #trkModal .lg-btns button { flex: 1; border: 0; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 600; background: #718096; color: #fff; cursor: pointer; }
+        /* ===== Card form on the whole screen (the cards are not visible while it is open) ===== */
+        .form-x { display: none; }
+        @media (max-width: 700px) {
+            .sidebar.open { position: fixed; inset: 0; width: 100%; height: 100dvh; max-height: none; z-index: 2500; box-shadow: none; }
+            .sidebar.open .sidebar-inner { box-sizing: border-box; min-height: 100%; padding-top: calc(54px + env(safe-area-inset-top, 0px)); padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }   /* room for the ✕ button */
+            .sidebar.open .form-x { display: flex; position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); right: 10px; z-index: 2510; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 50%; align-items: center; justify-content: center; background: rgba(113,128,150,.18); color: #4a5568; font-size: 18px; cursor: pointer; }
+            html[data-theme="dark"] .sidebar.open .form-x { background: rgba(255,255,255,.14); color: #e2e8f0; }
+        }
+        @media (min-width: 701px) {
+            body.form-open .content-area { display: none; }
+            body.form-open .sidebar { width: 100%; }
+            body.form-open .form-container { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
+        }
+        /* ===== Altitude label (top centre) ===== */
+        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 1px); left: 50%; transform: translateX(-50%); z-index: 4600; display: flex; align-items: center; gap: 4px; height: 16px; padding: 0 7px; border-radius: 9px; background: rgba(255,255,255,.84); color: #2d3748; font-size: 11px; line-height: 16px; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,.25); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+        #altBar[hidden] { display: none; }
+        #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
+        html[data-theme="dark"] #altBar, body.speedo-open #altBar { background: rgba(30,37,48,.84); color: #e2e8f0; }
+        body.profile-open #altBar, body.settings-open #altBar, body.mdl-open #altBar, body.form-open #altBar, body:has(.sidebar.open) #altBar { display: none; }
     </style>
 </head>
 <body>
@@ -1600,7 +1619,7 @@
   function pause() {
     if (S.state !== 'rec') return;
     S.t.activeMs += Date.now() - S.resumeAt; S.state = 'pause'; S.lastKmh = null;
-    wake(false); persistSoon(true); render();
+    persistSoon(true); render();                              // the screen stays awake while paused too (training mode)
   }
   function resume() {
     if (S.state !== 'pause') return;
@@ -1712,7 +1731,7 @@
   function startTimer() { if (!S.timer) S.timer = setInterval(tick, 1000); }
   function stopTimer() { if (S.timer) { clearInterval(S.timer); S.timer = 0; } }
   function tick() { if (document.hidden) return; renderStats(); }
-  document.addEventListener('visibilitychange', () => { if (document.hidden) persistSoon(true); else renderStats(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) persistSoon(true); else { renderStats(); if (S.state !== 'idle') wake(true); } });   // the browser drops the wake lock in the background: take it again
   window.addEventListener('pagehide', () => persistSoon(true));
 
   // ---------- UI ----------
@@ -1820,8 +1839,53 @@
   }
 
   window.trkFeed = feed; window.trkGpsError = gpsError;
+  window.trkNeedsWake = () => S.state !== 'idle';             // recording or paused → keep the screen on
   if (window.__TRK_TEST) window.__trk = { S, feed, start, pause, resume, finish, toGpx, stats, gpsError, pending, retryPending, dbAll, dropDb };
   restore();
+})();
+</script>
+<script>
+(function () {
+  // ===== Altitude above sea level (GPS): small centred label in the top row of the main screen, the map and the speedometer =====
+  const FRESH_MS = 15000;
+  let alt = null, at = 0, seen = false, el = null;
+  function make() {
+    if (el || !document.body) return;
+    el = document.createElement('div');
+    el.id = 'altBar'; el.hidden = true; el.title = 'Altitude above sea level (GPS)'; el.setAttribute('aria-label', 'Altitude above sea level');
+    el.innerHTML = '<span>⛰</span><b id="altVal">— m</b>';
+    document.body.appendChild(el);
+  }
+  function render() {
+    make(); if (!el) return;
+    if (!seen) { el.hidden = true; return; }                  // nothing until the first GPS fix
+    el.hidden = false;
+    const fresh = alt !== null && Date.now() - at < FRESH_MS;  // stale altitude is never shown as current
+    const txt = fresh ? Math.round(alt) + ' m' : '— m';
+    const v = document.getElementById('altVal'); if (v && v.textContent !== txt) v.textContent = txt;
+  }
+  window.altFeed = function (pos) {                           // called from the app's single watchPosition
+    try {
+      const c = pos && pos.coords; if (!c) return;
+      seen = true;
+      const now = Date.now();
+      if (typeof c.altitude === 'number' && isFinite(c.altitude) && c.altitude > -500 && c.altitude < 9000 &&
+          !(typeof c.altitudeAccuracy === 'number' && c.altitudeAccuracy > 150)) {
+        if (alt !== null && now - at < 30000 && Math.abs(c.altitude - alt) < 100) alt += (c.altitude - alt) * 0.35;   // light smoothing; real jumps pass through
+        else alt = c.altitude;
+        at = now;
+      }
+      render();
+    } catch (e) { }
+  };
+  setInterval(render, 2000);
+  // The main screen has no GPS until the map/speedometer is opened. If location access was granted before, start the same single stream now.
+  window.addEventListener('load', () => {
+    try {
+      if (navigator.permissions && navigator.permissions.query)
+        navigator.permissions.query({ name: 'geolocation' }).then(r => { if (r.state === 'granted' && typeof startGps === 'function') startGps(); }).catch(() => { });
+    } catch (e) { }
+  });
 })();
 </script>
 
@@ -2011,6 +2075,7 @@
 </div>
 
 <div class="sidebar" id="sidebar">
+    <button type="button" class="form-x" id="formX" onclick="closeFormDissolve()" aria-label="Close form">✕</button>
     <div class="sidebar-inner">
         <div class="app-brand app-brand-desk"><span class="app-brand-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div>
         <div class="header-top">
@@ -5538,6 +5603,7 @@
             const ll = [pos.coords.latitude, pos.coords.longitude];
             lastGps = { ll, acc: pos.coords.accuracy };
             if (window.trkFeed) trkFeed(pos);                      // GPS track recorder uses this same stream
+            if (window.altFeed) altFeed(pos);                      // altitude label
             speedoFeed(pos);                                       // спідометр користується цим самим потоком
             sortOnFix(ll);                                         // сортування «за відстанню до мене»
             if (!_fltGps) { _fltGps = true; if (hasMetricFilter()) applySearch(); }   // перша GPS-позиція: перерахувати фільтр за часом/відстанню від мене
@@ -5712,12 +5778,13 @@
         if (!navigator.wakeLock || _wlSentinel || document.visibilityState !== 'visible') return;
         try {
             const sent = await navigator.wakeLock.request('screen');
-            if (!SPD.open) { try { sent.release(); } catch (e) { } return; }   // тим часом спідометр закрили
+            if (!SPD.open && !(window.trkNeedsWake && trkNeedsWake())) { try { sent.release(); } catch (e) { } return; }   // nobody needs the screen on any more
             _wlSentinel = sent;
             sent.addEventListener('release', () => { if (_wlSentinel === sent) _wlSentinel = null; });
         } catch (e) { _wlSentinel = null; if (!needVideo) wakePlayVideo(); }   // Wake Lock відхилено — тримаємо екран відео
     }
     function wakeRelease() {
+        if (window.trkNeedsWake && trkNeedsWake()) return;      // a track is being recorded: keep the screen on even if the speedometer is closed
         try { if (_wlSentinel) _wlSentinel.release(); } catch (e) { }
         _wlSentinel = null;
         if (_wlVideo) { try { _wlVideo.pause(); } catch (e) { } }
