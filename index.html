@@ -2141,6 +2141,30 @@
     let places = [];
     let deletedIds = [];                 // id карток каталогу, видалених локально (щоб оновлення каталогу їх не повертало)
     let catalogIds = new Set();
+    // What GitHub (data/places/*.json) contains right now. Export sends only places that are missing there or differ from it.
+    let catalogRaw = new Map();
+    const _r6 = v => (Number.isFinite(+v) ? (+v).toFixed(6) : '');
+    function rawSnap(c) {
+        return { name: String(c.name || '').trim(), lat: _r6(c.lat), lng: _r6(c.lng), desc: String(c.desc || '').trim(), gmaps: String(c.gmapsUrl || '').trim(),
+                 near: String(c.near || ''), country: String(c.country || ''),
+                 types: (Array.isArray(c.types) ? c.types : []).map(String).sort().join(','), aliases: (Array.isArray(c.aliases) ? c.aliases : []).map(String).sort().join('|'),
+                 media: (c.media || []).map(m => DATA_BASE + m.file).join('|') };
+    }
+    function localSnap(p) {
+        const ll = parseCoords(p.coords) || [NaN, NaN];
+        return { name: String(p.name || '').trim(), lat: _r6(ll[0]), lng: _r6(ll[1]), desc: String(p.desc || '').trim(), gmaps: String(p.gmapsUrl || '').trim(),
+                 near: String(p.near || ''), country: String(p.country || ''),
+                 types: (p.types || []).map(String).sort().join(','), aliases: (p.aliases || []).map(String).sort().join('|'),
+                 media: (p.media || []).map(m => (typeof m.data === 'string' && m.data.startsWith(DATA_BASE)) ? m.data : 'new').join('|') };   // a photo/video that is not in data/ = new
+    }
+    function missingOnGithub(p) {
+        if (!catalogRaw.size) return !!p.dirty;                   // catalog not loaded (offline): all we know is the "changed by you" flag
+        const r = catalogRaw.get(p.id);
+        if (!r) return true;                                      // the place is not on GitHub at all
+        const l = localSnap(p);
+        return l.name !== r.name || l.lat !== r.lat || l.lng !== r.lng || l.desc !== r.desc || l.gmaps !== r.gmaps || l.types !== r.types ||
+               l.aliases !== r.aliases || l.media !== r.media || (l.near && l.near !== r.near) || (l.country && l.country !== r.country);
+    }
     let deletedNames = [];               // назви видалених вами карток — Update не повертає їх навіть якщо в каталозі інший id
     let typeDefs = [];                   // типи місць: [{id, name, icon, dirty}] — пляж, ресторан, екстрім …
     let typesDeleted = [];               // id типів каталогу, видалених вами локально (Update їх не повертає)
@@ -4087,7 +4111,7 @@
         const el = document.getElementById('localInfo');
         if (!el) return;
         recomputeDeleted();
-        const dirty = places.filter(p => p.dirty).length;
+        const dirty = places.filter(missingOnGithub).length;
         el.textContent = (dirty || deletedIds.length)
             ? `Local changes only in this browser: new or edited places — ${dirty}, removed from catalog — ${deletedIds.length}. To share them, use «Export».`
             : 'No local changes: showing catalog from repo.';
@@ -4857,7 +4881,8 @@
         try {
             recomputeDeleted();
             const items = [];                              // кожне місце — вже готовий JSON-рядок і його розмір у байтах
-            for (const p of places) {
+            const missing = places.filter(missingOnGithub);          // only places that are not on GitHub yet or differ from it
+            for (const p of missing) {
                 const media = [];
                 for (const m of p.media) {
                     // фото, що вже лежить у каталозі, експортуємо посиланням (ref) — файл обміну лишається легким; власні фото — повністю
@@ -4865,7 +4890,7 @@
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
                     catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
                 }
-                const s = JSON.stringify({ id: p.id, order: items.length + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}), media });
+                const s = JSON.stringify({ id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}), media });
                 items.push({ s, size: new Blob([s]).size });
             }
             // Пакуємо картки послідовно, перевіряючи фактичний розмір у байтах усього JSON-файлу.
@@ -4873,7 +4898,9 @@
             const d = new Date(), pad = n => String(n).padStart(2, '0');
             const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             const when = d.toISOString();
-            const typesOut = typeDefs.map(t => ({ id: t.id, name: t.name, icon: t.icon || '' })), usersOut = usersForExport();
+            const typesNew = catalogTypesLoaded ? typeDefs.filter(t => !catalogTypes.some(c => c.id === t.id && c.name === t.name && (c.icon || '') === (t.icon || ''))) : typeDefs.filter(t => t.dirty);
+            const typesOut = typesNew.map(t => ({ id: t.id, name: t.name, icon: t.icon || '' })), usersOut = usersForExport();
+            if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length) { toast('Nothing new to export — GitHub already has everything'); return; }
             const makeBlob = (g, part, total) => new Blob([
                 `{"format":"maps-places","version":3,"part":${part},"parts":${total},"exportedAt":${JSON.stringify(when)},"places":[`,
                 g.map(it => it.s).join(','),
@@ -4921,7 +4948,7 @@
                 if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 24 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
-            if (N > 1) toast(`Export: ${N} files (each under 25 MB)`);
+            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (N > 1 ? ` · ${N} files (each under 25 MB)` : ''));
             await deliverFiles(files);
         } catch (err) { console.error(err); alert('Could not prepare export: ' + err.message); }
     }
@@ -6662,6 +6689,7 @@
             const tr = await fetch(DATA_BASE + 'types.json', { cache: 'no-cache' });
             if (tr.ok) { const tj = await tr.json(); if (tj && Array.isArray(tj.types)) catalogTypesLoaded = true, catalogTypes = tj.types.filter(t => t && t.id && t.name).map(t => ({ id: String(t.id), name: String(t.name), icon: t.icon ? String(t.icon) : '' })); }
         } catch (e) { console.warn('data/types.json:', e); }
+        catalogRaw = new Map(cards.map(c => [c.id, rawSnap(c)]));      // remember exactly what GitHub has
         const near = nearCache(), ctry = countryCache();
         return cards.map(c => ({
             id: c.id, name: c.name, coords: c.lat + ', ' + c.lng, desc: c.desc || '', gmapsUrl: c.gmapsUrl || '',
