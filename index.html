@@ -1876,16 +1876,21 @@
       t = Array.prototype.find.call(document.querySelectorAll('.mobile-title, .app-brand-title'), x => x.offsetParent !== null && x.getBoundingClientRect().width > 0);
       const c = document.querySelector('.mobile-controls'); if (t && c && c.offsetParent !== null && t.closest('.mobile-header')) end = c.getBoundingClientRect().left;
     }
-    el.style.fontSize = '';
+    el.style.fontSize = ''; el.style.padding = '';
     if (!t) { el.style.top = ''; el.style.left = ''; return; }
-    const box = t.closest('.app-brand') || t, r = box.getBoundingClientRect(), tr = t.getBoundingClientRect();
+    const box = t.closest('.app-brand') || t, tr = t.getBoundingClientRect();
+    let right = tr.right;                                         // права межа самого тексту (не розтягнутого контейнера)
+    const au = box.querySelector && box.querySelector('.app-user');
+    if (au && !au.hidden && au.offsetParent !== null) right = Math.max(right, au.getBoundingClientRect().right);
     el.style.top = (tr.top + tr.height / 2) + 'px';
+    const GAP = 12;                                               // відступ від напису і від кнопки спідометра
     let w = el.offsetWidth, left;
     if (end !== null) {
-      const room = end - r.right - 12;
-      if (w > room && room > 40) { el.style.fontSize = Math.max(12, 19 * room / w) + 'px'; w = el.offsetWidth; }
-      left = (w <= room) ? (r.right + end) / 2 : r.right + 8 + w / 2;
-    } else left = r.right + 16 + w / 2;
+      const room = end - right - 2 * GAP;
+      if (w > room) { el.style.fontSize = Math.max(11, 19 * Math.max(room, 40) / w) + 'px'; w = el.offsetWidth; }
+      if (w > room) { el.style.padding = '0 7px'; w = el.offsetWidth; }
+      left = (w <= room) ? (right + end) / 2 : end - GAP - w / 2;  // не вміщується — притискаємо до кнопки з відступом, але не торкаємось її
+    } else left = right + 16 + w / 2;
     el.style.left = left + 'px';
   }
   window.addEventListener('resize', place); window.addEventListener('orientationchange', place);
