@@ -1042,7 +1042,7 @@
             body.form-open .form-container { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
         }
         /* ===== Altitude label (top centre) ===== */
-        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 1px); left: 50%; transform: translateX(-50%); z-index: 4600; display: flex; align-items: center; gap: 4px; height: 16px; padding: 0 7px; border-radius: 9px; background: rgba(255,255,255,.84); color: #2d3748; font-size: 11px; line-height: 16px; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,.25); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 17px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.9); color: #2d3748; font-size: 19px; line-height: 32px; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
         #altBar[hidden] { display: none; }
         #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
         html[data-theme="dark"] #altBar, body.speedo-open #altBar { background: rgba(30,37,48,.84); color: #e2e8f0; }
@@ -1863,7 +1863,33 @@
     const fresh = alt !== null && Date.now() - at < FRESH_MS;  // stale altitude is never shown as current
     const txt = fresh ? Math.round(alt) + ' m' : '— m';
     const v = document.getElementById('altVal'); if (v && v.textContent !== txt) v.textContent = txt;
+    place();
   }
+  // Put the label on the same line as the «SanMarynaGO» title (vertical centre), in the free space right after it
+  function place() {
+    if (!el || el.hidden) return;
+    const bc = document.body.classList;
+    let t = null, end = null;
+    if (bc.contains('speedo-open')) t = null;
+    else if (bc.contains('map-open')) { t = document.querySelector('#mapOverlay .map-bar-title'); const a = document.querySelector('#mapOverlay .map-bar-actions'); if (a) end = a.getBoundingClientRect().left; }
+    else {
+      t = Array.prototype.find.call(document.querySelectorAll('.mobile-title, .app-brand-title'), x => x.offsetParent !== null && x.getBoundingClientRect().width > 0);
+      const c = document.querySelector('.mobile-controls'); if (t && c && c.offsetParent !== null && t.closest('.mobile-header')) end = c.getBoundingClientRect().left;
+    }
+    el.style.fontSize = '';
+    if (!t) { el.style.top = ''; el.style.left = ''; return; }
+    const box = t.closest('.app-brand') || t, r = box.getBoundingClientRect(), tr = t.getBoundingClientRect();
+    el.style.top = (tr.top + tr.height / 2) + 'px';
+    let w = el.offsetWidth, left;
+    if (end !== null) {
+      const room = end - r.right - 12;
+      if (w > room && room > 40) { el.style.fontSize = Math.max(12, 19 * room / w) + 'px'; w = el.offsetWidth; }
+      left = (w <= room) ? (r.right + end) / 2 : r.right + 8 + w / 2;
+    } else left = r.right + 16 + w / 2;
+    el.style.left = left + 'px';
+  }
+  window.addEventListener('resize', place); window.addEventListener('orientationchange', place);
+  try { new MutationObserver(place).observe(document.body, { attributes: true, attributeFilter: ['class'] }); } catch (e) { }
   window.altFeed = function (pos) {                           // called from the app's single watchPosition
     try {
       const c = pos && pos.coords; if (!c) return;
@@ -2056,7 +2082,7 @@
         <div class="search-bar" id="searchBar">
             <div class="search-inner">
                 <span class="search-ico">🔍</span>
-                <input type="search" id="searchInput" placeholder="Search place (2+ chars)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+                <input type="search" id="searchInput" placeholder="Search place or card № (2+ chars)" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
                 <button type="button" id="searchClear" class="search-clear" aria-label="Clear"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6L18 18M18 6L6 18" stroke="#fff" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button>
             </div>
             <div class="search-info" id="searchInfo"></div>
@@ -2323,7 +2349,7 @@
                     <div class="c-photo"><div class="cell-photo-img" onclick="openGallery(${i})">${thumbHtml(p)}</div></div>
                     <div class="c-name">
                         <div>${link}</div>
-                        <div class="cell-near">${p.near ? '📍 ' + esc(p.near) : ''}</div>
+                        <div class="cell-near">${esc(nearLine(p))}</div>
                         ${(p.types && p.types.length) ? `<div class="cell-types">${p.types.map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${esc(typeLabel(t))}</span>` : ''; }).join('')}</div>` : ''}
                         ${p.desc ? `<div class="cell-desc">${esc(p.desc)}</div>` : ''}
                     </div>
@@ -2342,6 +2368,7 @@
         updateLinks();
         if (places.some(p => p.near === undefined || p.country === undefined)) scheduleNear();
         scheduleThumbs();                                        // мініатюри для власних фото
+        scheduleElev();                                          // висота над рівнем моря для кожної картки
         updateMapMarkers();
     }
 
@@ -4672,8 +4699,10 @@
         const q = normText(searchQuery()).trim(), hasQ = q.length >= 2, hasF = filterActive();
         if (!hasQ && !hasF) return null;
         const ref = hasF ? filterRef() : null, out = [];
+        const numQ = (q.match(/^#?0*(\d+)$/) || [])[1];      // «12», «012» або «#12» — номер картки
         places.forEach((p, i) => {
-            if (hasQ && !normText(p.name + ' ' + (p.near || '') + ' ' + (p.desc || '') + ' ' + (p.types || []).map(id => (typeById(id) || {}).name || '').join(' ') + ' ' + (p.country || '')).includes(q)) return;
+            if (hasQ && numQ !== undefined) { if (!(Number(numQ) === i + 1 || normText(p.name).includes(q))) return; }
+            else if (hasQ && !normText(p.name + ' ' + (p.near || '') + ' ' + (p.desc || '') + ' ' + (p.types || []).map(id => (typeById(id) || {}).name || '').join(' ') + ' ' + (p.country || '')).includes(q)) return;
             if (hasF && !passFilter(p, ref)) return;
             out.push(i);
         });
@@ -4763,10 +4792,39 @@
     let nearBusy = false, nearTimer = 0, lastNearFetch = 0;
     const nearFailed = new Set();
     function scheduleNear() { clearTimeout(nearTimer); nearTimer = setTimeout(runNear, 900); }
+    // ===== Висота над рівнем моря для кожної картки (Open-Meteo, один раз на місце; зберігається в браузері) =====
+    function elevCache() { try { return JSON.parse(localStorage.getItem('mymaps_elev') || '{}'); } catch (e) { return {}; } }
+    function elevOf(p) { const e = elevCache()[p.id]; return (e && e.c === p.coords && Number.isFinite(e.e)) ? e.e : null; }
+    function nearLine(p) {
+        const parts = [];
+        if (p.near) parts.push('📍 ' + p.near);
+        const e = elevOf(p); if (e !== null) parts.push('⛰ ' + Math.round(e) + ' m');
+        return parts.join(' · ');
+    }
+    let elevBusy = false, elevTimer = 0, elevFailAt = 0;
+    function scheduleElev() { clearTimeout(elevTimer); elevTimer = setTimeout(runElev, 1200); }
+    async function runElev() {
+        if (elevBusy || Date.now() - elevFailAt < 60000) return;
+        elevBusy = true;
+        try {
+            const cache = elevCache();
+            const need = places.map(p => ({ p, c: parseCoords(p.coords) })).filter(x => x.c && !(cache[x.p.id] && cache[x.p.id].c === x.p.coords && Number.isFinite(cache[x.p.id].e)));
+            for (let k = 0; k < need.length; k += 100) {
+                const chunk = need.slice(k, k + 100);
+                const url = 'https://api.open-meteo.com/v1/elevation?latitude=' + chunk.map(x => (+x.c[0]).toFixed(5)).join(',') + '&longitude=' + chunk.map(x => (+x.c[1]).toFixed(5)).join(',');
+                const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status);
+                const d = await r.json(); if (!d || !Array.isArray(d.elevation)) throw new Error('bad data');
+                chunk.forEach((x, j) => { if (Number.isFinite(d.elevation[j])) cache[x.p.id] = { c: x.p.coords, e: d.elevation[j] }; });
+                try { localStorage.setItem('mymaps_elev', JSON.stringify(cache)); } catch (e) { }
+                chunk.forEach(x => setNearText(x.p));
+            }
+        } catch (e) { elevFailAt = Date.now(); }       // немає інтернету / ліміт — спробуємо при наступному оновленні списку
+        finally { elevBusy = false; }
+    }
     function setNearText(p) {
         const rows = document.getElementById('placesTable').children;
         for (const r of rows) {
-            if (r.dataset.id === p.id) { const el = r.querySelector('.cell-near'); if (el) el.textContent = p.near ? '📍 ' + p.near : ''; }
+            if (r.dataset.id === p.id) { const el = r.querySelector('.cell-near'); if (el) el.textContent = nearLine(p); }
         }
     }
     // Назва країни АНГЛІЙСЬКОЮ за кодом країни (ISO 3166): Intl вбудований у браузер, тож окремого запиту не треба
@@ -5287,7 +5345,7 @@
         if (!el || el.querySelector('.map-search')) return;
         const box = document.createElement('div');
         box.className = 'map-search';
-        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><div class="ms-list" id="msList"></div>';
+        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map or card №" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><div class="ms-list" id="msList"></div>';
         el.appendChild(box);
         L.DomEvent.disableClickPropagation(box); L.DomEvent.disableScrollPropagation(box);
         const inp = box.querySelector('input'), list = box.querySelector('.ms-list');
@@ -5295,8 +5353,14 @@
         const clearPin = () => { if (searchPin) { map.removeLayer(searchPin); searchPin = null; } };
         const find = q => {
             const out = [];
+            const numQ = (q.match(/^#?0*(\d+)$/) || [])[1];      // номер картки
             places.forEach((p, i) => {
                 if (!parseCoords(p.coords)) return;
+                if (numQ !== undefined) {
+                    if (Number(numQ) === i + 1) { out.push({ i, rank: -1 }); return; }
+                    const kn = normText(p.name).indexOf(q); if (kn < 0) return;
+                    out.push({ i, rank: normText(p.name).startsWith(q) ? 0 : (kn === 0 ? 1 : 2) }); return;
+                }
                 const k = normText(p.name + ' ' + (p.near || '') + ' ' + (p.country || '')).indexOf(q);
                 if (k < 0) return;
                 out.push({ i, rank: normText(p.name).startsWith(q) ? 0 : (k === 0 ? 1 : 2) });
@@ -5328,7 +5392,7 @@
         const render = () => {
             const q = normText(inp.value).trim();
             if (q.length < 2) { closeList(); return; }
-            let html = find(q).map(r => { const p = places[r.i]; return '<div class="ms-row" data-i="' + r.i + '">' + esc(p.name) + (p.near ? '<small>' + esc(p.near) + '</small>' : '') + '</div>'; }).join('');
+            let html = find(q).map(r => { const p = places[r.i]; return '<div class="ms-row" data-i="' + r.i + '"><b>' + (r.i + 1) + '.</b> ' + esc(p.name) + (p.near ? '<small>' + esc(p.near) + '</small>' : '') + '</div>'; }).join('');
             if (q.length >= 2) html += '<div class="ms-row ms-addr">🌍 Search address: ' + esc(inp.value.trim()) + '</div>';
             if (!html) { closeList(); return; }
             list.innerHTML = html; list.classList.add('open');
