@@ -2186,11 +2186,11 @@
         return { name: String(p.name || '').trim(), lat: _r6(ll[0]), lng: _r6(ll[1]), desc: String(p.desc || '').trim(), gmaps: String(p.gmapsUrl || '').trim(),
                  near: String(p.near || ''), country: String(p.country || ''),
                  types: (p.types || []).map(String).sort().join(','), aliases: (p.aliases || []).map(String).sort().join('|'),
-                 media: (p.media || []).map(m => (typeof m.data === 'string' && m.data.startsWith(DATA_BASE)) ? m.data : (mediaSame.get(m) || 'new')).join('|') };   // фото не з data/ = нове, якщо воно не збігається з файлом на GitHub
+                 media: (p.media || []).map(m => (typeof m.data === 'string' && m.data.startsWith(DATA_BASE)) ? m.data : (ghSameMedia.get(m) || 'new')).join('|') };   // фото не з data/ = нове, якщо воно не збігається з файлом на GitHub
     }
     // Локальне фото (data:) з імпорту/старої копії, яке байт-у-байт збігається з файлом картки на GitHub, — це НЕ зміна.
     // Порівнюємо розмір у байтах із розміром файлу в репозиторії (HEAD-запит, без завантаження самого фото).
-    const mediaSame = new WeakMap(), ghSize = new Map();
+    const ghSameMedia = new WeakMap(), ghSize = new Map();
     let reconPromise = null;
     function dataUriBytes(d) { const i = d.indexOf(','); if (i < 0 || !/;base64$/i.test(d.slice(0, i))) return -1; const n = d.length - i - 1; return Math.floor(n * 3 / 4) - (d.endsWith('==') ? 2 : d.endsWith('=') ? 1 : 0); }
     async function ghFileSize(path) {
@@ -2212,15 +2212,15 @@
             let changed = false;
             for (const p of places) {
                 const r = catalogRaw.get(p.id); if (!r || !r.media) continue;
-                const todo = (p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith('data:') && !mediaSame.has(m));
+                const todo = (p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith('data:') && !ghSameMedia.has(m));
                 if (!todo.length) continue;
                 const paths = r.media.split('|').filter(Boolean);
-                const used = new Set((p.media || []).filter(m => mediaSame.has(m) || (typeof m.data === 'string' && m.data.startsWith(DATA_BASE))).map(m => mediaSame.get(m) || m.data));
+                const used = new Set((p.media || []).filter(m => ghSameMedia.has(m) || (typeof m.data === 'string' && m.data.startsWith(DATA_BASE))).map(m => ghSameMedia.get(m) || m.data));
                 for (const m of todo) {
                     const sz = dataUriBytes(m.data); if (sz < 0) continue;
                     for (const path of paths) {
                         if (used.has(path)) continue;
-                        if (await ghFileSize(path) === sz) { mediaSame.set(m, path); used.add(path); changed = true; break; }
+                        if (await ghFileSize(path) === sz) { ghSameMedia.set(m, path); used.add(path); changed = true; break; }
                     }
                 }
             }
@@ -4992,7 +4992,7 @@
                 for (const m of p.media) {
                     // фото, що вже лежить у каталозі, експортуємо посиланням (ref) — файл обміну лишається легким; власні фото — повністю
                     if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !m.data.includes('..')) { media.push({ type: m.type, ref: m.data.slice(DATA_BASE.length) }); continue; }
-                    if (mediaSame.has(m)) { media.push({ type: m.type, ref: mediaSame.get(m).slice(DATA_BASE.length) }); continue; }   // таке саме фото вже є на GitHub — лише посилання
+                    if (ghSameMedia.has(m)) { media.push({ type: m.type, ref: ghSameMedia.get(m).slice(DATA_BASE.length) }); continue; }   // таке саме фото вже є на GitHub — лише посилання
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
                     catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
                 }
