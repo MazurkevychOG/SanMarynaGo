@@ -876,8 +876,8 @@
         .tip-bubble[hidden] { display: none; }
     
         /* ===== Рідна прокрутка списку на телефонах: картка «прилипає» рівно під верхньою смугою ===== */
-        //html.native-snap .content-area { scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
-        //html.native-snap .place-row { scroll-snap-align: start; }
+        html.native-snap .content-area { scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; }
+        html.native-snap .place-row { scroll-snap-align: start; }
 
         /* ===== Splash: Vlorë and growing roads ===== */
         #splash{position:fixed;inset:0;z-index:9000;background-color:var(--sp-bg);overflow:hidden;transition:opacity 1.3s ease .1s,background-color 1.1s ease;
@@ -5012,11 +5012,17 @@
             const when = d.toISOString();
             const typesNew = catalogTypesLoaded ? typeDefs.filter(t => !catalogTypes.some(c => c.id === t.id && c.name === t.name && (c.icon || '') === (t.icon || ''))) : typeDefs.filter(t => t.dirty);
             const typesOut = typesNew.map(t => ({ id: t.id, name: t.name, icon: t.icon || '' })), usersOut = usersForExport();
-            if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length) { toast('Nothing new to export — GitHub already has everything'); return; }
+            // card order (card №): sent only when it differs from the order in data/index.json
+            let orderOut = null;
+            if (catalogRaw.size) {
+                const cat = [...catalogRaw.keys()].filter(id => places.some(p => p.id === id)), loc = places.map(p => p.id).filter(id => catalogRaw.has(id));
+                if (cat.length !== loc.length || cat.some((id, i) => id !== loc[i])) orderOut = places.map(p => p.id);
+            }
+            if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length && !orderOut) { toast('Nothing new to export — GitHub already has everything'); return; }
             const makeBlob = (g, part, total) => new Blob([
                 `{"format":"maps-places","version":3,"part":${part},"parts":${total},"exportedAt":${JSON.stringify(when)},"places":[`,
                 g.map(it => it.s).join(','),
-                `],"deleted":${JSON.stringify(part === 1 ? deletedIds : [])},"types":${JSON.stringify(part === 1 ? typesOut : [])},"typesDeleted":${JSON.stringify(part === 1 ? typesDeleted : [])},"users":${JSON.stringify(part === 1 ? usersOut : [])}}`
+                `],"deleted":${JSON.stringify(part === 1 ? deletedIds : [])},"types":${JSON.stringify(part === 1 ? typesOut : [])},"typesDeleted":${JSON.stringify(part === 1 ? typesDeleted : [])},"users":${JSON.stringify(part === 1 ? usersOut : [])}${part === 1 && orderOut ? ',"order":' + JSON.stringify(orderOut) : ''}}`
             ], { type: 'application/json' });
             const groups = [];
             let cur = [];
@@ -5060,7 +5066,7 @@
                 if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 24 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
-            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (N > 1 ? ` · ${N} files (each under 25 MB)` : ''));
+            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 25 MB)` : ''));
             await deliverFiles(files);
         } catch (err) { console.error(err); alert('Could not prepare export: ' + err.message); }
     }
@@ -5143,7 +5149,7 @@
         input.value = '';
         if (!fl.length) return;
         try {
-            let list = [], impTypes = [], impTypesDel = [], impUsers = [];                    // кілька частин експорту зливаються в один список
+            let list = [], impTypes = [], impTypesDel = [], impUsers = [], impOrder = [];                    // кілька частин експорту зливаються в один список
             for (const f of fl) {
                 const raw = JSON.parse(await readFileAsText(f));
                 const part = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.places) ? raw.places : null);
@@ -5153,11 +5159,12 @@
                     if (Array.isArray(raw.types)) impTypes = impTypes.concat(raw.types);
                     if (Array.isArray(raw.typesDeleted)) impTypesDel = impTypesDel.concat(raw.typesDeleted);
                     if (Array.isArray(raw.users)) impUsers = impUsers.concat(raw.users);
+                    if (Array.isArray(raw.order) && raw.order.length) impOrder = raw.order.map(String);
                 }
             }
             const items = sanitizeImported(list);
-            if (!items.length) throw new Error('no valid places found');
-            const mode = await askImportMode(items.length, list.length - items.length);
+            if (!items.length && !impOrder.length && !impTypes.length && !impTypesDel.length && !impUsers.length) throw new Error('no valid places found');
+            const mode = items.length ? await askImportMode(items.length, list.length - items.length) : 'merge';   // файл лише з порядком/типами/профілями — без запиту режиму
             if (mode === 'cancel') return;
             items.forEach(it => { it.dirty = true; });
             const tmap = applyImportedTypes(impTypes, impTypesDel);
@@ -5170,6 +5177,10 @@
                     if (idx < 0) idx = places.findIndex(p => p.name === it.name && p.coords === it.coords);
                     if (idx >= 0) { it.id = places[idx].id; it.aliases = [...new Set([...(places[idx].aliases || []), ...(it.aliases || [])])]; places[idx] = it; } else places.push(it);
                 });
+            }
+            if (impOrder.length) {                                                         // card order from the exported file
+                const pos = new Map(impOrder.map((id, i) => [id, i]));
+                places = places.map((p, i) => ({ p, k: pos.has(p.id) ? pos.get(p.id) : 1e9 + i })).sort((a, b) => a.k - b.k).map(x => x.p);
             }
             for (const u of impUsers) {                                                   // кабінети з файлу обміну: об'єднуємо з локальними
                 const nm = String(u && u.name || '').trim(); if (!nm) continue;
