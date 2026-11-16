@@ -4,15 +4,25 @@
   "name": "Chick’n Fork",
   "lat": 40.437937,
   "lng": 19.495687,
-  "desc": "",
+  "desc": "Укр сет",
   "gmapsUrl": "https://maps.app.goo.gl/QRnn8iGjxkcgsVyv7?g_st=ic",
-  "near": "Вльора",
-  "country": "Albania",
+  "near": "Vlorë",
+  "country": "Shqipëri",
   "types": [
     "restaurant",
-    "beach"
+    "beach",
+    "food"
   ],
   "media": [
+    {
+      "type": "image",
+      "file": "photos/chickn-fork/03.webp",
+      "thumb": "photos/chickn-fork/03_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 185238,
+      "srcSha256": "238af9ae0a46769196b09904ccdeb30ba84c92312ebc4146a3e42c963b701c47"
+    },
     {
       "type": "image",
       "file": "photos/chickn-fork/01.webp",
@@ -32,7 +42,7 @@
       "srcSha256": "e3b5d0bc6c384db38d5706b7b644b4324223362fab3718c813410bec9190c4bb"
     }
   ],
-  "updated": "2026-11-01",
+  "updated": "2026-11-16",
   "aliases": [
     "pmvxmrlw7k07wb"
   ]

@@ -7,7 +7,7 @@
   "routes": [
     {
       "id": "mvrxxmbt4bf2",
-      "name": "Надя",
+      "name": "Надя+Саша",
       "ts": 1793181445193,
       "ids": [
         "home-vlore-joanna",
@@ -25,9 +25,12 @@
   "settings": {
     "theme": "dark",
     "fab": {
-      "fx": 0.9808,
-      "fy": 0.8918
+      "fx": 0.952,
+      "fy": 0.9532
     }
   },
-  "updated": "2026-11-01"
+  "updated": "2026-11-16",
+  "deletedRoutes": [
+    "mwgbbiu1wd8h"
+  ]
 }

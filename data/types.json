@@ -3,42 +3,42 @@
   "types": [
     {
       "id": "beach",
-      "name": "Пляж",
+      "name": "Beach",
       "icon": "🏖️"
     },
     {
       "id": "restaurant",
-      "name": "Ресторан / кафе",
+      "name": "Resto",
       "icon": "🍽️"
     },
     {
       "id": "winery",
-      "name": "Винарня",
+      "name": "Winery",
       "icon": "🍷"
     },
     {
       "id": "extreme",
-      "name": "Екстрім",
+      "name": "Extreme",
       "icon": "🧗"
     },
     {
       "id": "history",
-      "name": "Історія та замки",
+      "name": "History",
       "icon": "🏰"
     },
     {
       "id": "nature",
-      "name": "Природа",
+      "name": "Nature",
       "icon": "🌿"
     },
     {
       "id": "stay",
-      "name": "Житло",
+      "name": "Building",
       "icon": "🏠"
     },
     {
       "id": "prohulyanka",
-      "name": "Прогулянка"
+      "name": "Walking"
     },
     {
       "id": "food",

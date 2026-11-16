@@ -1,6 +1,6 @@
 {
   "id": "plyazh-dhermi",
-  "order": 26,
+  "order": 5,
   "name": "Beach Dhermi",
   "lat": 40.135637,
   "lng": 19.647457,
@@ -33,8 +33,8 @@
       "srcSha256": "ee6279953d556582c79b3e536f64aa05683d23fedad905b9e6c848eb587fa73c"
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-16",
+  "country": "Shqipëri",
   "types": [
     "beach"
   ],
