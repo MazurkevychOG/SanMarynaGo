@@ -1912,10 +1912,16 @@
   setInterval(render, 2000);
   // The main screen has no GPS until the map/speedometer is opened. If location access was granted before, start the same single stream now.
   window.addEventListener('load', () => {
+    // Start unless access is explicitly denied: some browsers (iOS Safari…) report «prompt» or have no Permissions API even when location is allowed.
+    const go = granted => { try { if (typeof startGps === 'function') startGps(); if (granted) { seen = true; render(); } } catch (e) { } };
     try {
       if (navigator.permissions && navigator.permissions.query)
-        navigator.permissions.query({ name: 'geolocation' }).then(r => { if (r.state === 'granted' && typeof startGps === 'function') startGps(); }).catch(() => { });
-    } catch (e) { }
+        navigator.permissions.query({ name: 'geolocation' }).then(r => {
+          if (r.state !== 'denied') go(r.state === 'granted');
+          r.onchange = () => { if (r.state !== 'denied') go(r.state === 'granted'); };
+        }).catch(() => go(false));
+      else go(false);
+    } catch (e) { go(false); }
   });
 })();
 </script>
