@@ -2181,7 +2181,47 @@
         return { name: String(p.name || '').trim(), lat: _r6(ll[0]), lng: _r6(ll[1]), desc: String(p.desc || '').trim(), gmaps: String(p.gmapsUrl || '').trim(),
                  near: String(p.near || ''), country: String(p.country || ''),
                  types: (p.types || []).map(String).sort().join(','), aliases: (p.aliases || []).map(String).sort().join('|'),
-                 media: (p.media || []).map(m => (typeof m.data === 'string' && m.data.startsWith(DATA_BASE)) ? m.data : 'new').join('|') };   // a photo/video that is not in data/ = new
+                 media: (p.media || []).map(m => (typeof m.data === 'string' && m.data.startsWith(DATA_BASE)) ? m.data : (mediaSame.get(m) || 'new')).join('|') };   // фото не з data/ = нове, якщо воно не збігається з файлом на GitHub
+    }
+    // Локальне фото (data:) з імпорту/старої копії, яке байт-у-байт збігається з файлом картки на GitHub, — це НЕ зміна.
+    // Порівнюємо розмір у байтах із розміром файлу в репозиторії (HEAD-запит, без завантаження самого фото).
+    const mediaSame = new WeakMap(), ghSize = new Map();
+    let reconPromise = null;
+    function dataUriBytes(d) { const i = d.indexOf(','); if (i < 0 || !/;base64$/i.test(d.slice(0, i))) return -1; const n = d.length - i - 1; return Math.floor(n * 3 / 4) - (d.endsWith('==') ? 2 : d.endsWith('=') ? 1 : 0); }
+    async function ghFileSize(path) {
+        if (ghSize.has(path)) return ghSize.get(path);
+        let n = -1;
+        try {
+            let r = await fetch(path, { method: 'HEAD', cache: 'no-cache' });
+            const cl = r.ok ? r.headers.get('content-length') : null;
+            if (cl && +cl > 0) n = +cl;
+            else { r = await fetch(path, { cache: 'no-cache' }); if (r.ok) n = (await r.blob()).size; }
+        } catch (e) { }
+        if (n >= 0) ghSize.set(path, n);
+        return n;
+    }
+    function reconcileMedia() {
+        if (reconPromise) return reconPromise;
+        reconPromise = (async () => {
+            if (!catalogRaw.size) return false;
+            let changed = false;
+            for (const p of places) {
+                const r = catalogRaw.get(p.id); if (!r || !r.media) continue;
+                const todo = (p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith('data:') && !mediaSame.has(m));
+                if (!todo.length) continue;
+                const paths = r.media.split('|').filter(Boolean);
+                const used = new Set((p.media || []).filter(m => mediaSame.has(m) || (typeof m.data === 'string' && m.data.startsWith(DATA_BASE))).map(m => mediaSame.get(m) || m.data));
+                for (const m of todo) {
+                    const sz = dataUriBytes(m.data); if (sz < 0) continue;
+                    for (const path of paths) {
+                        if (used.has(path)) continue;
+                        if (await ghFileSize(path) === sz) { mediaSame.set(m, path); used.add(path); changed = true; break; }
+                    }
+                }
+            }
+            return changed;
+        })().finally(() => { reconPromise = null; });
+        return reconPromise;
     }
     function missingOnGithub(p) {
         if (!catalogRaw.size) return !!p.dirty;                   // catalog not loaded (offline): all we know is the "changed by you" flag
@@ -4142,6 +4182,7 @@
         el.textContent = (dirty || deletedIds.length)
             ? `Local changes only in this browser: new or edited places — ${dirty}, removed from catalog — ${deletedIds.length}. To share them, use «Export».`
             : 'No local changes: showing catalog from repo.';
+        reconcileMedia().then(ch => { if (ch) refreshLocalInfo(); }).catch(() => { });
     }
     // Update: докачує каталог із репозиторію (GitHub) і ЗБАГАЧУЄ ним поточні картки — нічого з ваших даних не видаляє.
     // Картка каталогу й ваша картка — одне й те саме місце, якщо збігається id або назва (без урахування регістру).
@@ -4939,12 +4980,14 @@
         try {
             recomputeDeleted();
             const items = [];                              // кожне місце — вже готовий JSON-рядок і його розмір у байтах
+            await reconcileMedia();                                   // фото, що вже є на GitHub, не вважаємо змінами
             const missing = places.filter(missingOnGithub);          // only places that are not on GitHub yet or differ from it
             for (const p of missing) {
                 const media = [];
                 for (const m of p.media) {
                     // фото, що вже лежить у каталозі, експортуємо посиланням (ref) — файл обміну лишається легким; власні фото — повністю
                     if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !m.data.includes('..')) { media.push({ type: m.type, ref: m.data.slice(DATA_BASE.length) }); continue; }
+                    if (mediaSame.has(m)) { media.push({ type: m.type, ref: mediaSame.get(m).slice(DATA_BASE.length) }); continue; }   // таке саме фото вже є на GitHub — лише посилання
                     try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
                     catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
                 }
