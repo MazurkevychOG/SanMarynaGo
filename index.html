@@ -1313,7 +1313,8 @@
   const MAX_ACC_WALK = 80;                          // m: fixes up to this are kept when walking
   const GAP_WALK_MS = 90000;                        // walking: a signal gap up to 90 s is bridged (dashed), longer = break
   const MAX_MS_WALK = 15;                           // m/s: faster implied movement while walking = GPS jump
-  const COLOR = '#e91e63';     // actual track (planned OSRM route is blue/orange)
+  const COLOR = '#16a34a';     // actual track — green (planned OSRM route is blue/orange)
+  const FOLLOW = { on: true, zoomDone: false, bound: false, minZoom: 16 };   // map follows the current point while recording
 
   const $ = id => document.getElementById(id);
   const getMap = () => { try { return (typeof map !== 'undefined' && map) ? map : null; } catch (e) { return null; } };
@@ -1526,7 +1527,7 @@
       updateMode(vEst);
       lineAdd(ll, newSeg || link);
       if (link) gapAdd(a.ll, ll);
-      persistSoon(false); renderStats();
+      persistSoon(false); renderStats(); followTick();
     } catch (e) { console.warn('GPS track feed:', e); }
   }
   function gpsError(err) {
@@ -1612,6 +1613,7 @@
     try { startGps(); } catch (e) { }                        // existing single GPS stream (no-op if already running)
     const now = Date.now();
     S.t = { id: 't' + now.toString(36) + Math.random().toString(36).slice(2, 5), name: defName(now), start: now, end: 0, segs: [], dist: 0, moveMs: 0, activeMs: 0, maxMs: 0, done: false };
+    FOLLOW.on = true; FOLLOW.zoomDone = false;
     S.state = 'rec'; S.resumeAt = now; S.needSeg = true; S.anchor = null; S.lastValidT = 0; S.bad = 0; S.lastKmh = null; S.weak = 0; S.err = ''; S.vw = []; S.walk = false;
     drawAll(false); wake(true); persistSoon(true); startTimer(); render();
     say('● Recording — keep this page open and the screen on');
@@ -1623,6 +1625,7 @@
   }
   function resume() {
     if (S.state !== 'pause') return;
+    FOLLOW.on = true;
     S.resumeAt = Date.now(); S.needSeg = true; S.anchor = null; S.bad = 0; S.vw = []; S.walk = false; S.state = 'rec';
     try { startGps(); } catch (e) { }
     wake(true); persistSoon(true); render();
@@ -1754,6 +1757,7 @@
   }
   function renderStats() {
     const card = $('trkStats'); if (!card || card.hidden) return;
+    liftStats(card);
     const st = stats(); if (!st) return;
     const now = Date.now(), lost = S.state === 'rec' && (S.err || now - (S.lastFixAt || S.t.start) > LOST_MS);
     let chip = 'TRACK', cls = 'done';
@@ -1792,6 +1796,41 @@
     render();
   }
   window.addTrackUi = addTrackUi;
+
+  // The route summary («398 km · 128 h …», bottom-left of the map) is wide and would be covered by the track card: raise the card above it.
+  function liftStats(card) {
+    try {
+      card = card || $('trkStats'); if (!card || card.hidden) return;
+      const m = getMap(), sum = document.querySelector('.route-summary');
+      let b = '';
+      if (m && sum && sum.offsetParent !== null) {
+        const cr = m.getContainer().getBoundingClientRect(), sr = sum.getBoundingClientRect();
+        b = Math.max(28, Math.round(cr.bottom - sr.top + 8)) + 'px';
+      }
+      if (card.style.bottom !== b) card.style.bottom = b;
+    } catch (e) { }
+  }
+  setInterval(liftStats, 700);
+  window.addEventListener('resize', () => liftStats());
+
+  // Keep the current point in the middle of the map while recording (zoom ≥ 16 so the roads are readable).
+  // Dragging the map pauses following; the green «my location» button turns it back on.
+  function followTick() {
+    try {
+      if (!FOLLOW.on || S.state !== 'rec') return;
+      const m = getMap(); if (!m) return;
+      const c = m.getContainer(); if (!c || c.offsetParent === null || !c.clientWidth) return;     // map is not on screen now: catch up when it opens
+      if (!FOLLOW.bound) { FOLLOW.bound = true; m.on('dragstart', () => { FOLLOW.on = false; }); }
+      let ll = null; try { if (typeof lastGps !== 'undefined' && lastGps && lastGps.ll) ll = lastGps.ll; } catch (e) { }
+      if (!ll && S.anchor) ll = S.anchor.ll;
+      if (!ll) return;
+      if (!FOLLOW.zoomDone) { FOLLOW.zoomDone = true; m.setView(ll, Math.max(m.getZoom(), FOLLOW.minZoom), { animate: false }); return; }
+      const d = m.latLngToContainerPoint(ll).distanceTo(m.getSize().divideBy(2));
+      if (d > 6) m.panTo(ll, { animate: true, duration: 0.6, easeLinearity: 1, noMoveStart: true });
+    } catch (e) { }
+  }
+  setInterval(followTick, 1500);
+  document.addEventListener('trk-recenter', () => { FOLLOW.on = true; FOLLOW.zoomDone = false; followTick(); });
 
   // ---------- trips list ----------
   function closeTrips() { const m = $('trkModal'); if (m) m.remove(); }
@@ -6028,6 +6067,7 @@
                 L.DomEvent.on(a, 'click', ev => {
                     L.DomEvent.stop(ev);
                     startGps();
+                    try { document.dispatchEvent(new Event('trk-recenter')); } catch (e) { }
                     if (lastGps) map.setView(lastGps.ll, Math.max(map.getZoom(), 15));
                     else toast('Locating you… allow GPS access');
                 });
