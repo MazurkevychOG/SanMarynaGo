@@ -5039,7 +5039,7 @@
         return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
     }
     // Жорсткий ліміт кожного файлу — 24 000 000 байтів, щоб гарантовано бути нижче 25 МБ.
-    const EXPORT_PART_MAX = 24_000_000;
+    const EXPORT_PART_MAX = 20_000_000;     // one export file (for the repo «inbox» folder) is never larger than 20 MB
     async function deliverFiles(files) {                  // files: [{ blob, name }]
         try {
             if (isCoarse() && typeof File === 'function' && navigator.canShare && navigator.share) {
@@ -5059,7 +5059,8 @@
             if (k < files.length - 1) await new Promise(r => setTimeout(r, 400));
         }
     }
-    async function exportData() {
+    async function exportBuild() {                         // compares the browser data with the repository and returns the files to hand over (or null)
+        setWaitText('Comparing with the repository…');
         toast('Preparing export…');
         try {
             recomputeDeleted();
@@ -5091,7 +5092,8 @@
                 const cat = [...catalogRaw.keys()].filter(id => places.some(p => p.id === id)), loc = places.map(p => p.id).filter(id => catalogRaw.has(id));
                 if (cat.length !== loc.length || cat.some((id, i) => id !== loc[i])) orderOut = places.map(p => p.id);
             }
-            if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length && !orderOut) { toast('Nothing new to export — GitHub already has everything'); return; }
+            if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length && !orderOut) { toast('Nothing new to export — GitHub already has everything'); return null; }
+            setWaitText('Packing ' + items.length + ' changed place' + (items.length === 1 ? '' : 's') + '…');
             const makeBlob = (g, part, total) => new Blob([
                 `{"format":"maps-places","version":3,"part":${part},"parts":${total},"exportedAt":${JSON.stringify(when)},"places":[`,
                 g.map(it => it.s).join(','),
@@ -5104,12 +5106,12 @@
                 // Перевірка повного JSON, а не лише суми розмірів карток.
                 if (candidate.length && makeBlob(candidate, groups.length + 1, 999).size > EXPORT_PART_MAX) {
                     if (!cur.length) {
-                        throw new Error(`Card «${it.s ? JSON.parse(it.s).name : 'untitled'}» alone exceeds 24 MB. Shrink/remove some photos or videos and export again.`);
+                        throw new Error(`Card «${it.s ? JSON.parse(it.s).name : 'untitled'}» alone exceeds 20 MB. Shrink/remove some photos or videos and export again.`);
                     }
                     groups.push(cur);
                     cur = [it];
                     if (makeBlob(cur, groups.length + 1, 999).size > EXPORT_PART_MAX) {
-                        throw new Error(`Card «${JSON.parse(it.s).name}» alone exceeds 24 MB. Shrink/remove some photos or videos and export again.`);
+                        throw new Error(`Card «${JSON.parse(it.s).name}» alone exceeds 20 MB. Shrink/remove some photos or videos and export again.`);
                     }
                 } else {
                     cur = candidate;
@@ -5124,7 +5126,7 @@
                 const total = groups.length;
                 for (let i = 0; i < groups.length; i++) {
                     if (makeBlob(groups[i], i + 1, total).size > EXPORT_PART_MAX) {
-                        if (groups[i].length <= 1) throw new Error(`One card in part ${i + 1} exceeds 24 MB. Shrink/remove some photos or videos.`);
+                        if (groups[i].length <= 1) throw new Error(`One card in part ${i + 1} exceeds 20 MB. Shrink/remove some photos or videos.`);
                         const moved = groups[i].pop();
                         if (i + 1 === groups.length) groups.push([]);
                         groups[i + 1].unshift(moved);
@@ -5136,12 +5138,43 @@
             const N = groups.length, w = String(N).length;
             const files = groups.map((g, k) => {
                 const blob = makeBlob(g, k + 1, N);
-                if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 24 MB limit.`);
+                if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 20 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
             toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 25 MB)` : ''));
-            await deliverFiles(files);
-        } catch (err) { console.error(err); alert('Could not prepare export: ' + err.message); }
+            return files;
+        } catch (err) { throw err; }
+    }
+    // Export: sonar sound + green snake while the data is compared and packed; when the files have been handed over (share sheet / downloads closed)
+    // every window collapses and the user is back on the Settings page.
+    let _runExp = false;
+    function collapseToSettings() {
+        const t = f => { try { f(); } catch (e) { } };
+        const bc = document.body.classList;
+        t(closeCtx);
+        if (bc.contains('map-open')) t(closeMobileMap);
+        if (bc.contains('profile-open')) t(closeProfile);
+        if (bc.contains('speedo-open')) t(closeSpeedo);
+        if (bc.contains('mdl-open')) { t(closeTypes); t(closeFilter); }
+        ['saveRouteModal', 'editRouteModal', 'navPickModal', 'stopModal'].forEach(id => { const m = document.getElementById(id); if (m) m.classList.remove('open'); });
+        ['logsModal', 'trkModal', 'tripCostModal'].forEach(id => { const m = document.getElementById(id); if (m) m.remove(); });
+        const mm = document.getElementById('mediaModal'); if (mm && mm.style.display && mm.style.display !== 'none') t(closeGallery);
+        t(openSettings);
+    }
+    async function exportData() {
+        if (_runExp) return;
+        _runExp = true;
+        showWait('Exporting…'); startWaitSound();
+        const t0 = Date.now(); let files = null, failed = null;
+        try { files = await exportBuild(); }
+        catch (err) { console.error(err); failed = err; }
+        const left = 1200 - (Date.now() - t0);
+        if (left > 0) await new Promise(r => setTimeout(r, left));
+        hideWait(); stopWaitSound();
+        try {
+            if (failed) alert('Could not prepare export: ' + failed.message);
+            else if (files) await deliverFiles(files);
+        } finally { _runExp = false; collapseToSettings(); }
     }
 
     function applyImportedTypes(defs, del) {                 // → Map(id із файлу → id у вашому списку)
