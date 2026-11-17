@@ -1042,7 +1042,7 @@
             body.form-open .form-container { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
         }
         /* ===== Altitude label (top centre) ===== */
-        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 17px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.9); color: #2d3748; font-size: 19px; line-height: 32px; white-space: nowrap; pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 17px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.9); color: #2d3748; font-size: 19px; line-height: 32px; white-space: nowrap; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
         #altBar[hidden] { display: none; }
         #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
         html[data-theme="dark"] #altBar, body.speedo-open #altBar { background: rgba(30,37,48,.84); color: #e2e8f0; }
@@ -1830,6 +1830,20 @@
     } catch (e) { }
   }
   setInterval(followTick, 1500);
+  // Tap on the empty map = reset: close the recorded track/route that is shown (never while recording or paused)
+  function bindTap() {
+    try {
+      const m = getMap(); if (!m || m.__trkTap) return;
+      m.__trkTap = true;
+      m.on('click', () => {
+        if (S.state !== 'idle' || !S.t) return;
+        try { if (typeof lastCtxOpen !== 'undefined' && Date.now() - lastCtxOpen < 700) return; } catch (e) { }
+        S.t = null; drawAll(false); render();
+        say('Track closed');
+      });
+    } catch (e) { }
+  }
+  setInterval(bindTap, 1000);
   document.addEventListener('trk-recenter', () => { FOLLOW.on = true; FOLLOW.zoomDone = false; followTick(); });
 
   // ---------- trips list ----------
@@ -1845,6 +1859,8 @@
       const b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
       const act = b.dataset.act, id = b.dataset.id;
       if (act === 'x') { closeTrips(); return; }
+      if (act === 'pfopen') { closeTrips(); try { pfRouteAct('open', id); } catch (er) { dbFail('open route', er); } return; }
+      if (act === 'pfdel') { try { pfRouteAct('del', id); } catch (er) { } fill(); return; }
       let tr = pending.get(id); if (!tr) { try { tr = await dbGet('trips', id); } catch (er) { dbFail('read', er); } }
       if (!tr) { say('Track not found'); return; }
       if (act === 'view') { closeTrips(); viewTrip(tr); }
@@ -1869,10 +1885,21 @@
       try { list = await dbAll('trips'); } catch (e) { dbFail('list', e); }
       const have = new Set(list.map(t => t.id)); pending.forEach(t => { if (!have.has(t.id)) list.push(t); });
       list.sort((a, b) => b.start - a.start);
+      let cabHtml = '';                                       // saved routes and GPS tracks from the personal cabinet (Profile)
+      try {
+        const cab = (typeof pfRoutesLoad === 'function') ? pfRoutesLoad() : [];
+        if (cab.length) {
+          cabHtml = '<div class="lg-meta" style="margin-top:8px"><b>🗂 Saved routes (Profile) · ' + cab.length + '</b></div>' + cab.map(r => {
+            const d = new Date(r.ts || 0), when = isNaN(d.getTime()) || !r.ts ? '' : ' · ' + d.toLocaleDateString();
+            return '<div class="lg-row"><div class="lg-top"><b>' + he(r.name) + '</b></div><small>' + (r.trk ? 'GPS track' : (r.ids || []).length + ' points') + ' · ' + ((r.dist || 0) / 1000).toFixed(2) + ' km · ' + fmtDur((r.dur || 0) * 1000) + (r.ret ? ' · round trip' : '') + he(when) + '</small>' +
+              '<div class="trk-row-acts"><button data-act="pfopen" data-id="' + he(r.id) + '">Open</button><button data-act="pfdel" data-id="' + he(r.id) + '" class="del" title="Delete">✕</button></div></div>';
+          }).join('');
+        }
+      } catch (e) { }
       const rows = list.map(t => '<div class="lg-row"><div class="lg-top"><b>' + he(t.name) + '</b></div><small>' + he(new Date(t.start).toLocaleString()) + ' · ' + (t.dist / 1000).toFixed(2) + ' km · ' + fmtDur(t.activeMs) + (pending.has(t.id) ? ' · ⚠ not saved on device yet' : '') + '</small>' +
         '<div class="trk-row-acts"><button data-act="view" data-id="' + he(t.id) + '">View</button><button data-act="gpx" data-id="' + he(t.id) + '">GPX</button><button data-act="route" data-id="' + he(t.id) + '">Save route</button>' +
         '<button data-act="ren" data-id="' + he(t.id) + '" title="Rename">✎</button><button data-act="del" data-id="' + he(t.id) + '" class="del" title="Delete">🗑</button></div></div>').join('');
-      m.firstChild.innerHTML = '<h3>🗂 Trips</h3><div class="lg-list">' + (rows || '<div class="lg-row"><small>No recorded trips yet.</small></div>') + '</div><div class="lg-btns"><button type="button" data-act="x" id="lgX">Close</button></div>';
+      m.firstChild.innerHTML = '<h3>🗂 Trips</h3><div class="lg-list">' + (rows || '<div class="lg-row"><small>No recorded trips yet.</small></div>') + cabHtml + '</div><div class="lg-btns"><button type="button" data-act="x" id="lgX">Close</button></div>';
     }
     fill();
   }
@@ -1887,12 +1914,19 @@
 (function () {
   // ===== Altitude above sea level (GPS): small centred label in the top row of the main screen, the map and the speedometer =====
   const FRESH_MS = 15000;
-  let alt = null, at = 0, seen = false, el = null;
+  let alt = null, at = 0, seen = false, el = null, retryAt = 0;
   function make() {
     if (el || !document.body) return;
     el = document.createElement('div');
     el.id = 'altBar'; el.hidden = true; el.title = 'Altitude above sea level (GPS)'; el.setAttribute('aria-label', 'Altitude above sea level');
     el.innerHTML = '<span>⛰</span><b id="altVal">— m</b>';
+    el.addEventListener('click', ev => {                      // tap on the number = retry a lost GPS signal
+      ev.stopPropagation();
+      retryAt = Date.now(); at = 0;
+      try { if (typeof speedoRetry === 'function') speedoRetry(); else if (typeof startGps === 'function') startGps(); } catch (e) { }
+      try { if (typeof toast === 'function') toast('Retrying GPS…'); } catch (e) { }
+      render();
+    });
     document.body.appendChild(el);
   }
   function render() {
@@ -1900,7 +1934,7 @@
     if (!seen) { el.hidden = true; return; }                  // nothing until the first GPS fix
     el.hidden = false;
     const fresh = alt !== null && Date.now() - at < FRESH_MS;  // stale altitude is never shown as current
-    const txt = fresh ? Math.round(alt) + ' m' : '— m';
+    const txt = fresh ? Math.round(alt) + ' m' : (Date.now() - retryAt < 2500 ? '… m' : '— m');
     const v = document.getElementById('altVal'); if (v && v.textContent !== txt) v.textContent = txt;
     place();
   }
