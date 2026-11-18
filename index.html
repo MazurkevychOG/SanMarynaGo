@@ -1377,7 +1377,7 @@
   const dbFail = (what, e) => console.warn('GPS track: ' + what + ' failed:', (e && e.message) || e);
 
   // ---------- state ----------
-  const S = { vw: [], walk: false, gapLine: null, state: 'idle', t: null, resumeAt: 0, needSeg: true, anchor: null, lastValidT: 0, lastFixAt: 0, lastKmh: null, bad: 0, weak: 0, err: '',
+  const S = { vw: [], walk: false, gapLine: null, state: 'idle', t: null, open: [], resumeAt: 0, needSeg: true, anchor: null, lastValidT: 0, lastFixAt: 0, lastKmh: null, bad: 0, weak: 0, err: '',
               line: null, marks: null, hidden: false, fold: false, timer: 0, saveT: 0 };
 
   const stats = () => {
@@ -1429,31 +1429,39 @@
     else l.addLatLng(ll, rings[rings.length - 1]);
   }
   function clearMarks() { const m = getMap(); if (S.marks && m) m.removeLayer(S.marks); S.marks = null; }
+  // Several recorded trips can be open on the map at once: S.open (+ the current S.t).
+  function viewSet() { const set = S.open.slice(); if (S.t && !set.some(x => x.id === S.t.id)) set.push(S.t); return set; }
+  function costRefresh() { try { if (typeof updateListCount === 'function') updateListCount(); } catch (e) { } }
+  function dropOpen(id) { S.open = S.open.filter(x => x.id !== id); if (S.t && S.t.id === id) S.t = S.open.length ? S.open[S.open.length - 1] : null; }
+  function closeAllTrips() { S.open = []; S.t = null; }
+  window.trkOpenTrips = () => (S.state === 'idle' ? viewSet() : S.open.slice()).filter(t => t && t.done);   // trips shown on the map (for the cost calculation and the Trips list)
+  window.trkOpenIds = () => new Set(window.trkOpenTrips().map(t => t.id));
   function drawAll(fit) {                                   // rebuild from data (view / restore / map created later)
     const m = getMap(); if (!m) return;
     const l = ensureLine(); if (!l) return;
     clearMarks();
     const t = S.t;
     const rings = [], gaps = [];                            // a point with a 6th item follows a bridged gap: dashed link + new solid ring
-    if (t) t.segs.forEach(sg => {
+    viewSet().forEach(tt => tt.segs.forEach(sg => {
       let ring = [], prev = null;
       sg.forEach(p => {
         if (p[5] && ring.length) { rings.push(ring); ring = []; if (prev) gaps.push([[prev[0], prev[1]], [p[0], p[1]]]); }
         ring.push([p[0], p[1]]); prev = p;
       });
       if (ring.length) rings.push(ring);
-    });
+    }));
     l.setLatLngs(rings);
     const g = ensureGap(); if (g) g.setLatLngs(gaps);
-    if (t && t.done && t.segs.some(s => s.length)) {
-      const first = t.segs.find(s => s.length)[0], lastSeg = [...t.segs].reverse().find(s => s.length), last = lastSeg[lastSeg.length - 1];
-      S.marks = L.layerGroup([
-        L.circleMarker([first[0], first[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#2ecc71', fillOpacity: 1, interactive: false }),
-        L.circleMarker([last[0], last[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#e74c3c', fillOpacity: 1, interactive: false })
-      ]);
-      if (!S.hidden) S.marks.addTo(m);
-    }
-    if (fit && t && l.getLatLngs().length) { try { m.invalidateSize(); m.fitBounds(l.getBounds(), { padding: [40, 40], maxZoom: 17 }); } catch (e) { } }
+    const ms = [];
+    viewSet().forEach(tt => {
+      if (tt.done && tt.segs.some(s => s.length)) {
+        const first = tt.segs.find(s => s.length)[0], lastSeg = [...tt.segs].reverse().find(s => s.length), last = lastSeg[lastSeg.length - 1];
+        ms.push(L.circleMarker([first[0], first[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#2ecc71', fillOpacity: 1, interactive: false }),
+                L.circleMarker([last[0], last[1]], { radius: 7, color: '#fff', weight: 2, fillColor: '#e74c3c', fillOpacity: 1, interactive: false }));
+      }
+    });
+    if (ms.length) { S.marks = L.layerGroup(ms); if (!S.hidden) S.marks.addTo(m); }
+    if (fit && (t || S.open.length) && l.getLatLngs().length) { try { m.invalidateSize(); m.fitBounds(l.getBounds(), { padding: [40, 40], maxZoom: 17 }); } catch (e) { } }
     applyTrackWeight();
   }
   function setHidden(h) {
@@ -1612,6 +1620,7 @@
     if (!navigator.geolocation) { say('No geolocation in this browser'); return; }
     try { startGps(); } catch (e) { }                        // existing single GPS stream (no-op if already running)
     const now = Date.now();
+    S.open = [];
     S.t = { id: 't' + now.toString(36) + Math.random().toString(36).slice(2, 5), name: defName(now), start: now, end: 0, segs: [], dist: 0, moveMs: 0, activeMs: 0, maxMs: 0, done: false };
     FOLLOW.on = true; FOLLOW.zoomDone = false;
     S.state = 'rec'; S.resumeAt = now; S.needSeg = true; S.anchor = null; S.lastValidT = 0; S.bad = 0; S.lastKmh = null; S.weak = 0; S.err = ''; S.vw = []; S.walk = false;
@@ -1637,7 +1646,7 @@
     S.state = 'idle'; stopTimer(); wake(false); clearTimeout(S.saveT);
     const n = t.segs.reduce((k, s) => k + s.length, 0);
     if (n < 2) {
-      S.t = null; drawAll(false); render();
+      S.t = S.open.length ? S.open[S.open.length - 1] : null; drawAll(false); render();
       dbDel('active', 'cur').catch(() => { }); lsDel(ASTASH);
       say('Track too short — not saved'); return;
     }
@@ -1652,8 +1661,8 @@
     const nr = S.t.done ? routesFor(S.t.id) : 0;
     if (!confirm(rec ? 'Delete the current recording?' : 'Delete this track?' + (nr ? ' Its route in Profile will be removed too.' : ''))) return;
     const id = S.t.id, wasDone = S.t.done;
-    S.state = 'idle'; stopTimer(); clearTimeout(S.saveT); wake(false); S.t = null;
-    drawAll(false); render();
+    S.state = 'idle'; stopTimer(); clearTimeout(S.saveT); wake(false); dropOpen(id);
+    drawAll(false); render(); costRefresh();
     pending.delete(id); lsDel(STASH + id); lsDel(ASTASH);
     try { await dbDel('active', 'cur'); if (wasDone) await dbDel('trips', id); } catch (e) { dbFail('delete', e); }
     const dr = wasDone ? dropRoutesFor(id) : 0;
@@ -1713,7 +1722,10 @@
   async function viewTrip(trip) {
     if (!trip) return;
     if (S.state !== 'idle') { say('Finish the recording first'); return; }
+    if (S.t && S.t.done && !S.open.some(x => x.id === S.t.id)) S.open.push(S.t);       // the trip that is shown now stays open
+    if (!S.open.some(x => x.id === trip.id)) S.open.push(trip);
     S.t = trip; S.hidden = false;
+    costRefresh();
     try { if (window.matchMedia && matchMedia('(max-width: 700px)').matches && typeof openMobileMap === 'function') openMobileMap(); } catch (e) { }
     render();
     setTimeout(() => { drawAll(true); render(); }, 350);
@@ -1836,10 +1848,11 @@
       const m = getMap(); if (!m || m.__trkTap) return;
       m.__trkTap = true;
       m.on('click', () => {
-        if (S.state !== 'idle' || !S.t) return;
+        if (S.state !== 'idle' || (!S.t && !S.open.length)) return;
         try { if (typeof lastCtxOpen !== 'undefined' && Date.now() - lastCtxOpen < 700) return; } catch (e) { }
-        S.t = null; drawAll(false); render();
-        say('Track closed');
+        const n = viewSet().length;
+        closeAllTrips(); drawAll(false); render(); costRefresh();
+        say(n > 1 ? n + ' tracks closed' : 'Track closed');
       });
     } catch (e) { }
   }
@@ -1859,7 +1872,7 @@
       const b = e.target.closest && e.target.closest('[data-act]'); if (!b) return;
       const act = b.dataset.act, id = b.dataset.id;
       if (act === 'x') { closeTrips(); return; }
-      if (act === 'pfopen') { closeTrips(); try { pfRouteAct('open', id); } catch (er) { dbFail('open route', er); } return; }
+      if (act === 'pfopen') { closeTrips(); try { pfRouteAct('open', id, true); } catch (er) { dbFail('open route', er); } return; }
       if (act === 'pfdel') { try { pfRouteAct('del', id); } catch (er) { } fill(); return; }
       let tr = pending.get(id); if (!tr) { try { tr = await dbGet('trips', id); } catch (er) { dbFail('read', er); } }
       if (!tr) { say('Track not found'); return; }
@@ -1876,7 +1889,7 @@
         if (!confirm('Delete «' + tr.name + '»?' + (nr ? ' Its route in Profile will be removed too.' : ''))) return;
         try { await dbDel('trips', id); } catch (er) { dbFail('delete', er); }
         pending.delete(id); lsDel(STASH + id); dropRoutesFor(id);
-        if (S.t && S.t.id === id && S.state === 'idle') { S.t = null; drawAll(false); render(); }
+        if (S.state === 'idle') { dropOpen(id); drawAll(false); render(); costRefresh(); }
         fill();
       }
     });
@@ -1885,9 +1898,14 @@
       try { list = await dbAll('trips'); } catch (e) { dbFail('list', e); }
       const have = new Set(list.map(t => t.id)); pending.forEach(t => { if (!have.has(t.id)) list.push(t); });
       list.sort((a, b) => b.start - a.start);
+      const openIds = window.trkOpenIds ? window.trkOpenIds() : new Set();
+      if (S.t) openIds.add(S.t.id);
+      list = list.filter(t => !openIds.has(t.id));              // already open on the map → not in the list; closing it on the map brings it back
       let cabHtml = '';                                       // saved routes and GPS tracks from the personal cabinet (Profile)
       try {
-        const cab = (typeof pfRoutesLoad === 'function') ? pfRoutesLoad() : [];
+        const selIds = new Set(places.filter(p => p.selected).map(p => p.id));
+        const isOpen = r => r.trk ? openIds.has(r.trk) : (() => { const ids = (r.ids || []).map(x => { const pl = placeByAnyId(x); return pl && pl.id; }).filter(Boolean); return ids.length > 0 && ids.every(x => selIds.has(x)); })();
+        const cab = ((typeof pfRoutesLoad === 'function') ? pfRoutesLoad() : []).filter(r => !isOpen(r));      // an open route is not listed either
         if (cab.length) {
           cabHtml = '<div class="lg-meta" style="margin-top:8px"><b>🗂 Saved routes (Profile) · ' + cab.length + '</b></div>' + cab.map(r => {
             const d = new Date(r.ts || 0), when = isNaN(d.getTime()) || !r.ts ? '' : ' · ' + d.toLocaleDateString();
@@ -4667,7 +4685,7 @@
         if (e.key === 'Escape') closeEditRoute();
         else if (e.key === 'Enter' && e.target && e.target.id === 'ermName') { e.preventDefault(); saveEditRoute(); }
     });
-    function pfRouteAct(kind, id) {
+    function pfRouteAct(kind, id, add) {
         const list = pfRoutesLoad();
         const i = list.findIndex(r => r.id === id);
         if (i < 0) return;
@@ -4683,11 +4701,12 @@
             const ids = new Set();
             let missing = 0;
             for (const rid of r.ids || []) { const pl = placeByAnyId(rid); if (pl) ids.add(pl.id); else missing++; }   // id місця міг змінитись (аліас)
-            places.forEach(p => { p.selected = ids.has(p.id); });
+            const prev = add ? places.filter(p => p.selected).length : 0;           // from the map's Trips list a route is ADDED to what is already open
+            places.forEach(p => { p.selected = (prev ? p.selected : false) || ids.has(p.id); });
             const rt = document.getElementById('returnToStart');
-            if (rt) { rt.checked = !!r.ret; onReturnToggle(rt); }
+            if (rt && !prev) { rt.checked = !!r.ret; onReturnToggle(rt); }
             persistSelection(); refreshSelectionUI();
-            savedRouteSig = routeSig(); updateListCount();      // щойно відкритий маршрут — без змін, 💾 прихована
+            savedRouteSig = prev ? null : routeSig(); updateListCount();      // щойно відкритий маршрут — без змін, 💾 прихована
             closeProfile();
             toast(missing ? '▶ Route opened (' + missing + ' places no longer in list)' : '▶ Route opened: ' + r.name);
             if (window.matchMedia && window.matchMedia('(max-width: 700px)').matches) {
@@ -4718,17 +4737,24 @@
     function closeTripCost() { const m = document.getElementById('tripCostModal'); if (m) m.remove(); }
     function showTripCost() {
         const n = places.filter(p => p.selected).length;
-        if (!n) return;
+        const trips = (window.trkOpenTrips ? window.trkOpenTrips() : []);       // recorded trips open on the map
+        if (!n && !trips.length) return;
         const eff = n + (startFromMe && startSnap ? 1 : (n === 1 && autoStart ? 1 : 0));
         const pf = pfLoad(), cur = pf.cur || '€', ex = extrasTotals();
         const cons = pfNum(pf.cons), price = pfNum(pf.price);
-        const meters = (routeTotals && eff >= 2) ? routeTotals.distance : null;
+        const routeM = (routeTotals && eff >= 2) ? routeTotals.distance : null;
+        const tripsM = trips.reduce((a, t) => a + (t.dist || 0), 0);
+        const meters = (routeM != null || trips.length) ? (routeM || 0) + tripsM : null;      // all open points + all open trips
         const f = meters != null ? pfFuel(meters, cons, price) : null;
         const money = v => pfFmt(v, 2) + ' ' + esc(cur);
         const row = (l, v) => '<div class="tc-row"><span>' + l + '</span><b>' + v + '</b></div>';
         let html = '<h3>💶 Trip cost</h3>';
         const notes = [];
-        html += row('🧭 Distance', meters != null ? (routeTotals.estimated ? '≈ ' : '') + fmtKm(meters) : '—');
+        html += row('🧭 Distance', meters != null ? (routeM != null && routeTotals.estimated ? '≈ ' : '') + fmtKm(meters) : '—');
+        if (trips.length) {                                   // what the distance is made of: open route points + open recorded trips
+            if (routeM != null) html += row('📍 Route · ' + eff + ' points', fmtKm(routeM));
+            html += row('🚗 Recorded trips · ' + trips.length, fmtKm(tripsM));
+        }
         if (meters == null) notes.push(eff < 2 ? 'Distance needs a start: allow GPS, or select 2+ points.' : 'Route is still calculating — try again in a moment.');
         let total = 0, haveAny = false;
         if (f) {
@@ -4757,9 +4783,10 @@
         ['returnToggle', 'returnToggleDesk'].forEach(id => { const rt = document.getElementById(id); if (rt) rt.style.display = eff >= 2 ? 'inline-flex' : 'none'; });
         const canSave = !!(routeTotals && eff >= 2) && !(savedRouteSig !== null && routeSig() === savedRouteSig);                           // кнопка 💾 лише коли є готовий маршрут
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });
-        document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = n >= 1 ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
+        const nt = (window.trkOpenTrips ? window.trkOpenTrips().length : 0);
+        document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = (n >= 1 || nt >= 1) ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         const lh = document.getElementById('listHead');
-        if (lh) { lh.classList.toggle('has-cost', n > 0); lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
+        if (lh) { lh.classList.toggle('has-cost', n > 0 || nt > 0); lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
         if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
@@ -5064,23 +5091,8 @@
         toast('Preparing export…');
         try {
             recomputeDeleted();
-            const items = [];                              // кожне місце — вже готовий JSON-рядок і його розмір у байтах
-            await reconcileMedia();                                   // фото, що вже є на GitHub, не вважаємо змінами
-            const missing = places.filter(missingOnGithub);          // only places that are not on GitHub yet or differ from it
-            for (const p of missing) {
-                const media = [];
-                for (const m of p.media) {
-                    // фото, що вже лежить у каталозі, експортуємо посиланням (ref) — файл обміну лишається легким; власні фото — повністю
-                    if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !m.data.includes('..')) { media.push({ type: m.type, ref: m.data.slice(DATA_BASE.length) }); continue; }
-                    if (ghSameMedia.has(m)) { media.push({ type: m.type, ref: ghSameMedia.get(m).slice(DATA_BASE.length) }); continue; }   // таке саме фото вже є на GitHub — лише посилання
-                    try { media.push({ type: m.type, data: await toDataUri(m.data) }); }
-                    catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
-                }
-                const s = JSON.stringify({ id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}), media });
-                items.push({ s, size: new Blob([s]).size });
-            }
-            // Пакуємо картки послідовно, перевіряючи фактичний розмір у байтах усього JSON-файлу.
-            // Якщо додавання картки перевищує ліміт, вона переноситься в наступний пакет.
+            const items = [];                              // each place = ready JSON string and its size in bytes
+            await reconcileMedia();                                   // photos already on GitHub are not changes
             const d = new Date(), pad = n => String(n).padStart(2, '0');
             const day = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
             const when = d.toISOString();
@@ -5092,6 +5104,33 @@
                 const cat = [...catalogRaw.keys()].filter(id => places.some(p => p.id === id)), loc = places.map(p => p.id).filter(id => catalogRaw.has(id));
                 if (cat.length !== loc.length || cat.some((id, i) => id !== loc[i])) orderOut = places.map(p => p.id);
             }
+            // Room for ONE card inside a package: the whole file must stay ≤ EXPORT_PART_MAX (20 MB).
+            const envBytes = new Blob([`{"format":"maps-places","version":3,"part":999,"parts":999,"exportedAt":${JSON.stringify(when)},"places":[`,
+                `],"deleted":${JSON.stringify(deletedIds)},"types":${JSON.stringify(typesOut)},"typesDeleted":${JSON.stringify(typesDeleted)},"users":${JSON.stringify(usersOut)}${orderOut ? ',"order":' + JSON.stringify(orderOut) : ''}}`]).size;
+            const CAP = EXPORT_PART_MAX - envBytes - 2048;
+            if (CAP < 1_000_000) throw new Error('Profile/types data alone is almost 20 MB — nothing is left for the photos.');
+            const missing = places.filter(missingOnGithub);          // only places that are not on GitHub yet or differ from it
+            const deferred = [], tooBig = [];                         // photos that did not fit into this package / can never fit
+            for (const p of missing) {
+                const base = { id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}) };
+                let used = JSON.stringify({ ...base, media: [] }).length;
+                const media = [];
+                for (const m of p.media) {
+                    // a photo that is already in the catalog goes as a reference (ref) — the file stays light; own photos go in full
+                    if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !m.data.includes('..')) { const e = { type: m.type, ref: m.data.slice(DATA_BASE.length) }; media.push(e); used += JSON.stringify(e).length + 1; continue; }
+                    if (ghSameMedia.has(m)) { const e = { type: m.type, ref: ghSameMedia.get(m).slice(DATA_BASE.length) }; media.push(e); used += JSON.stringify(e).length + 1; continue; }   // same photo is already on GitHub — reference only
+                    let uri;
+                    try { uri = await toDataUri(m.data); }
+                    catch (e) { throw new Error(`photo of place «${p.name}» could not read (${e.message})`); }
+                    const add = uri.length + 48;
+                    if (used + add > CAP) { (add + JSON.stringify({ ...base, media: [] }).length > CAP ? tooBig : deferred).push(p.name); continue; }   // does not fit this package: the next export compares with GitHub again and takes the rest
+                    media.push({ type: m.type, data: uri }); used += add;
+                }
+                const s = JSON.stringify({ ...base, media });
+                items.push({ s, size: new Blob([s]).size });
+            }
+            // Пакуємо картки послідовно, перевіряючи фактичний розмір у байтах усього JSON-файлу.
+            // Якщо додавання картки перевищує ліміт, вона переноситься в наступний пакет.
             if (!items.length && !deletedIds.length && !typesOut.length && !typesDeleted.length && !orderOut) { toast('Nothing new to export — GitHub already has everything'); return null; }
             setWaitText('Packing ' + items.length + ' changed place' + (items.length === 1 ? '' : 's') + '…');
             const makeBlob = (g, part, total) => new Blob([
@@ -5141,7 +5180,7 @@
                 if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 20 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
-            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 25 MB)` : ''));
+            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 20 MB)` : '') + (deferred.length ? ` · ${deferred.length} photo(s) did not fit — export again after uploading these files` : '') + (tooBig.length ? ` · ${tooBig.length} photo(s) are bigger than 20 MB and were skipped — shrink them` : ''));
             return files;
         } catch (err) { throw err; }
     }
