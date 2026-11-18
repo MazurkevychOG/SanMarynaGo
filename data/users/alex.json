@@ -20,16 +20,27 @@
       "dist": 576146.5,
       "dur": 40419,
       "est": false
+    },
+    {
+      "id": "mwjoaex618wx",
+      "name": "Trip 2026-11-16 20:31",
+      "ts": 1794858298892,
+      "ids": [],
+      "ret": false,
+      "dist": 5747.143127603189,
+      "dur": 787,
+      "est": false,
+      "trk": "tmwjnt9qi5fg"
     }
   ],
   "settings": {
-    "theme": "dark",
+    "theme": "light",
     "fab": {
-      "fx": 0.952,
-      "fy": 0.9532
+      "fx": 0.9674,
+      "fy": 0.874
     }
   },
-  "updated": "2026-11-16",
+  "updated": "2026-11-18",
   "deletedRoutes": [
     "mwgbbiu1wd8h"
   ]
