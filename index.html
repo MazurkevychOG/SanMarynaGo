@@ -4967,7 +4967,7 @@
     function nearLine(p) {
         const parts = [];
         if (p.near) parts.push('📍 ' + p.near);
-        const dt = distText(p); if (dt) parts.push('🧭 ' + dt);
+        const dt = distText(p); if (dt) parts.push('📏 ' + dt);
         const e = elevOf(p); if (e !== null && Math.round(e) >= 100) parts.push('⛰ ' + Math.round(e) + ' m');
         return parts.join(' · ');
     }
