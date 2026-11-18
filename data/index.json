@@ -60,26 +60,8 @@
       "updated": "2026-11-16"
     },
     {
-      "id": "plyazh-dhermi",
-      "order": 4,
-      "name": "Beach Dhermi",
-      "lat": 40.135637,
-      "lng": 19.647457,
-      "category": null,
-      "desc": "",
-      "near": "Dhërmi",
-      "country": "Shqipëri",
-      "types": [
-        "beach"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
-      "thumb": "photos/plyazh-dhermi/02_thumb.webp",
-      "photos": 3,
-      "updated": "2026-11-16"
-    },
-    {
       "id": "gjipe-beach",
-      "order": 5,
+      "order": 4,
       "name": "Gjipe beach",
       "lat": 40.126937,
       "lng": 19.670437,
@@ -98,7 +80,7 @@
     },
     {
       "id": "saranda-embankment",
-      "order": 6,
+      "order": 5,
       "name": "Saranda Embankment",
       "lat": 39.8734834,
       "lng": 20.0104313,
@@ -119,7 +101,7 @@
     },
     {
       "id": "plazhi-i-himares",
-      "order": 7,
+      "order": 6,
       "name": "Plazhi i Himarës",
       "lat": 40.1008123,
       "lng": 19.7456809,
@@ -138,7 +120,7 @@
     },
     {
       "id": "bora-bora-beach-ksamil",
-      "order": 8,
+      "order": 7,
       "name": "Bora Bora beach | Ksamil",
       "lat": 39.7713041,
       "lng": 19.9984411,
@@ -157,7 +139,7 @@
     },
     {
       "id": "abeille-restaurant",
-      "order": 9,
+      "order": 8,
       "name": "Abeille Restaurant",
       "lat": 40.1574251,
       "lng": 19.8151497,
@@ -176,7 +158,7 @@
     },
     {
       "id": "mesopotam-restaurant",
-      "order": 10,
+      "order": 9,
       "name": "Mesopotam Restaurant",
       "lat": 39.9105198,
       "lng": 20.1028693,
@@ -194,7 +176,7 @@
     },
     {
       "id": "bujtina-e-peshkaterit",
-      "order": 11,
+      "order": 10,
       "name": "Bujtina e peshkaterit",
       "lat": 40.361562,
       "lng": 19.480187,
@@ -213,7 +195,7 @@
     },
     {
       "id": "kantina-balaj-mifol",
-      "order": 12,
+      "order": 11,
       "name": "Kantina Balaj (Mifol)",
       "lat": 40.5963295,
       "lng": 19.483349,
@@ -232,7 +214,7 @@
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
-      "order": 13,
+      "order": 12,
       "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
       "lat": 40.387768,
       "lng": 19.605723,
@@ -251,7 +233,7 @@
     },
     {
       "id": "argjiro-winery-gjirokaster",
-      "order": 14,
+      "order": 13,
       "name": "\"Argjiro\" Winery (Gjirokastër)",
       "lat": 40.0990336,
       "lng": 20.1501935,
@@ -270,7 +252,7 @@
     },
     {
       "id": "bridge-of-brataj",
-      "order": 15,
+      "order": 14,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -286,6 +268,24 @@
       "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
       "thumb": "photos/bridge-of-brataj/01_thumb.webp",
       "photos": 4,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "plyazh-dhermi",
+      "order": 15,
+      "name": "Beach Dhermi",
+      "lat": 40.135637,
+      "lng": 19.647457,
+      "category": null,
+      "desc": "",
+      "near": "Dhërmi",
+      "country": "Shqipëri",
+      "types": [
+        "beach"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
+      "thumb": "photos/plyazh-dhermi/03_thumb.webp",
+      "photos": 3,
       "updated": "2026-11-18"
     },
     {
