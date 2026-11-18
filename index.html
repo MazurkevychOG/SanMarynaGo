@@ -953,6 +953,11 @@
         #tripCostModal .tc-note { font-size: 12px; opacity: .7; margin-top: 8px; }
         /* ===== Search box on the map ===== */
         .map-search { position: absolute; top: 10px; left: 64px; right: 64px; max-width: 340px; margin: 0 auto; z-index: 1000; }
+        .map-search .ms-clear { position: absolute; right: 6px; top: 5px; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: #e2e8f0; color: #4a5568; font-size: 15px; line-height: 28px; text-align: center; cursor: pointer; z-index: 2; }
+        .map-search .ms-clear[hidden] { display: none; }
+        #mapSearchInput { padding-right: 42px !important; }
+        #mapSearchInput::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
+        html[data-theme="dark"] .map-search .ms-clear { background: #3a4558; color: #e2e8f0; }
         .map-search input { width: 100%; box-sizing: border-box; height: 38px; border-radius: 19px; border: 1px solid #cbd5e0; padding: 0 14px; font-size: 16px; background: #fff; color: #2d3748; box-shadow: 0 2px 6px rgba(0,0,0,.25); outline: none; }
         .ms-list { display: none; background: #fff; border-radius: 12px; margin-top: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.3); overflow: hidden; max-height: 50vh; overflow-y: auto; }
         .ms-list.open { display: block; }
@@ -2632,7 +2637,7 @@
                 try { if (navigator.vibrate) navigator.vibrate(16); } catch (err) { }
                 startReorder({ currentTarget: content, pointerId: pid, pointerType: ptype, clientX: sx, clientY: sy, button: 0, target: content, preventDefault() { } },
                     row, () => Array.from(tbody.children),
-                    (from, to) => { if (sortMode === 'group') setSortMode('manual'); const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); persistPlaces(true); },   // номери всіх карток перераховуються в render(), порядок зберігається одразу
+                    (from, to) => { if (sortMode === 'group') setSortMode('manual', false, true); const m = places.splice(from, 1)[0]; places.splice(to, 0, m); sync(); persistPlaces(true); },   // номери всіх карток перераховуються в render(), порядок зберігається одразу
                     { ghost: () => rowGhost(row, i), immediate: true, onEnd: () => { row._reordering = false; }, onDone: () => { suppressClickUntil = Date.now() + 450; } });
             }, ptype === 'mouse' ? 250 : LONG_PRESS_MS);
         });
@@ -4953,10 +4958,17 @@
     // ===== Висота над рівнем моря для кожної картки (Open-Meteo, один раз на місце; зберігається в браузері) =====
     function elevCache() { try { return JSON.parse(localStorage.getItem('mymaps_elev') || '{}'); } catch (e) { return {}; } }
     function elevOf(p) { const e = elevCache()[p.id]; return (e && e.c === p.coords && Number.isFinite(e.e)) ? e.e : null; }
+    function distText(p) {                                    // straight-line distance from the current place (GPS or the last known position)
+        let ref = null; try { ref = sortRef(); } catch (e) { }
+        const c = parseCoords(p.coords); if (!ref || !c) return '';
+        const m = haversine(ref, c);
+        return m < 1000 ? Math.round(m < 100 ? m : m / 10) * (m < 100 ? 1 : 10) + ' m' : (m < 10000 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km';
+    }
     function nearLine(p) {
         const parts = [];
         if (p.near) parts.push('📍 ' + p.near);
-        const e = elevOf(p); if (e !== null) parts.push('⛰ ' + Math.round(e) + ' m');
+        const dt = distText(p); if (dt) parts.push('🧭 ' + dt);
+        const e = elevOf(p); if (e !== null && Math.round(e) >= 100) parts.push('⛰ ' + Math.round(e) + ' m');
         return parts.join(' · ');
     }
     let elevBusy = false, elevTimer = 0, elevFailAt = 0;
@@ -5561,7 +5573,7 @@
         if (!el || el.querySelector('.map-search')) return;
         const box = document.createElement('div');
         box.className = 'map-search';
-        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map or card №" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><div class="ms-list" id="msList"></div>';
+        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map or card №" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><button type="button" class="ms-clear" id="msClear" hidden aria-label="Clear search" title="Clear">✕</button><div class="ms-list" id="msList"></div>';
         el.appendChild(box);
         L.DomEvent.disableClickPropagation(box); L.DomEvent.disableScrollPropagation(box);
         const inp = box.querySelector('input'), list = box.querySelector('.ms-list');
@@ -5615,6 +5627,10 @@
             list.querySelectorAll('.ms-row[data-i]').forEach(row => row.onclick = () => goPlace(+row.dataset.i));
             const a = list.querySelector('.ms-addr'); if (a) a.onclick = () => addrSearch(inp.value.trim());
         };
+        const clr = box.querySelector('.ms-clear');
+        const syncClr = () => { clr.hidden = !inp.value.length; };          // «clear» appears after at least 1 character
+        clr.addEventListener('click', e => { e.preventDefault(); inp.value = ''; syncClr(); closeList(); clearPin(); inp.focus(); });
+        inp.addEventListener('input', syncClr);
         inp.addEventListener('input', render);
         inp.addEventListener('focus', render);
         inp.addEventListener('keydown', e => {
@@ -5622,7 +5638,7 @@
                 e.preventDefault();
                 const q = normText(inp.value).trim(), res = find(q);
                 if (res.length) goPlace(res[0].i); else if (q.length >= 2) addrSearch(inp.value.trim());
-            } else if (e.key === 'Escape') { e.stopPropagation(); inp.value = ''; closeList(); clearPin(); inp.blur(); }
+            } else if (e.key === 'Escape') { e.stopPropagation(); inp.value = ''; syncClr(); closeList(); clearPin(); inp.blur(); }
         });
         document.addEventListener('pointerdown', e => { if (!box.contains(e.target)) closeList(); });
     }
@@ -6901,8 +6917,9 @@
     // За замовчуванням: за ГРУПОЮ (типом місця; порядок груп — як у списку типів, без типу — в кінець), а в межах групи — за відстанню до мого ПОТОЧНОГО місця
     // (GPS; поки його немає — остання відома позиція; якщо й її немає, у групі лишається попередній порядок). «Мій порядок» — ручне перетягування карток.
     const SORT_KEY = 'mymaps_sort', POS_KEY = 'mymaps_lastpos';
-    let sortMode = 'group';                                  // 'group' — за групою й відстанню (за замовчуванням), 'manual' — мій порядок
-    try { const v = localStorage.getItem(SORT_KEY); if (v === 'manual' || v === 'group') sortMode = v; } catch (e) { }
+    let sortMode = 'manual', sortSaved = false;               // default: «My order» (a saved choice of the user is kept)
+    try { const v = localStorage.getItem(SORT_KEY); if (v === 'manual' || v === 'group') { sortMode = v; sortSaved = true; } } catch (e) { }
+    let _defaultPending = !sortSaved, _defTimer = 0;          // first run: build «My order» from the nearest place once the position is known
     let cachedPos = null, _sortRef = null, _posSavedAt = 0, _sortTimer = 0, _lastTouch = 0, SORT_DEBOUNCE = 1500, SORT_IDLE = 3000, SORT_MOVE_M = 1000;
     try { const a = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); if (Array.isArray(a) && isFinite(a[0]) && isFinite(a[1])) cachedPos = [a[0], a[1]]; } catch (e) { }
     ['pointerdown', 'touchmove', 'wheel', 'scroll'].forEach(ev => document.addEventListener(ev, () => { _lastTouch = Date.now(); }, { passive: true, capture: true }));
@@ -6921,12 +6938,35 @@
         if (changed) places = it.map(x => x.p);
         return changed;
     }
-    function setSortMode(m, quiet) {
+    function orderByDistance() {                             // top → bottom: from the smallest distance from the current place
+        const ref = sortRef(); if (!ref) return false;
+        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, d: c ? haversine(ref, c) : Infinity }; });
+        it.sort((a, b) => (a.d === b.d ? 0 : (a.d < b.d ? -1 : 1)) || (a.i - b.i));
+        places = it.map(x => x.p);
+        return true;
+    }
+    function buildDefaultOrder() {                           // one time: nearest first; then it is the user's own order
+        if (!_defaultPending || sortMode !== 'manual' || !sortRef()) return false;
+        _defaultPending = false;
+        try { localStorage.setItem(SORT_KEY, 'manual'); } catch (e) { }
+        return orderByDistance();
+    }
+    function scheduleDefaultBuild() {
+        clearTimeout(_defTimer);
+        _defTimer = setTimeout(function tick() {
+            if (!_defaultPending) return;
+            const b = document.body.classList, ed = document.getElementById('editIndex');
+            const busy = ['map-open', 'form-open', 'profile-open', 'settings-open', 'speedo-open', 'mdl-open', 'filtering'].some(c => b.contains(c)) || (ed && ed.value !== '') || Date.now() - _lastTouch < SORT_IDLE;
+            if (busy) { _defTimer = setTimeout(tick, 2500); return; }
+            if (buildDefaultOrder()) sync();
+        }, 1500);
+    }
+    function setSortMode(m, quiet, noResort) {
         if (m !== 'group' && m !== 'manual') return;
         sortMode = m;
         try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
         if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
-        else if (!quiet) toast('Manual order: hold a card to drag');
+        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
         renderSortChips();
     }
     function renderSortChips() {
@@ -6935,11 +6975,18 @@
         box.innerHTML = [['group', '🧭 By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
-        if (hint) hint.textContent = sortMode === 'manual' ? 'You set the order: hold a card and drag.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
+        if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down; hold a card and drag to change.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
+    }
+    let _distAt = 0, _distRef = null;
+    function refreshDistances() {                            // card texts follow the current place
+        const byId = new Map(places.map(p => [p.id, p])), tb = document.getElementById('placesTable'); if (!tb) return;
+        for (const r of tb.children) { const p = byId.get(r.dataset.id), el = p && r.querySelector('.cell-near'); if (el) { const t = nearLine(p); if (el.textContent !== t) el.textContent = t; } }
     }
     function sortOnFix(ll) {                                 // викликається з GPS-підписки
         const now = Date.now();
+        if (now - _distAt > 4000 && (!_distRef || haversine(_distRef, ll) > 30)) { _distAt = now; _distRef = ll.slice(); refreshDistances(); }
         if (now - _posSavedAt > 20000) { _posSavedAt = now; cachedPos = ll.slice(); try { localStorage.setItem(POS_KEY, JSON.stringify([ll[0], ll[1], now])); } catch (e) { } }
+        if (_defaultPending && sortMode === 'manual') scheduleDefaultBuild();
         if (sortMode !== 'group') return;
         if (_sortRef && haversine(_sortRef, ll) < SORT_MOVE_M) return;     // ще поруч із місцем останнього сортування
         scheduleAutoResort();
@@ -7045,7 +7092,7 @@
         restoreReturnToggle();
         applyUserSettings();
         pfFillForm();
-        if (sortMode === 'group') reorderAuto();                  // порядок за замовчуванням: група → відстань до мого місця (остання відома позиція)
+        if (sortMode === 'group') reorderAuto(); else buildDefaultOrder();      // порядок за замовчуванням: група → відстань до мого місця (остання відома позиція)
         render();
         syncStickyOffset();
         initMap();
