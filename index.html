@@ -6917,6 +6917,8 @@
     // За замовчуванням: за ГРУПОЮ (типом місця; порядок груп — як у списку типів, без типу — в кінець), а в межах групи — за відстанню до мого ПОТОЧНОГО місця
     // (GPS; поки його немає — остання відома позиція; якщо й її немає, у групі лишається попередній порядок). «Мій порядок» — ручне перетягування карток.
     const SORT_KEY = 'mymaps_sort', POS_KEY = 'mymaps_lastpos';
+    // One-time switch: «By group & distance» that was only the old default (or an old choice) becomes «My order» now; an already saved «My order» is kept as is.
+    try { if (!localStorage.getItem('mymaps_sort_def2')) { localStorage.setItem('mymaps_sort_def2', '1'); if (localStorage.getItem(SORT_KEY) === 'group') localStorage.removeItem(SORT_KEY); } } catch (e) { }
     let sortMode = 'manual', sortSaved = false;               // default: «My order» (a saved choice of the user is kept)
     try { const v = localStorage.getItem(SORT_KEY); if (v === 'manual' || v === 'group') { sortMode = v; sortSaved = true; } } catch (e) { }
     let _defaultPending = !sortSaved, _defTimer = 0;          // first run: build «My order» from the nearest place once the position is known
