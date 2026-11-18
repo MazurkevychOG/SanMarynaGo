@@ -193,26 +193,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "kantina-balaj-mifol",
-      "order": 11,
-      "name": "Kantina Balaj (Mifol)",
-      "lat": 40.5963295,
-      "lng": 19.483349,
-      "category": null,
-      "desc": "",
-      "near": "Mifol",
-      "country": "Albania",
-      "types": [
-        "winery"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/XVZ2suFnkKSnNc2N8?g_st=ic",
-      "thumb": "photos/kantina-balaj-mifol/01_thumb.webp",
-      "photos": 6,
-      "updated": "2026-10-28"
-    },
-    {
       "id": "mesopotam-restaurant",
-      "order": 12,
+      "order": 11,
       "name": "Mesopotam Restaurant",
       "lat": 39.9105198,
       "lng": 20.1028693,
@@ -230,7 +212,7 @@
     },
     {
       "id": "bujtina-e-peshkaterit",
-      "order": 13,
+      "order": 12,
       "name": "Bujtina e peshkaterit",
       "lat": 40.361562,
       "lng": 19.480187,
@@ -245,6 +227,25 @@
       "gmapsUrl": "https://maps.app.goo.gl/kPyKfR9szQJzVffx8?g_st=ic",
       "thumb": "photos/bujtina-e-peshkaterit/01_thumb.webp",
       "photos": 2,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "kantina-balaj-mifol",
+      "order": 13,
+      "name": "Kantina Balaj (Mifol)",
+      "lat": 40.5963295,
+      "lng": 19.483349,
+      "category": null,
+      "desc": "",
+      "near": "Mifol",
+      "country": "Shqipëri",
+      "types": [
+        "winery",
+        "food"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/XVZ2suFnkKSnNc2N8?g_st=ic",
+      "thumb": "photos/kantina-balaj-mifol/01_thumb.webp",
+      "photos": 4,
       "updated": "2026-11-18"
     },
     {
@@ -267,8 +268,27 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "apollonia-pojan",
+      "id": "argjiro-winery-gjirokaster",
       "order": 15,
+      "name": "\"Argjiro\" Winery (Gjirokastër)",
+      "lat": 40.0990336,
+      "lng": 20.1501935,
+      "category": null,
+      "desc": "",
+      "near": "Arshi Lengo",
+      "country": "Shqipëri",
+      "types": [
+        "winery",
+        "food"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/DTenKLZa6SrF8jb26?g_st=ic",
+      "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "apollonia-pojan",
+      "order": 16,
       "name": "Apollonia (Pojan)",
       "lat": 40.72134,
       "lng": 19.4710887,
@@ -285,8 +305,65 @@
       "updated": "2026-10-28"
     },
     {
+      "id": "bridge-of-brataj",
+      "order": 17,
+      "name": "Bridge of Brataj",
+      "lat": 40.2668864,
+      "lng": 19.6718241,
+      "category": null,
+      "desc": "",
+      "near": "Brataj",
+      "country": "Shqipëri",
+      "types": [
+        "prohulyanka",
+        "nature",
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
+      "thumb": "photos/bridge-of-brataj/01_thumb.webp",
+      "photos": 4,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "footbridge-ura-e-walesatit-lepenice",
+      "order": 18,
+      "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
+      "lat": 40.3038256,
+      "lng": 19.6524006,
+      "category": null,
+      "desc": "",
+      "near": "Lepenicë",
+      "country": "Shqipëri",
+      "types": [
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
+      "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "vjosa-albania-rafting-group-glamping",
+      "order": 19,
+      "name": "Vjosa Albania Rafting Group Glamping",
+      "lat": 40.224062,
+      "lng": 19.373812,
+      "category": null,
+      "desc": "",
+      "country": "Shqipëri",
+      "types": [
+        "extreme",
+        "stay",
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/76tLw25Fasd7mi6f6?g_st=ic",
+      "thumb": "photos/vjosa-albania-rafting-group-glamping/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
       "id": "ferma-ajson-armando",
-      "order": 16,
+      "order": 20,
       "name": "Ferma Ajson - Armando",
       "lat": 40.382712,
       "lng": 19.612297,
@@ -304,7 +381,7 @@
     },
     {
       "id": "gorica-bridge-berat",
-      "order": 17,
+      "order": 21,
       "name": "Gorica Bridge (Berat)",
       "lat": 40.7032111,
       "lng": 19.9446481,
@@ -321,63 +398,8 @@
       "updated": "2026-10-28"
     },
     {
-      "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 18,
-      "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
-      "lat": 40.3038256,
-      "lng": 19.6524006,
-      "category": null,
-      "desc": "",
-      "near": "Lepenicë",
-      "country": "Albania",
-      "types": [
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
-      "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
-    },
-    {
-      "id": "bridge-of-brataj",
-      "order": 19,
-      "name": "Bridge of Brataj",
-      "lat": 40.2668864,
-      "lng": 19.6718241,
-      "category": null,
-      "desc": "",
-      "near": "Brataj",
-      "country": "Albania",
-      "types": [
-        "nature",
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/ucZPtHN8S4CpDX1q7?g_st=ic",
-      "thumb": "photos/bridge-of-brataj/01_thumb.webp",
-      "photos": 4,
-      "updated": "2026-11-01"
-    },
-    {
-      "id": "argjiro-winery-gjirokaster",
-      "order": 20,
-      "name": "\"Argjiro\" Winery (Gjirokastër)",
-      "lat": 40.0990336,
-      "lng": 20.1501935,
-      "category": null,
-      "desc": "",
-      "near": "Arshi Lengo",
-      "country": "Albania",
-      "types": [
-        "winery"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/DTenKLZa6SrF8jb26?g_st=ic",
-      "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
-    },
-    {
       "id": "gjirokaster-castle",
-      "order": 21,
+      "order": 22,
       "name": "Фортеця Гірокастра (Gjirokastër Castle)",
       "lat": 40.0727906,
       "lng": 20.1392199,
@@ -396,7 +418,7 @@
     },
     {
       "id": "ile-bridge-kutal",
-      "order": 22,
+      "order": 23,
       "name": "Ile bridge (Kutal)",
       "lat": 40.2575881,
       "lng": 20.3232416,
@@ -414,7 +436,7 @@
     },
     {
       "id": "langarica-canyon",
-      "order": 23,
+      "order": 24,
       "name": "Langarica Canyon",
       "lat": 40.2459895,
       "lng": 20.4383168,
@@ -433,7 +455,7 @@
     },
     {
       "id": "sopot-waterfall",
-      "order": 24,
+      "order": 25,
       "name": "Sopot Waterfall",
       "lat": 40.1442433,
       "lng": 20.4425384,
@@ -451,7 +473,7 @@
     },
     {
       "id": "blue-eye",
-      "order": 25,
+      "order": 26,
       "name": "Блакитне Око (Blue Eye)",
       "lat": 39.9236423,
       "lng": 20.1924637,
@@ -469,7 +491,7 @@
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 26,
+      "order": 27,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
@@ -489,7 +511,7 @@
     },
     {
       "id": "the-castle-of-porto-palermo",
-      "order": 27,
+      "order": 28,
       "name": "The Castle of Porto Palermo",
       "lat": 40.0622157,
       "lng": 19.790746,
@@ -507,7 +529,7 @@
     },
     {
       "id": "llogara-view-point",
-      "order": 28,
+      "order": 29,
       "name": "Llogara View point",
       "lat": 40.1894877,
       "lng": 19.6000919,
@@ -526,7 +548,7 @@
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
-      "order": 29,
+      "order": 30,
       "name": "Llixhat e Bënjës - Thermal Baths",
       "lat": 40.2441306,
       "lng": 20.4319674,
@@ -545,7 +567,7 @@
     },
     {
       "id": "arbri-olive-oil",
-      "order": 30,
+      "order": 31,
       "name": "Arbri Olive Oil",
       "lat": 40.3274774,
       "lng": 19.5110889,
@@ -560,7 +582,7 @@
     },
     {
       "id": "fish-hub-albadriatico",
-      "order": 31,
+      "order": 32,
       "name": "Fish HUB AlbAdriatico",
       "lat": 40.2955308,
       "lng": 19.4882518,
@@ -574,24 +596,6 @@
       "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
       "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
       "photos": 2,
-      "updated": "2026-10-28"
-    },
-    {
-      "id": "vjosa-albania-rafting-group-glamping",
-      "order": 32,
-      "name": "Vjosa Albania Rafting Group Glamping",
-      "lat": 40.224062,
-      "lng": 19.373812,
-      "category": null,
-      "desc": "",
-      "country": "Albania",
-      "types": [
-        "extreme",
-        "stay"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/76tLw25Fasd7mi6f6?g_st=ic",
-      "thumb": "photos/vjosa-albania-rafting-group-glamping/01_thumb.webp",
-      "photos": 1,
       "updated": "2026-10-28"
     }
   ]
