@@ -2016,16 +2016,25 @@
   setInterval(render, 2000);
   // The main screen has no GPS until the map/speedometer is opened. If location access was granted before, start the same single stream now.
   window.addEventListener('load', () => {
-    // Start unless access is explicitly denied: some browsers (iOS Safari…) report «prompt» or have no Permissions API even when location is allowed.
+    // The permission question appears only on the very first visit. Later: if the browser still remembers the permission («granted») GPS connects by itself;
+    // if the browser forgot it («prompt») we do NOT ask again on load — GPS starts when you open the map / speedometer or tap the height.
+    const flag = k => { try { return localStorage.getItem(k) === '1'; } catch (e) { return false; } };
+    const mark = k => { try { localStorage.setItem(k, '1'); } catch (e) { } };
+    const first = () => { if (flag('gps_asked')) return false; mark('gps_asked'); return true; };
     const go = granted => { try { if (typeof startGps === 'function') startGps(); if (granted) { seen = true; render(); } } catch (e) { } };
+    const noApi = () => { if (flag('gps_ok') || first()) go(false); };         // old browsers without the Permissions API
     try {
       if (navigator.permissions && navigator.permissions.query)
         navigator.permissions.query({ name: 'geolocation' }).then(r => {
-          if (r.state !== 'denied') go(r.state === 'granted');
-          r.onchange = () => { if (r.state !== 'denied') go(r.state === 'granted'); };
-        }).catch(() => go(false));
-      else go(false);
-    } catch (e) { go(false); }
+          if (r.state === 'granted') go(true);
+          else if (r.state === 'prompt' && first()) go(false);
+          r.onchange = () => { if (r.state === 'granted') go(true); };
+        }).catch(noApi);
+      else noApi();
+    } catch (e) { noApi(); }
+    const iv = setInterval(() => {                                               // remember that a fix was received at least once
+      try { if (typeof lastGps !== 'undefined' && lastGps) { mark('gps_ok'); mark('gps_asked'); clearInterval(iv); } } catch (e) { }
+    }, 3000);
   });
 })();
 </script>
@@ -2325,6 +2334,13 @@
                 const todo = (p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith('data:') && !ghSameMedia.has(m));
                 if (!todo.length) continue;
                 const paths = r.media.split('|').filter(Boolean);
+                const led = (ledgerLoad()[p.id] || []);
+                if (led.length) {                              // photos exported earlier from this device → repo files (same order) that no local reference uses
+                    const usedRef = new Set((p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith(DATA_BASE)).map(m => m.data));
+                    const pool = paths.filter(x => !usedRef.has(x));
+                    const mine = (p.media || []).filter(m => typeof m.data === 'string' && m.data.startsWith('data:') && !ghSameMedia.has(m) && led.includes(fpOf(m.data)));
+                    if (mine.length && pool.length >= mine.length) { mine.forEach((m, k) => ghSameMedia.set(m, pool[k])); changed = true; }
+                }
                 const used = new Set((p.media || []).filter(m => ghSameMedia.has(m) || (typeof m.data === 'string' && m.data.startsWith(DATA_BASE))).map(m => ghSameMedia.get(m) || m.data));
                 for (const m of todo) {
                     const sz = dataUriBytes(m.data); if (sz < 0) continue;
@@ -2337,6 +2353,31 @@
             return changed;
         })().finally(() => { reconPromise = null; });
         return reconPromise;
+    }
+    // --- what was already exported from this device (photo fingerprints per place): such photos are in the repo, even if the repo re-encoded them
+    function fpOf(uri) {
+        let h = 2166136261 >>> 0; const n = uri.length, step = Math.max(1, Math.floor(n / 4000));
+        for (let i = 0; i < n; i += step) { h ^= uri.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+        for (let i = Math.max(0, n - 256); i < n; i++) { h ^= uri.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+        return n + ':' + h.toString(36);
+    }
+    const LEDGER_KEY = 'mymaps_uploaded';
+    const ledgerLoad = () => { try { return JSON.parse(localStorage.getItem(LEDGER_KEY) || '{}'); } catch (e) { return {}; } };
+    let _lastExportFp = null;
+    function ledgerCommit() {                                 // called when the export files have been handed over
+        if (!_lastExportFp) return;
+        const l = ledgerLoad();
+        for (const id of Object.keys(_lastExportFp)) l[id] = [...new Set([...(l[id] || []), ..._lastExportFp[id]])];
+        try { localStorage.setItem(LEDGER_KEY, JSON.stringify(l)); } catch (e) { }
+        _lastExportFp = null;
+    }
+    function diffFields(p) {                                  // why a place differs from the repo (for the export report)
+        const r = catalogRaw.get(p.id); if (!r) return ['not on GitHub'];
+        const l = localSnap(p), out = [];
+        if (l.name !== r.name) out.push('name'); if (l.lat !== r.lat || l.lng !== r.lng) out.push('coords'); if (l.desc !== r.desc) out.push('desc');
+        if (l.gmaps !== r.gmaps) out.push('link'); if (l.types !== r.types) out.push('types'); if (l.aliases !== r.aliases) out.push('aliases');
+        if (l.media !== r.media) out.push('photos'); if (l.near && l.near !== r.near) out.push('town'); if (l.country && l.country !== r.country) out.push('country');
+        return out;
     }
     function missingOnGithub(p) {
         if (!catalogRaw.size) return !!p.dirty;                   // catalog not loaded (offline): all we know is the "changed by you" flag
@@ -4355,7 +4396,7 @@
             catch (err) { console.error('Update:', err); alert('Could not load catalog from GitHub: ' + err.message); return; }
             recomputeDeleted();                                   // що ви видалили локально — рахуємо за СТАРИМ каталогом
             const key = n => String(n || '').trim().toLowerCase();
-            let added = 0, enriched = 0, merged = 0;
+            let added = 0, enriched = 0, merged = 0, released = 0;
             setWaitText('Comparing photos…');
             // Те саме фото може лежати у вашій картці як base64 (імпорт, стара версія), а в каталозі — як файл: порівнюємо за ВМІСТОМ, а не за адресою
             const addMedia = async (t, list) => {               // додає фото/відео, яких у картці ще немає (за вмістом)
@@ -4391,6 +4432,25 @@
                     Object.assign(target, c, { selected: target.selected, dirty: false });
                     continue;
                 }
+                let adopted = false;
+                if (target.dirty && catalogRaw.has(c.id)) {          // the repo already has what was exported from this device → take the repo photos instead of keeping local copies
+                    const rr = catalogRaw.get(c.id), ll = localSnap(target);
+                    const sameData = ll.name === rr.name && ll.lat === rr.lat && ll.lng === rr.lng && ll.desc === rr.desc && ll.types === rr.types;
+                    const led = ledgerLoad()[target.id] || [];
+                    const loc = target.media || [];
+                    const own = loc.filter(m => typeof m.data === 'string' && m.data.startsWith('data:'));
+                    // (a) photos that were exported from this device; (b) one-time migration: the same number of photos at the same positions in an already uploaded card
+                    const legacy = !localStorage.getItem('mymaps_adopt_legacy_v1') && sameData && loc.length === c.media.length;
+                    if (own.length && (legacy || own.every(m => led.includes(fpOf(m.data))))) {
+                        const usedRef = new Set(loc.filter(m => !String(m.data).startsWith('data:')).map(m => m.data));
+                        const pool = c.media.filter(m => !usedRef.has(m.data));
+                        if (legacy ? true : pool.length >= own.length) {
+                            let k = 0;
+                            target.media = legacy ? loc.map((m, i) => (String(m.data).startsWith('data:') ? { ...c.media[i] } : m)) : loc.map(m => (String(m.data).startsWith('data:') ? { ...pool[k++] } : m));
+                            adopted = true;
+                        }
+                    }
+                }
                 let changed = false;
                 { const before = JSON.stringify([target.id, target.aliases, target.country, target.types, target.near]); quickEnrich(target, c); if (before !== JSON.stringify([target.id, target.aliases, target.country, target.types, target.near])) changed = true; }
                 for (const d of extra) {                           // зливаємо дублі: фото й порожні поля переходять у головну
@@ -4407,15 +4467,17 @@
                 for (const f of ['gmapsUrl', 'desc', 'near', 'coords']) if (!target[f] && c[f]) { target[f] = c[f]; changed = true; }
                 if (target.id !== c.id) { target.id = c.id; changed = true; }
                 if (changed) { target.dirty = true; enriched++; }
+                else if (adopted && !missingOnGithub(target)) { target.dirty = false; released++; }       // nothing differs from GitHub any more
             }
+            try { localStorage.setItem('mymaps_adopt_legacy_v1', '1'); } catch (e) { }
             _hashCache.clear(); _sizeCache.clear();
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
             mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
             sync();
             touchVersion();
-            toast(added || enriched || merged
-                ? `Update: added new ${added}, enriched ${enriched}` + (merged ? `, merged dupes ${merged}` : '')
+            toast(added || enriched || merged || released
+                ? `Update: added new ${added}, enriched ${enriched}` + (merged ? `, merged dupes ${merged}` : '') + (released ? `, already on GitHub ${released}` : '')
                 : 'Update: no new data — you are up to date');
             scheduleNear();
             refreshLocalInfo();
@@ -5134,6 +5196,9 @@
             if (CAP < 1_000_000) throw new Error('Profile/types data alone is almost 20 MB — nothing is left for the photos.');
             const missing = places.filter(missingOnGithub);          // only places that are not on GitHub yet or differ from it
             const deferred = [], tooBig = [];                         // photos that did not fit into this package / can never fit
+            const _expFp = {}; _lastExportFp = _expFp;
+            const why = {}; missing.forEach(p => diffFields(p).forEach(f => { why[f] = (why[f] || 0) + 1; }));
+            console.info('Export: places that differ from GitHub →', Object.fromEntries(missing.map(p => [p.name, diffFields(p).join(', ')])));
             for (const p of missing) {
                 const base = { id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}) };
                 let used = JSON.stringify({ ...base, media: [] }).length;
@@ -5148,6 +5213,7 @@
                     const add = uri.length + 48;
                     if (used + add > CAP) { (add + JSON.stringify({ ...base, media: [] }).length > CAP ? tooBig : deferred).push(p.name); continue; }   // does not fit this package: the next export compares with GitHub again and takes the rest
                     media.push({ type: m.type, data: uri }); used += add;
+                    if (m.data.startsWith('data:')) (_expFp[p.id] = _expFp[p.id] || []).push(fpOf(uri));
                 }
                 const s = JSON.stringify({ ...base, media });
                 items.push({ s, size: new Blob([s]).size });
@@ -5203,7 +5269,7 @@
                 if (blob.size > EXPORT_PART_MAX) throw new Error(`Could not fit part ${k + 1} into 20 MB limit.`);
                 return { blob, name: `mymaps-${day}-${String(k + 1).padStart(w, '0')}.json` };
             });
-            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 20 MB)` : '') + (deferred.length ? ` · ${deferred.length} photo(s) did not fit — export again after uploading these files` : '') + (tooBig.length ? ` · ${tooBig.length} photo(s) are bigger than 20 MB and were skipped — shrink them` : ''));
+            toast(`Export: ${items.length} of ${places.length} places are new or changed` + (orderOut ? ', card order' : '') + (typesOut.length ? `, types ${typesOut.length}` : '') + (deletedIds.length ? `, deleted ${deletedIds.length}` : '') + (usersOut.length ? `, profiles ${usersOut.length}` : '') + (N > 1 ? ` · ${N} files (each under 20 MB)` : '') + (Object.keys(why).length ? ` · differs in: ${Object.entries(why).map(([k, v]) => k + ' ' + v).join(', ')}` : '') + (deferred.length ? ` · ${deferred.length} photo(s) did not fit — export again after uploading these files` : '') + (tooBig.length ? ` · ${tooBig.length} photo(s) are bigger than 20 MB and were skipped — shrink them` : ''));
             return files;
         } catch (err) { throw err; }
     }
@@ -5235,7 +5301,7 @@
         hideWait(); stopWaitSound();
         try {
             if (failed) alert('Could not prepare export: ' + failed.message);
-            else if (files) await deliverFiles(files);
+            else if (files) { await deliverFiles(files); ledgerCommit(); }
         } finally { _runExp = false; collapseToSettings(); }
     }
 
