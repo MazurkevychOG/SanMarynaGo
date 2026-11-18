@@ -1,7 +1,7 @@
 {
   "id": "llogara-view-point",
-  "order": 29,
-  "name": "Llogara View point",
+  "order": 18,
+  "name": "Llogora View point",
   "lat": 40.1894877,
   "lng": 19.6000919,
   "desc": "",
@@ -15,10 +15,37 @@
       "width": 1178,
       "height": 652,
       "bytes": 47462
+    },
+    {
+      "type": "image",
+      "file": "photos/llogara-view-point/02.webp",
+      "thumb": "photos/llogara-view-point/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 316878,
+      "srcSha256": "106b074b441601449a7a91488700ea4c70c49642c55e0121f04c5acedf1e3e89"
+    },
+    {
+      "type": "image",
+      "file": "photos/llogara-view-point/03.webp",
+      "thumb": "photos/llogara-view-point/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 392004,
+      "srcSha256": "158ca2c0985733ea2cb5a8a0f8c147d16172925f1e17155ff771c794e5bff6cc"
+    },
+    {
+      "type": "image",
+      "file": "photos/llogara-view-point/04.webp",
+      "thumb": "photos/llogara-view-point/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 275254,
+      "srcSha256": "addc91a520cc79891118a0cd150eec2ef523c8ca1d7bf78637786c506a89de80"
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "nature",
     "extreme"

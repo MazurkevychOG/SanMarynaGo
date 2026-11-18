@@ -287,26 +287,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "apollonia-pojan",
-      "order": 16,
-      "name": "Apollonia (Pojan)",
-      "lat": 40.72134,
-      "lng": 19.4710887,
-      "category": null,
-      "desc": "",
-      "near": "Kryegjatë",
-      "country": "Albania",
-      "types": [
-        "history"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/MqyUjpcYpUKuxLzL6?g_st=ic",
-      "thumb": "photos/apollonia-pojan/01_thumb.webp",
-      "photos": 6,
-      "updated": "2026-10-28"
-    },
-    {
       "id": "bridge-of-brataj",
-      "order": 17,
+      "order": 16,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -326,7 +308,7 @@
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 18,
+      "order": 17,
       "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
       "lat": 40.3038256,
       "lng": 19.6524006,
@@ -340,6 +322,25 @@
       "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
       "thumb": "photos/footbridge-ura-e-walesatit-lepenice/01_thumb.webp",
       "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "llogara-view-point",
+      "order": 18,
+      "name": "Llogora View point",
+      "lat": 40.1894877,
+      "lng": 19.6000919,
+      "category": null,
+      "desc": "",
+      "near": "Palasë",
+      "country": "Shqipëri",
+      "types": [
+        "nature",
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/XjCoFZfnBCATEwym7?g_st=ic",
+      "thumb": "photos/llogara-view-point/01_thumb.webp",
+      "photos": 4,
       "updated": "2026-11-18"
     },
     {
@@ -362,8 +363,28 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "ferma-ajson-armando",
+      "id": "gjirokaster-castle",
       "order": 20,
+      "name": "Фортеця Гірокастра (Gjirokastër Castle)",
+      "lat": 40.0727906,
+      "lng": 20.1392199,
+      "category": null,
+      "desc": "",
+      "near": "Gjirokastër",
+      "country": "Shqipëri",
+      "types": [
+        "history",
+        "extreme",
+        "prohulyanka"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/JSDY51PrMUEuKQB56?g_st=ic",
+      "thumb": "photos/gjirokaster-castle/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "ferma-ajson-armando",
+      "order": 21,
       "name": "Ferma Ajson - Armando",
       "lat": 40.382712,
       "lng": 19.612297,
@@ -380,8 +401,44 @@
       "updated": "2026-11-18"
     },
     {
+      "id": "ile-bridge-kutal",
+      "order": 22,
+      "name": "Ile bridge (Kutal)",
+      "lat": 40.2575881,
+      "lng": 20.3232416,
+      "category": null,
+      "desc": "",
+      "near": "Bual",
+      "country": "Shqipëri",
+      "types": [
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/E3EFwYwmmE5RadyS9?g_st=ic",
+      "thumb": "photos/ile-bridge-kutal/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "apollonia-pojan",
+      "order": 23,
+      "name": "Apollonia (Pojan)",
+      "lat": 40.72134,
+      "lng": 19.4710887,
+      "category": null,
+      "desc": "",
+      "near": "Kryegjatë",
+      "country": "Shqipëri",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/MqyUjpcYpUKuxLzL6?g_st=ic",
+      "thumb": "photos/apollonia-pojan/01_thumb.webp",
+      "photos": 3,
+      "updated": "2026-11-18"
+    },
+    {
       "id": "gorica-bridge-berat",
-      "order": 21,
+      "order": 24,
       "name": "Gorica Bridge (Berat)",
       "lat": 40.7032111,
       "lng": 19.9446481,
@@ -398,45 +455,8 @@
       "updated": "2026-10-28"
     },
     {
-      "id": "gjirokaster-castle",
-      "order": 22,
-      "name": "Фортеця Гірокастра (Gjirokastër Castle)",
-      "lat": 40.0727906,
-      "lng": 20.1392199,
-      "category": null,
-      "desc": "",
-      "near": "Гірокастра",
-      "country": "Albania",
-      "types": [
-        "history",
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/JSDY51PrMUEuKQB56?g_st=ic",
-      "thumb": "photos/gjirokaster-castle/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
-    },
-    {
-      "id": "ile-bridge-kutal",
-      "order": 23,
-      "name": "Ile bridge (Kutal)",
-      "lat": 40.2575881,
-      "lng": 20.3232416,
-      "category": null,
-      "desc": "",
-      "near": "Bual",
-      "country": "Albania",
-      "types": [
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/E3EFwYwmmE5RadyS9?g_st=ic",
-      "thumb": "photos/ile-bridge-kutal/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
-    },
-    {
       "id": "langarica-canyon",
-      "order": 24,
+      "order": 25,
       "name": "Langarica Canyon",
       "lat": 40.2459895,
       "lng": 20.4383168,
@@ -455,7 +475,7 @@
     },
     {
       "id": "sopot-waterfall",
-      "order": 25,
+      "order": 26,
       "name": "Sopot Waterfall",
       "lat": 40.1442433,
       "lng": 20.4425384,
@@ -473,7 +493,7 @@
     },
     {
       "id": "blue-eye",
-      "order": 26,
+      "order": 27,
       "name": "Блакитне Око (Blue Eye)",
       "lat": 39.9236423,
       "lng": 20.1924637,
@@ -491,7 +511,7 @@
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 27,
+      "order": 28,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
@@ -511,7 +531,7 @@
     },
     {
       "id": "the-castle-of-porto-palermo",
-      "order": 28,
+      "order": 29,
       "name": "The Castle of Porto Palermo",
       "lat": 40.0622157,
       "lng": 19.790746,
@@ -526,25 +546,6 @@
       "thumb": "photos/the-castle-of-porto-palermo/01_thumb.webp",
       "photos": 1,
       "updated": "2026-10-28"
-    },
-    {
-      "id": "llogara-view-point",
-      "order": 29,
-      "name": "Llogara View point",
-      "lat": 40.1894877,
-      "lng": 19.6000919,
-      "category": null,
-      "desc": "",
-      "near": "Palasë",
-      "country": "Albania",
-      "types": [
-        "nature",
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/XjCoFZfnBCATEwym7?g_st=ic",
-      "thumb": "photos/llogara-view-point/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
