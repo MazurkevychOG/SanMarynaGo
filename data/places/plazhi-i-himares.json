@@ -1,6 +1,6 @@
 {
   "id": "plazhi-i-himares",
-  "order": 23,
+  "order": 7,
   "name": "Plazhi i Himarës",
   "lat": 40.1008123,
   "lng": 19.7456809,
@@ -17,11 +17,11 @@
       "bytes": 138904
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "beach",
     "restaurant"
   ],
-  "near": "Хімара"
+  "near": "Himarë"
 }

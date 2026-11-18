@@ -60,26 +60,8 @@
       "updated": "2026-11-16"
     },
     {
-      "id": "fortress-of-bashtove",
-      "order": 4,
-      "name": "Fortress of Bashtovë",
-      "lat": 41.0471305,
-      "lng": 19.4962406,
-      "category": null,
-      "desc": "",
-      "near": "Vilë-Ballaj",
-      "country": "Albania",
-      "types": [
-        "history"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
-      "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
-      "photos": 3,
-      "updated": "2026-10-28"
-    },
-    {
       "id": "plyazh-dhermi",
-      "order": 5,
+      "order": 4,
       "name": "Beach Dhermi",
       "lat": 40.135637,
       "lng": 19.647457,
@@ -96,8 +78,64 @@
       "updated": "2026-11-16"
     },
     {
-      "id": "kantina-balaj-mifol",
+      "id": "gjipe-beach",
+      "order": 5,
+      "name": "Gjipe beach",
+      "lat": 40.126937,
+      "lng": 19.670437,
+      "category": null,
+      "desc": "",
+      "near": "Ilias",
+      "country": "Shqipëri",
+      "types": [
+        "beach",
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/pm13HkD3uDDF8vsd8?g_st=ic",
+      "thumb": "photos/gjipe-beach/01_thumb.webp",
+      "photos": 4,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "fortress-of-bashtove",
       "order": 6,
+      "name": "Fortress of Bashtovë",
+      "lat": 41.0471305,
+      "lng": 19.4962406,
+      "category": null,
+      "desc": "",
+      "near": "Vilë-Ballaj",
+      "country": "Albania",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
+      "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
+      "photos": 3,
+      "updated": "2026-10-28"
+    },
+    {
+      "id": "plazhi-i-himares",
+      "order": 7,
+      "name": "Plazhi i Himarës",
+      "lat": 40.1008123,
+      "lng": 19.7456809,
+      "category": null,
+      "desc": "",
+      "near": "Himarë",
+      "country": "Shqipëri",
+      "types": [
+        "beach",
+        "restaurant"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/2KA31rASvYwkJ1aD6?g_st=ic",
+      "thumb": "photos/plazhi-i-himares/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "kantina-balaj-mifol",
+      "order": 8,
       "name": "Kantina Balaj (Mifol)",
       "lat": 40.5963295,
       "lng": 19.483349,
@@ -115,7 +153,7 @@
     },
     {
       "id": "apollonia-pojan",
-      "order": 7,
+      "order": 9,
       "name": "Apollonia (Pojan)",
       "lat": 40.72134,
       "lng": 19.4710887,
@@ -133,7 +171,7 @@
     },
     {
       "id": "gorica-bridge-berat",
-      "order": 8,
+      "order": 10,
       "name": "Gorica Bridge (Berat)",
       "lat": 40.7032111,
       "lng": 19.9446481,
@@ -151,7 +189,7 @@
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 9,
+      "order": 11,
       "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
       "lat": 40.3038256,
       "lng": 19.6524006,
@@ -169,7 +207,7 @@
     },
     {
       "id": "bridge-of-brataj",
-      "order": 10,
+      "order": 12,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -188,7 +226,7 @@
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
-      "order": 11,
+      "order": 13,
       "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
       "lat": 40.387768,
       "lng": 19.605723,
@@ -206,7 +244,7 @@
     },
     {
       "id": "argjiro-winery-gjirokaster",
-      "order": 12,
+      "order": 14,
       "name": "\"Argjiro\" Winery (Gjirokastër)",
       "lat": 40.0990336,
       "lng": 20.1501935,
@@ -224,7 +262,7 @@
     },
     {
       "id": "gjirokaster-castle",
-      "order": 13,
+      "order": 15,
       "name": "Фортеця Гірокастра (Gjirokastër Castle)",
       "lat": 40.0727906,
       "lng": 20.1392199,
@@ -243,7 +281,7 @@
     },
     {
       "id": "ile-bridge-kutal",
-      "order": 14,
+      "order": 16,
       "name": "Ile bridge (Kutal)",
       "lat": 40.2575881,
       "lng": 20.3232416,
@@ -261,7 +299,7 @@
     },
     {
       "id": "langarica-canyon",
-      "order": 15,
+      "order": 17,
       "name": "Langarica Canyon",
       "lat": 40.2459895,
       "lng": 20.4383168,
@@ -280,7 +318,7 @@
     },
     {
       "id": "sopot-waterfall",
-      "order": 16,
+      "order": 18,
       "name": "Sopot Waterfall",
       "lat": 40.1442433,
       "lng": 20.4425384,
@@ -298,7 +336,7 @@
     },
     {
       "id": "blue-eye",
-      "order": 17,
+      "order": 19,
       "name": "Блакитне Око (Blue Eye)",
       "lat": 39.9236423,
       "lng": 20.1924637,
@@ -316,7 +354,7 @@
     },
     {
       "id": "mesopotam-restaurant",
-      "order": 18,
+      "order": 20,
       "name": "Mesopotam Restaurant",
       "lat": 39.9105198,
       "lng": 20.1028693,
@@ -334,7 +372,7 @@
     },
     {
       "id": "saranda-embankment",
-      "order": 19,
+      "order": 21,
       "name": "Saranda Embankment",
       "lat": 39.8734834,
       "lng": 20.0104313,
@@ -355,7 +393,7 @@
     },
     {
       "id": "bora-bora-beach-ksamil",
-      "order": 20,
+      "order": 22,
       "name": "Bora Bora beach | Ksamil",
       "lat": 39.7713041,
       "lng": 19.9984411,
@@ -374,7 +412,7 @@
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 21,
+      "order": 23,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
@@ -394,7 +432,7 @@
     },
     {
       "id": "the-castle-of-porto-palermo",
-      "order": 22,
+      "order": 24,
       "name": "The Castle of Porto Palermo",
       "lat": 40.0622157,
       "lng": 19.790746,
@@ -411,27 +449,8 @@
       "updated": "2026-10-28"
     },
     {
-      "id": "plazhi-i-himares",
-      "order": 23,
-      "name": "Plazhi i Himarës",
-      "lat": 40.1008123,
-      "lng": 19.7456809,
-      "category": null,
-      "desc": "",
-      "near": "Хімара",
-      "country": "Albania",
-      "types": [
-        "beach",
-        "restaurant"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/2KA31rASvYwkJ1aD6?g_st=ic",
-      "thumb": "photos/plazhi-i-himares/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
-    },
-    {
       "id": "abeille-restaurant",
-      "order": 24,
+      "order": 25,
       "name": "Abeille Restaurant",
       "lat": 40.1574251,
       "lng": 19.8151497,
@@ -450,7 +469,7 @@
     },
     {
       "id": "llogara-view-point",
-      "order": 25,
+      "order": 26,
       "name": "Llogara View point",
       "lat": 40.1894877,
       "lng": 19.6000919,
@@ -469,7 +488,7 @@
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
-      "order": 26,
+      "order": 27,
       "name": "Llixhat e Bënjës - Thermal Baths",
       "lat": 40.2441306,
       "lng": 20.4319674,
@@ -488,7 +507,7 @@
     },
     {
       "id": "arbri-olive-oil",
-      "order": 27,
+      "order": 28,
       "name": "Arbri Olive Oil",
       "lat": 40.3274774,
       "lng": 19.5110889,
@@ -503,7 +522,7 @@
     },
     {
       "id": "bujtina-e-peshkaterit",
-      "order": 28,
+      "order": 29,
       "name": "Bujtina e peshkaterit",
       "lat": 40.361562,
       "lng": 19.480187,
@@ -521,7 +540,7 @@
     },
     {
       "id": "fish-hub-albadriatico",
-      "order": 29,
+      "order": 30,
       "name": "Fish HUB AlbAdriatico",
       "lat": 40.2955308,
       "lng": 19.4882518,
@@ -535,25 +554,6 @@
       "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
       "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
       "photos": 2,
-      "updated": "2026-10-28"
-    },
-    {
-      "id": "gjipe-beach",
-      "order": 30,
-      "name": "Gjipe beach",
-      "lat": 40.126937,
-      "lng": 19.670437,
-      "category": null,
-      "desc": "",
-      "near": "Ilias",
-      "country": "Albania",
-      "types": [
-        "beach",
-        "nature"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/pm13HkD3uDDF8vsd8?g_st=ic",
-      "thumb": "photos/gjipe-beach/01_thumb.webp",
-      "photos": 4,
       "updated": "2026-10-28"
     },
     {
