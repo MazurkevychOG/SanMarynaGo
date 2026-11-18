@@ -4966,9 +4966,9 @@
         const m = haversine(ref, c);
         return m < 1000 ? Math.round(m < 100 ? m : m / 10) * (m < 100 ? 1 : 10) + ' m' : (m < 10000 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km';
     }
-    // Card line: 📍 town · wheel distance · ⛰ height. Every unit is "no-wrap": an icon is never separated from its number —
+    // Card line: 📍 town · (modern alloy wheel) distance · ⛰ height. Every unit is "no-wrap": an icon is never separated from its number —
     // when the line is too narrow the whole unit (icon + number) moves to the next line.
-    const WHEEL_SVG = '<svg class="wheel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M12 2v7.6M12 14.4V22M2 12h7.6M14.4 12H22M4.9 4.9l5.4 5.4M13.7 13.7l5.4 5.4M19.1 4.9l-5.4 5.4M10.3 13.7l-5.4 5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>';
+    const WHEEL_SVG = '<svg class="wheel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3.4"/><circle cx="12" cy="12" r="6.9" fill="none" stroke="currentColor" stroke-width="1"/><path d="M10.9 9.7L11.1 5.5M13.1 9.7L12.9 5.5M13.9 10.2L17.9 9.1M14.6 12.4L18.5 10.9M14.3 13.2L16.6 16.7M12.5 14.6L15.1 17.8M11.5 14.6L8.9 17.8M9.7 13.2L7.4 16.7M9.4 12.4L5.5 10.9M10.1 10.2L6.1 9.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/></svg>';
     function nearHtml(p) {
         const units = [];
         if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
