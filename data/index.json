@@ -97,26 +97,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "fortress-of-bashtove",
-      "order": 6,
-      "name": "Fortress of Bashtovë",
-      "lat": 41.0471305,
-      "lng": 19.4962406,
-      "category": null,
-      "desc": "",
-      "near": "Vilë-Ballaj",
-      "country": "Albania",
-      "types": [
-        "history"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
-      "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
-      "photos": 3,
-      "updated": "2026-10-28"
-    },
-    {
       "id": "saranda-embankment",
-      "order": 7,
+      "order": 6,
       "name": "Saranda Embankment",
       "lat": 39.8734834,
       "lng": 20.0104313,
@@ -137,7 +119,7 @@
     },
     {
       "id": "plazhi-i-himares",
-      "order": 8,
+      "order": 7,
       "name": "Plazhi i Himarës",
       "lat": 40.1008123,
       "lng": 19.7456809,
@@ -156,7 +138,7 @@
     },
     {
       "id": "bora-bora-beach-ksamil",
-      "order": 9,
+      "order": 8,
       "name": "Bora Bora beach | Ksamil",
       "lat": 39.7713041,
       "lng": 19.9984411,
@@ -175,7 +157,7 @@
     },
     {
       "id": "abeille-restaurant",
-      "order": 10,
+      "order": 9,
       "name": "Abeille Restaurant",
       "lat": 40.1574251,
       "lng": 19.8151497,
@@ -194,7 +176,7 @@
     },
     {
       "id": "mesopotam-restaurant",
-      "order": 11,
+      "order": 10,
       "name": "Mesopotam Restaurant",
       "lat": 39.9105198,
       "lng": 20.1028693,
@@ -212,7 +194,7 @@
     },
     {
       "id": "bujtina-e-peshkaterit",
-      "order": 12,
+      "order": 11,
       "name": "Bujtina e peshkaterit",
       "lat": 40.361562,
       "lng": 19.480187,
@@ -231,7 +213,7 @@
     },
     {
       "id": "kantina-balaj-mifol",
-      "order": 13,
+      "order": 12,
       "name": "Kantina Balaj (Mifol)",
       "lat": 40.5963295,
       "lng": 19.483349,
@@ -250,7 +232,7 @@
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
-      "order": 14,
+      "order": 13,
       "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
       "lat": 40.387768,
       "lng": 19.605723,
@@ -269,7 +251,7 @@
     },
     {
       "id": "argjiro-winery-gjirokaster",
-      "order": 15,
+      "order": 14,
       "name": "\"Argjiro\" Winery (Gjirokastër)",
       "lat": 40.0990336,
       "lng": 20.1501935,
@@ -288,7 +270,7 @@
     },
     {
       "id": "bridge-of-brataj",
-      "order": 16,
+      "order": 15,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -308,7 +290,7 @@
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 17,
+      "order": 16,
       "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
       "lat": 40.3038256,
       "lng": 19.6524006,
@@ -326,7 +308,7 @@
     },
     {
       "id": "llogara-view-point",
-      "order": 18,
+      "order": 17,
       "name": "Llogora View point",
       "lat": 40.1894877,
       "lng": 19.6000919,
@@ -345,7 +327,7 @@
     },
     {
       "id": "vjosa-albania-rafting-group-glamping",
-      "order": 19,
+      "order": 18,
       "name": "Vjosa Albania Rafting Group Glamping",
       "lat": 40.224062,
       "lng": 19.373812,
@@ -364,7 +346,7 @@
     },
     {
       "id": "gjirokaster-castle",
-      "order": 20,
+      "order": 19,
       "name": "Фортеця Гірокастра (Gjirokastër Castle)",
       "lat": 40.0727906,
       "lng": 20.1392199,
@@ -384,7 +366,7 @@
     },
     {
       "id": "ferma-ajson-armando",
-      "order": 21,
+      "order": 20,
       "name": "Ferma Ajson - Armando",
       "lat": 40.382712,
       "lng": 19.612297,
@@ -402,7 +384,7 @@
     },
     {
       "id": "ile-bridge-kutal",
-      "order": 22,
+      "order": 21,
       "name": "Ile bridge (Kutal)",
       "lat": 40.2575881,
       "lng": 20.3232416,
@@ -420,7 +402,7 @@
     },
     {
       "id": "apollonia-pojan",
-      "order": 23,
+      "order": 22,
       "name": "Apollonia (Pojan)",
       "lat": 40.72134,
       "lng": 19.4710887,
@@ -437,26 +419,26 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "gorica-bridge-berat",
-      "order": 24,
-      "name": "Gorica Bridge (Berat)",
-      "lat": 40.7032111,
-      "lng": 19.9446481,
+      "id": "the-castle-of-porto-palermo",
+      "order": 23,
+      "name": "The Castle of Porto Palermo",
+      "lat": 40.0622157,
+      "lng": 19.790746,
       "category": null,
       "desc": "",
-      "near": "Uznovë",
-      "country": "Albania",
+      "near": "Qeparo i Sipërm",
+      "country": "Shqipëri",
       "types": [
         "history"
       ],
-      "gmapsUrl": "https://maps.app.goo.gl/ofcvFN4N2zLKuCZS9?g_st=ic",
-      "thumb": "photos/gorica-bridge-berat/01_thumb.webp",
-      "photos": 2,
-      "updated": "2026-10-28"
+      "gmapsUrl": "https://maps.google.com/?q=The%20Castle%20of%20Porto%20Palermo,%20Ali%20Pasha%20Tepelena%20Fortress,%20Porto%20Palermo&ftid=0x135b25f1dc24a0e7:0x8da49d7e3bc5f316&entry=gps&shh=CAE&lucs=,94297699,100826475,94231188,94280568,100821555,47071704,94218641,94282134,100835699,94286869,100820247,100822504,100838877,121816461&g_st=ic",
+      "thumb": "photos/the-castle-of-porto-palermo/01_thumb.webp",
+      "photos": 5,
+      "updated": "2026-11-18"
     },
     {
       "id": "langarica-canyon",
-      "order": 25,
+      "order": 24,
       "name": "Langarica Canyon",
       "lat": 40.2459895,
       "lng": 20.4383168,
@@ -474,51 +456,51 @@
       "updated": "2026-11-01"
     },
     {
-      "id": "sopot-waterfall",
-      "order": 26,
-      "name": "Sopot Waterfall",
-      "lat": 40.1442433,
-      "lng": 20.4425384,
+      "id": "gorica-bridge-berat",
+      "order": 25,
+      "name": "Gorica Bridge (Berat)",
+      "lat": 40.7032111,
+      "lng": 19.9446481,
       "category": null,
       "desc": "",
-      "near": "Strëmbec",
-      "country": "Albania",
+      "near": "Uznovë",
+      "country": "Shqipëri",
       "types": [
-        "nature"
+        "history"
       ],
-      "gmapsUrl": "https://maps.app.goo.gl/EFjXUNTCHSsxih2a8?g_st=ic",
-      "thumb": "photos/sopot-waterfall/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "gmapsUrl": "https://maps.app.goo.gl/ofcvFN4N2zLKuCZS9?g_st=ic",
+      "thumb": "photos/gorica-bridge-berat/01_thumb.webp",
+      "photos": 2,
+      "updated": "2026-11-18"
     },
     {
-      "id": "blue-eye",
-      "order": 27,
-      "name": "Блакитне Око (Blue Eye)",
-      "lat": 39.9236423,
-      "lng": 20.1924637,
+      "id": "fortress-of-bashtove",
+      "order": 26,
+      "name": "Fortress of Bashtovë",
+      "lat": 41.0471305,
+      "lng": 19.4962406,
       "category": null,
       "desc": "",
-      "near": "Muzinë",
-      "country": "Albania",
+      "near": "Vilë-Ballaj",
+      "country": "Shqipëri",
       "types": [
-        "nature"
+        "history"
       ],
-      "gmapsUrl": "https://maps.app.goo.gl/bYyW1CjxTAhrwBn38?g_st=ic",
-      "thumb": "photos/blue-eye/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-10-28"
+      "gmapsUrl": "https://maps.app.goo.gl/DsondcQCZcYEuhdx9?g_st=ic",
+      "thumb": "photos/fortress-of-bashtove/01_thumb.webp",
+      "photos": 3,
+      "updated": "2026-11-18"
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 28,
+      "order": 27,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
       "category": null,
       "desc": "",
       "near": "Shëndellia",
-      "country": "Albania",
+      "country": "Shqipëri",
       "types": [
         "history",
         "prohulyanka",
@@ -527,25 +509,44 @@
       "gmapsUrl": "https://maps.app.goo.gl/Dhs81dHUyxiJmBzt9?g_st=ic",
       "thumb": "photos/butrint-ancient-theatre/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-11-01"
+      "updated": "2026-11-18"
     },
     {
-      "id": "the-castle-of-porto-palermo",
-      "order": 29,
-      "name": "The Castle of Porto Palermo",
-      "lat": 40.0622157,
-      "lng": 19.790746,
+      "id": "blue-eye",
+      "order": 28,
+      "name": "Блакитне Око (Blue Eye)",
+      "lat": 39.9236423,
+      "lng": 20.1924637,
       "category": null,
       "desc": "",
-      "near": "Qeparo i Sipërm",
-      "country": "Albania",
+      "near": "Muzinë",
+      "country": "Shqipëri",
       "types": [
-        "history"
+        "nature",
+        "prohulyanka"
       ],
-      "gmapsUrl": "https://maps.google.com/?q=The%20Castle%20of%20Porto%20Palermo,%20Ali%20Pasha%20Tepelena%20Fortress,%20Porto%20Palermo&ftid=0x135b25f1dc24a0e7:0x8da49d7e3bc5f316&entry=gps&shh=CAE&lucs=,94297699,100826475,94231188,94280568,100821555,47071704,94218641,94282134,100835699,94286869,100820247,100822504,100838877,121816461&g_st=ic",
-      "thumb": "photos/the-castle-of-porto-palermo/01_thumb.webp",
+      "gmapsUrl": "https://maps.app.goo.gl/bYyW1CjxTAhrwBn38?g_st=ic",
+      "thumb": "photos/blue-eye/01_thumb.webp",
       "photos": 1,
-      "updated": "2026-10-28"
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "sopot-waterfall",
+      "order": 29,
+      "name": "Sopot Waterfall",
+      "lat": 40.1442433,
+      "lng": 20.4425384,
+      "category": null,
+      "desc": "",
+      "near": "Strëmbec",
+      "country": "Shqipëri",
+      "types": [
+        "nature"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/EFjXUNTCHSsxih2a8?g_st=ic",
+      "thumb": "photos/sopot-waterfall/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
@@ -575,11 +576,14 @@
       "category": null,
       "desc": "",
       "near": "Tragjas",
-      "country": "Albania",
+      "country": "Shqipëri",
+      "types": [
+        "food"
+      ],
       "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
       "thumb": "photos/arbri-olive-oil/01_thumb.webp",
       "photos": 3,
-      "updated": "2026-10-28"
+      "updated": "2026-11-18"
     },
     {
       "id": "fish-hub-albadriatico",
@@ -589,15 +593,15 @@
       "lng": 19.4882518,
       "category": null,
       "desc": "",
-      "near": "Орікум",
-      "country": "Albania",
+      "near": "Orikum",
+      "country": "Shqipëri",
       "types": [
-        "restaurant"
+        "food"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
       "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
       "photos": 2,
-      "updated": "2026-10-28"
+      "updated": "2026-11-18"
     }
   ]
 }

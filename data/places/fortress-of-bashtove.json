@@ -1,6 +1,6 @@
 {
   "id": "fortress-of-bashtove",
-  "order": 6,
+  "order": 26,
   "name": "Fortress of Bashtovë",
   "lat": 41.0471305,
   "lng": 19.4962406,
@@ -33,8 +33,8 @@
       "bytes": 177320
     }
   ],
-  "updated": "2026-10-28",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "history"
   ],

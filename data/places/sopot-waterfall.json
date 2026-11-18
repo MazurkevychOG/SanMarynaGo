@@ -1,6 +1,6 @@
 {
   "id": "sopot-waterfall",
-  "order": 26,
+  "order": 29,
   "name": "Sopot Waterfall",
   "lat": 40.1442433,
   "lng": 20.4425384,
@@ -17,8 +17,8 @@
       "bytes": 104104
     }
   ],
-  "updated": "2026-10-28",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "nature"
   ],

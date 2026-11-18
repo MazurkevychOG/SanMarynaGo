@@ -36,7 +36,10 @@
       "srcSha256": "acbd8b713090375c21a116234bad58831636d906a7b7d3759b63cda1aad5de7b"
     }
   ],
-  "updated": "2026-10-28",
-  "country": "Albania",
-  "near": "Tragjas"
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
+  "near": "Tragjas",
+  "types": [
+    "food"
+  ]
 }

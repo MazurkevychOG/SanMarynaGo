@@ -1,6 +1,6 @@
 {
   "id": "the-castle-of-porto-palermo",
-  "order": 29,
+  "order": 23,
   "name": "The Castle of Porto Palermo",
   "lat": 40.0622157,
   "lng": 19.790746,
@@ -15,10 +15,46 @@
       "width": 997,
       "height": 740,
       "bytes": 104562
+    },
+    {
+      "type": "image",
+      "file": "photos/the-castle-of-porto-palermo/02.webp",
+      "thumb": "photos/the-castle-of-porto-palermo/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 341730,
+      "srcSha256": "9c188ab5cf2d7fde77d335d4a72bf85d5098048d872998b11ee0347a78a7ce9d"
+    },
+    {
+      "type": "image",
+      "file": "photos/the-castle-of-porto-palermo/03.webp",
+      "thumb": "photos/the-castle-of-porto-palermo/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 309818,
+      "srcSha256": "2e1eca206ba0bdcb571830d3c3d25a2bc345e48640425fcdf22d83d00f0d58c2"
+    },
+    {
+      "type": "image",
+      "file": "photos/the-castle-of-porto-palermo/04.webp",
+      "thumb": "photos/the-castle-of-porto-palermo/04_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 387468,
+      "srcSha256": "d287ce439120cf1d074d20a45e217a55f82484da00d2027453302371cdb11098"
+    },
+    {
+      "type": "image",
+      "file": "photos/the-castle-of-porto-palermo/05.webp",
+      "thumb": "photos/the-castle-of-porto-palermo/05_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 297594,
+      "srcSha256": "44549f37efaa7d0a90b493c028aa92d51f8f914046bcd95e2400d50320056fd4"
     }
   ],
-  "updated": "2026-10-28",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "history"
   ],

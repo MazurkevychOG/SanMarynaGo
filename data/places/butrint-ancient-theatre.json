@@ -1,6 +1,6 @@
 {
   "id": "butrint-ancient-theatre",
-  "order": 28,
+  "order": 27,
   "name": "Butrint Ancient Theatre",
   "lat": 39.7455936,
   "lng": 20.0204852,
@@ -17,8 +17,8 @@
       "bytes": 302580
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "history",
     "prohulyanka",
