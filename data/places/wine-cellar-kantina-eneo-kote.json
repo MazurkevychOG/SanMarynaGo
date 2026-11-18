@@ -1,6 +1,6 @@
 {
   "id": "wine-cellar-kantina-eneo-kote",
-  "order": 13,
+  "order": 14,
   "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
   "lat": 40.387768,
   "lng": 19.605723,
@@ -17,10 +17,11 @@
       "bytes": 58152
     }
   ],
-  "updated": "2026-10-28",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
-    "winery"
+    "winery",
+    "food"
   ],
   "near": "Mavrovë"
 }

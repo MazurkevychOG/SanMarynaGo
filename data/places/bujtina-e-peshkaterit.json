@@ -1,15 +1,16 @@
 {
   "id": "bujtina-e-peshkaterit",
-  "order": 29,
+  "order": 13,
   "name": "Bujtina e peshkaterit",
   "lat": 40.361562,
   "lng": 19.480187,
   "desc": "",
   "gmapsUrl": "https://maps.app.goo.gl/kPyKfR9szQJzVffx8?g_st=ic",
   "near": "Radhimë",
-  "country": "Albania",
+  "country": "Shqipëri",
   "types": [
-    "restaurant"
+    "restaurant",
+    "food"
   ],
   "media": [
     {
@@ -31,7 +32,7 @@
       "srcSha256": "3b5a274be96214bee6a761fb71d23000cc5f63775c318cda160b9f40c104ab34"
     }
   ],
-  "updated": "2026-11-01",
+  "updated": "2026-11-18",
   "aliases": [
     "pmvxzbhwgg7fq5"
   ]

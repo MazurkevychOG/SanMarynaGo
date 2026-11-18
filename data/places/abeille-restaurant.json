@@ -1,6 +1,6 @@
 {
   "id": "abeille-restaurant",
-  "order": 25,
+  "order": 10,
   "name": "Abeille Restaurant",
   "lat": 40.1574251,
   "lng": 19.8151497,
@@ -15,10 +15,28 @@
       "width": 627,
       "height": 871,
       "bytes": 47946
+    },
+    {
+      "type": "image",
+      "file": "photos/abeille-restaurant/02.webp",
+      "thumb": "photos/abeille-restaurant/02_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 328380,
+      "srcSha256": "b25b5328b54e64c837cfe19a5f30d158c37fc6caf5f4385f0cd94c45f9d91207"
+    },
+    {
+      "type": "image",
+      "file": "photos/abeille-restaurant/03.webp",
+      "thumb": "photos/abeille-restaurant/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 350462,
+      "srcSha256": "b5e570bbcaaf5dd05b2f04cd4a95f99ffdd672a04ca2beabaf6d496a8aef8a13"
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "restaurant",
     "nature"
