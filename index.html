@@ -224,6 +224,8 @@
         .c-name { min-width: 0; padding-left: 12px; }
         .place-name-link { display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; font-size: 28px; line-height: 1.2; }
         .cell-near { font-size: 20px; color: #5a7184; margin-top: 6px; overflow-wrap: anywhere; }
+        .cell-near .nw { white-space: nowrap; }
+        .cell-near .wheel { width: 1em; height: 1em; vertical-align: -.13em; }
         .cell-desc { font-size: 18px; color: #718096; margin-top: 4px; overflow-wrap: anywhere; }
         .drag-handle { align-self: stretch; margin: -12px 0; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; color: #a0aec0; }
         .drag-handle.grip { font-size: 30px; color: #b8c2cc; }
@@ -2502,7 +2504,7 @@
                     <div class="c-photo"><div class="cell-photo-img" onclick="openGallery(${i})">${thumbHtml(p)}</div></div>
                     <div class="c-name">
                         <div>${link}</div>
-                        <div class="cell-near">${esc(nearLine(p))}</div>
+                        <div class="cell-near">${nearHtml(p)}</div>
                         ${(p.types && p.types.length) ? `<div class="cell-types">${p.types.map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${esc(typeLabel(t))}</span>` : ''; }).join('')}</div>` : ''}
                         ${p.desc ? `<div class="cell-desc">${esc(p.desc)}</div>` : ''}
                     </div>
@@ -4964,12 +4966,15 @@
         const m = haversine(ref, c);
         return m < 1000 ? Math.round(m < 100 ? m : m / 10) * (m < 100 ? 1 : 10) + ' m' : (m < 10000 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km';
     }
-    function nearLine(p) {
-        const parts = [];
-        if (p.near) parts.push('📍 ' + p.near);
-        const dt = distText(p); if (dt) parts.push('📏 ' + dt);
-        const e = elevOf(p); if (e !== null && Math.round(e) >= 100) parts.push('⛰ ' + Math.round(e) + ' m');
-        return parts.join(' · ');
+    // Card line: 📍 town · wheel distance · ⛰ height. Every unit is "no-wrap": an icon is never separated from its number —
+    // when the line is too narrow the whole unit (icon + number) moves to the next line.
+    const WHEEL_SVG = '<svg class="wheel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M12 2v7.6M12 14.4V22M2 12h7.6M14.4 12H22M4.9 4.9l5.4 5.4M13.7 13.7l5.4 5.4M19.1 4.9l-5.4 5.4M10.3 13.7l-5.4 5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>';
+    function nearHtml(p) {
+        const units = [];
+        if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
+        const dt = distText(p); if (dt) units.push('<span class="nw">' + WHEEL_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
+        const e = elevOf(p); if (e !== null && Math.round(e) >= 100) units.push('<span class="nw">⛰&nbsp;' + Math.round(e) + '&nbsp;m</span>');
+        return units.map((u, i) => i < units.length - 1 ? u.replace(/<\/span>$/, '&nbsp;·</span>') : u).join(' ');
     }
     let elevBusy = false, elevTimer = 0, elevFailAt = 0;
     function scheduleElev() { clearTimeout(elevTimer); elevTimer = setTimeout(runElev, 1200); }
@@ -4994,7 +4999,7 @@
     function setNearText(p) {
         const rows = document.getElementById('placesTable').children;
         for (const r of rows) {
-            if (r.dataset.id === p.id) { const el = r.querySelector('.cell-near'); if (el) el.textContent = nearLine(p); }
+            if (r.dataset.id === p.id) { const el = r.querySelector('.cell-near'); if (el) el.innerHTML = nearHtml(p); }
         }
     }
     // Назва країни АНГЛІЙСЬКОЮ за кодом країни (ISO 3166): Intl вбудований у браузер, тож окремого запиту не треба
@@ -6982,7 +6987,7 @@
     let _distAt = 0, _distRef = null;
     function refreshDistances() {                            // card texts follow the current place
         const byId = new Map(places.map(p => [p.id, p])), tb = document.getElementById('placesTable'); if (!tb) return;
-        for (const r of tb.children) { const p = byId.get(r.dataset.id), el = p && r.querySelector('.cell-near'); if (el) { const t = nearLine(p); if (el.textContent !== t) el.textContent = t; } }
+        for (const r of tb.children) { const p = byId.get(r.dataset.id), el = p && r.querySelector('.cell-near'); if (el) { const t = nearHtml(p); if (el.dataset.h !== t) { el.dataset.h = t; el.innerHTML = t; } } }
     }
     function sortOnFix(ll) {                                 // викликається з GPS-підписки
         const now = Date.now();
