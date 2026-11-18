@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "count": 32,
+  "count": 33,
   "places": [
     {
       "id": "home-vlore-joanna",
@@ -401,8 +401,28 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "apollonia-pojan",
+      "id": "llixhat-e-benjes-thermal-baths",
       "order": 22,
+      "name": "Llixhat e Bënjës - Thermal Baths",
+      "lat": 40.2441306,
+      "lng": 20.4319674,
+      "category": null,
+      "desc": "",
+      "near": "Ogdunan",
+      "country": "Shqipëri",
+      "types": [
+        "nature",
+        "prohulyanka",
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/qyZ9sy7mK4W78xNB7?g_st=ic",
+      "thumb": "photos/llixhat-e-benjes-thermal-baths/01_thumb.webp",
+      "photos": 5,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "apollonia-pojan",
+      "order": 23,
       "name": "Apollonia (Pojan)",
       "lat": 40.72134,
       "lng": 19.4710887,
@@ -419,8 +439,28 @@
       "updated": "2026-11-18"
     },
     {
+      "id": "langarica-canyon",
+      "order": 24,
+      "name": "Langarica Canyon",
+      "lat": 40.2459895,
+      "lng": 20.4383168,
+      "category": null,
+      "desc": "",
+      "near": "Ogdunan",
+      "country": "Shqipëri",
+      "types": [
+        "nature",
+        "prohulyanka",
+        "extreme"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/T5hARBJk2hsGM5Xa7?g_st=ic",
+      "thumb": "photos/langarica-canyon/01_thumb.webp",
+      "photos": 1,
+      "updated": "2026-11-18"
+    },
+    {
       "id": "the-castle-of-porto-palermo",
-      "order": 23,
+      "order": 25,
       "name": "The Castle of Porto Palermo",
       "lat": 40.0622157,
       "lng": 19.790746,
@@ -437,27 +477,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "langarica-canyon",
-      "order": 24,
-      "name": "Langarica Canyon",
-      "lat": 40.2459895,
-      "lng": 20.4383168,
-      "category": null,
-      "desc": "",
-      "near": "Ogdunan",
-      "country": "Albania",
-      "types": [
-        "nature",
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/T5hARBJk2hsGM5Xa7?g_st=ic",
-      "thumb": "photos/langarica-canyon/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-01"
-    },
-    {
       "id": "gorica-bridge-berat",
-      "order": 25,
+      "order": 26,
       "name": "Gorica Bridge (Berat)",
       "lat": 40.7032111,
       "lng": 19.9446481,
@@ -475,7 +496,7 @@
     },
     {
       "id": "fortress-of-bashtove",
-      "order": 26,
+      "order": 27,
       "name": "Fortress of Bashtovë",
       "lat": 41.0471305,
       "lng": 19.4962406,
@@ -493,7 +514,7 @@
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 27,
+      "order": 28,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
@@ -513,7 +534,7 @@
     },
     {
       "id": "blue-eye",
-      "order": 28,
+      "order": 29,
       "name": "Блакитне Око (Blue Eye)",
       "lat": 39.9236423,
       "lng": 20.1924637,
@@ -532,7 +553,7 @@
     },
     {
       "id": "sopot-waterfall",
-      "order": 29,
+      "order": 30,
       "name": "Sopot Waterfall",
       "lat": 40.1442433,
       "lng": 20.4425384,
@@ -547,25 +568,6 @@
       "thumb": "photos/sopot-waterfall/01_thumb.webp",
       "photos": 1,
       "updated": "2026-11-18"
-    },
-    {
-      "id": "llixhat-e-benjes-thermal-baths",
-      "order": 30,
-      "name": "Llixhat e Bënjës - Thermal Baths",
-      "lat": 40.2441306,
-      "lng": 20.4319674,
-      "category": null,
-      "desc": "",
-      "near": "Ogdunan",
-      "country": "Albania",
-      "types": [
-        "nature",
-        "extreme"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/qyZ9sy7mK4W78xNB7?g_st=ic",
-      "thumb": "photos/llixhat-e-benjes-thermal-baths/01_thumb.webp",
-      "photos": 5,
-      "updated": "2026-11-01"
     },
     {
       "id": "arbri-olive-oil",
@@ -601,6 +603,28 @@
       "gmapsUrl": "https://maps.app.goo.gl/gYxg4vuUN1eG61bC6?g_st=ic",
       "thumb": "photos/fish-hub-albadriatico/01_thumb.webp",
       "photos": 2,
+      "updated": "2026-11-18"
+    },
+    {
+      "id": "mrizi-i-pishave",
+      "order": 33,
+      "name": "Mrizi I pishave",
+      "lat": 40.25362,
+      "lng": 19.535055,
+      "category": null,
+      "desc": "",
+      "near": "Dukat",
+      "country": "Shqipëri",
+      "types": [
+        "food",
+        "nature",
+        "winery",
+        "restaurant",
+        "prohulyanka"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/zBqpNTHnZfafqzYn6?g_st=ic",
+      "thumb": "photos/mrizi-i-pishave/01_thumb.webp",
+      "photos": 1,
       "updated": "2026-11-18"
     }
   ]

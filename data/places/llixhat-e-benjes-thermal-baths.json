@@ -1,6 +1,6 @@
 {
   "id": "llixhat-e-benjes-thermal-baths",
-  "order": 30,
+  "order": 22,
   "name": "Llixhat e Bënjës - Thermal Baths",
   "lat": 40.2441306,
   "lng": 20.4319674,
@@ -53,10 +53,11 @@
       "srcSha256": "ca2bc5f3061a8e24b9b5cf5014ac246d946c0226e07387e430f3a4ec5dcf6512"
     }
   ],
-  "updated": "2026-11-01",
-  "country": "Albania",
+  "updated": "2026-11-18",
+  "country": "Shqipëri",
   "types": [
     "nature",
+    "prohulyanka",
     "extreme"
   ],
   "near": "Ogdunan"
