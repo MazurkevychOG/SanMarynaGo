@@ -1435,6 +1435,12 @@
   function dropOpen(id) { S.open = S.open.filter(x => x.id !== id); if (S.t && S.t.id === id) S.t = S.open.length ? S.open[S.open.length - 1] : null; }
   function closeAllTrips() { S.open = []; S.t = null; }
   window.trkOpenTrips = () => (S.state === 'idle' ? viewSet() : S.open.slice()).filter(t => t && t.done);   // trips shown on the map (for the cost calculation and the Trips list)
+  window.trkResetViews = () => {                           // «reset all» on the map: close every opened recorded trip (not while recording)
+    if (S.state !== 'idle') return 0;
+    const n = viewSet().length; if (!n) return 0;
+    closeAllTrips(); drawAll(false); render(); costRefresh();
+    return n;
+  };
   window.trkOpenIds = () => new Set(window.trkOpenTrips().map(t => t.id));
   function drawAll(fit) {                                   // rebuild from data (view / restore / map created later)
     const m = getMap(); if (!m) return;
@@ -4784,9 +4790,9 @@
         const canSave = !!(routeTotals && eff >= 2) && !(savedRouteSig !== null && routeSig() === savedRouteSig);                           // кнопка 💾 лише коли є готовий маршрут
         document.querySelectorAll('.save-route-btn').forEach(b => { b.style.display = canSave ? 'inline-flex' : 'none'; });
         const nt = (window.trkOpenTrips ? window.trkOpenTrips().length : 0);
-        document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = (n >= 1 || nt >= 1) ? 'inline-flex' : 'none'; });        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
+        document.querySelectorAll('.trip-cost-btn').forEach(b => { b.style.display = (n >= 1 || (nt >= 1 && b.closest('#mapOverlay'))) ? 'inline-flex' : 'none'; });   // main screen: only for selected points, not for recorded trips        // «Повернутися на старт» — лише коли в маршруті є 2 і більше точок
         const lh = document.getElementById('listHead');
-        if (lh) { lh.classList.toggle('has-cost', n > 0 || nt > 0); lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
+        if (lh) { lh.classList.toggle('has-cost', n > 0); lh.classList.toggle('has-count', n > 0); lh.classList.toggle('has-save', canSave && n > 0); }   // є лічильник → кнопки праворуч переходять на другий рядок
         if (!n) { el.style.display = 'none'; el.textContent = ''; el.style.fontSize = ''; return; }   // лічильник лише коли щось вибрано
         el.style.display = 'inline-block';
         const ex = extrasTotals();
@@ -5816,9 +5822,10 @@
     }
     function resetAllPoints() {
         const had = places.some(p => p.selected);
+        const closedTrips = window.trkResetViews ? window.trkResetViews() : 0;       // opened recorded trips are reset too
         shownNames.clear();
         if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); refreshSelectionUI(); toast('⟲ All points reset'); }
-        else { updateMapMarkers(); toast('No points selected'); }
+        else { updateMapMarkers(); toast(closedTrips ? (closedTrips > 1 ? closedTrips + ' tracks closed' : 'Track closed') : 'No points selected'); }
     }
     function addResetControl() {
         const Ctl = L.Control.extend({
