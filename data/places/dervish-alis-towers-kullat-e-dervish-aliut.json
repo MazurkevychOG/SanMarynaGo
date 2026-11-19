@@ -1,0 +1,56 @@
+{
+  "id": "dervish-alis-towers-kullat-e-dervish-aliut",
+  "order": 11,
+  "name": "Dervish Ali's Towers Kullat e Dervish Aliut",
+  "lat": 40.2513794,
+  "lng": 19.5684183,
+  "desc": "",
+  "gmapsUrl": "https://maps.app.goo.gl/aEtNK9P1XpeXGYu46?g_st=ic",
+  "near": "Dukat",
+  "country": "Shqipëri",
+  "types": [
+    "history"
+  ],
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/dervish-alis-towers-kullat-e-dervish-aliut/01.webp",
+      "thumb": "photos/dervish-alis-towers-kullat-e-dervish-aliut/01_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 406906,
+      "srcSha256": "12ce6a7f71fd2b6c809a90fe04d850d47aae7dafc089fc7d3c93ae567b34c44c"
+    },
+    {
+      "type": "image",
+      "file": "photos/dervish-alis-towers-kullat-e-dervish-aliut/02.webp",
+      "thumb": "photos/dervish-alis-towers-kullat-e-dervish-aliut/02_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 356666,
+      "srcSha256": "c8cf08af289c8e4b69d74e0defdf93d4caf02751f8be567d736199d47dfc8035"
+    },
+    {
+      "type": "image",
+      "file": "photos/dervish-alis-towers-kullat-e-dervish-aliut/03.webp",
+      "thumb": "photos/dervish-alis-towers-kullat-e-dervish-aliut/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 370778,
+      "srcSha256": "7d0e4be3410552641161676ffff4080c021e83ee0daee48c58791947a0337dcc"
+    },
+    {
+      "type": "image",
+      "file": "photos/dervish-alis-towers-kullat-e-dervish-aliut/04.webp",
+      "thumb": "photos/dervish-alis-towers-kullat-e-dervish-aliut/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 377496,
+      "srcSha256": "d8446d646d9ae9ad6de1b58c991c522912f9a04b1e0438f2917ec083d8c28440"
+    }
+  ],
+  "updated": "2026-11-19",
+  "aliases": [
+    "pmwmdqfyelc0i2"
+  ]
+}

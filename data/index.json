@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "count": 33,
+  "count": 34,
   "places": [
     {
       "id": "home-vlore-joanna",
@@ -79,8 +79,26 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "saranda-embankment",
+      "id": "arbri-olive-oil",
       "order": 5,
+      "name": "Arbri Olive Oil",
+      "lat": 40.3274774,
+      "lng": 19.5110889,
+      "category": null,
+      "desc": "",
+      "near": "Tragjas",
+      "country": "Shqipëri",
+      "types": [
+        "food"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
+      "thumb": "photos/arbri-olive-oil/01_thumb.webp",
+      "photos": 5,
+      "updated": "2026-11-19"
+    },
+    {
+      "id": "saranda-embankment",
+      "order": 6,
       "name": "Saranda Embankment",
       "lat": 39.8734834,
       "lng": 20.0104313,
@@ -101,7 +119,7 @@
     },
     {
       "id": "plazhi-i-himares",
-      "order": 6,
+      "order": 7,
       "name": "Plazhi i Himarës",
       "lat": 40.1008123,
       "lng": 19.7456809,
@@ -120,7 +138,7 @@
     },
     {
       "id": "bora-bora-beach-ksamil",
-      "order": 7,
+      "order": 8,
       "name": "Bora Bora beach | Ksamil",
       "lat": 39.7713041,
       "lng": 19.9984411,
@@ -139,7 +157,7 @@
     },
     {
       "id": "abeille-restaurant",
-      "order": 8,
+      "order": 9,
       "name": "Abeille Restaurant",
       "lat": 40.1574251,
       "lng": 19.8151497,
@@ -158,7 +176,7 @@
     },
     {
       "id": "mesopotam-restaurant",
-      "order": 9,
+      "order": 10,
       "name": "Mesopotam Restaurant",
       "lat": 39.9105198,
       "lng": 20.1028693,
@@ -175,8 +193,26 @@
       "updated": "2026-11-18"
     },
     {
+      "id": "dervish-alis-towers-kullat-e-dervish-aliut",
+      "order": 11,
+      "name": "Dervish Ali's Towers Kullat e Dervish Aliut",
+      "lat": 40.2513794,
+      "lng": 19.5684183,
+      "category": null,
+      "desc": "",
+      "near": "Dukat",
+      "country": "Shqipëri",
+      "types": [
+        "history"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/aEtNK9P1XpeXGYu46?g_st=ic",
+      "thumb": "photos/dervish-alis-towers-kullat-e-dervish-aliut/01_thumb.webp",
+      "photos": 4,
+      "updated": "2026-11-19"
+    },
+    {
       "id": "bujtina-e-peshkaterit",
-      "order": 10,
+      "order": 12,
       "name": "Bujtina e peshkaterit",
       "lat": 40.361562,
       "lng": 19.480187,
@@ -195,7 +231,7 @@
     },
     {
       "id": "kantina-balaj-mifol",
-      "order": 11,
+      "order": 13,
       "name": "Kantina Balaj (Mifol)",
       "lat": 40.5963295,
       "lng": 19.483349,
@@ -214,7 +250,7 @@
     },
     {
       "id": "wine-cellar-kantina-eneo-kote",
-      "order": 12,
+      "order": 14,
       "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
       "lat": 40.387768,
       "lng": 19.605723,
@@ -233,7 +269,7 @@
     },
     {
       "id": "argjiro-winery-gjirokaster",
-      "order": 13,
+      "order": 15,
       "name": "\"Argjiro\" Winery (Gjirokastër)",
       "lat": 40.0990336,
       "lng": 20.1501935,
@@ -252,7 +288,7 @@
     },
     {
       "id": "bridge-of-brataj",
-      "order": 14,
+      "order": 16,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -272,7 +308,7 @@
     },
     {
       "id": "plyazh-dhermi",
-      "order": 15,
+      "order": 17,
       "name": "Beach Dhermi",
       "lat": 40.135637,
       "lng": 19.647457,
@@ -290,7 +326,7 @@
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 16,
+      "order": 18,
       "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
       "lat": 40.3038256,
       "lng": 19.6524006,
@@ -308,7 +344,7 @@
     },
     {
       "id": "llogara-view-point",
-      "order": 17,
+      "order": 19,
       "name": "Llogora View point",
       "lat": 40.1894877,
       "lng": 19.6000919,
@@ -327,7 +363,7 @@
     },
     {
       "id": "vjosa-albania-rafting-group-glamping",
-      "order": 18,
+      "order": 20,
       "name": "Vjosa Albania Rafting Group Glamping",
       "lat": 40.224062,
       "lng": 19.373812,
@@ -346,7 +382,7 @@
     },
     {
       "id": "gjirokaster-castle",
-      "order": 19,
+      "order": 21,
       "name": "Фортеця Гірокастра (Gjirokastër Castle)",
       "lat": 40.0727906,
       "lng": 20.1392199,
@@ -366,7 +402,7 @@
     },
     {
       "id": "ferma-ajson-armando",
-      "order": 20,
+      "order": 22,
       "name": "Ferma Ajson - Armando",
       "lat": 40.382712,
       "lng": 19.612297,
@@ -384,7 +420,7 @@
     },
     {
       "id": "ile-bridge-kutal",
-      "order": 21,
+      "order": 23,
       "name": "Ile bridge (Kutal)",
       "lat": 40.2575881,
       "lng": 20.3232416,
@@ -402,7 +438,7 @@
     },
     {
       "id": "llixhat-e-benjes-thermal-baths",
-      "order": 22,
+      "order": 24,
       "name": "Llixhat e Bënjës - Thermal Baths",
       "lat": 40.2441306,
       "lng": 20.4319674,
@@ -422,7 +458,7 @@
     },
     {
       "id": "apollonia-pojan",
-      "order": 23,
+      "order": 25,
       "name": "Apollonia (Pojan)",
       "lat": 40.72134,
       "lng": 19.4710887,
@@ -440,7 +476,7 @@
     },
     {
       "id": "langarica-canyon",
-      "order": 24,
+      "order": 26,
       "name": "Langarica Canyon",
       "lat": 40.2459895,
       "lng": 20.4383168,
@@ -460,7 +496,7 @@
     },
     {
       "id": "the-castle-of-porto-palermo",
-      "order": 25,
+      "order": 27,
       "name": "The Castle of Porto Palermo",
       "lat": 40.0622157,
       "lng": 19.790746,
@@ -478,7 +514,7 @@
     },
     {
       "id": "gorica-bridge-berat",
-      "order": 26,
+      "order": 28,
       "name": "Gorica Bridge (Berat)",
       "lat": 40.7032111,
       "lng": 19.9446481,
@@ -496,7 +532,7 @@
     },
     {
       "id": "fortress-of-bashtove",
-      "order": 27,
+      "order": 29,
       "name": "Fortress of Bashtovë",
       "lat": 41.0471305,
       "lng": 19.4962406,
@@ -514,7 +550,7 @@
     },
     {
       "id": "butrint-ancient-theatre",
-      "order": 28,
+      "order": 30,
       "name": "Butrint Ancient Theatre",
       "lat": 39.7455936,
       "lng": 20.0204852,
@@ -534,7 +570,7 @@
     },
     {
       "id": "blue-eye",
-      "order": 29,
+      "order": 31,
       "name": "Блакитне Око (Blue Eye)",
       "lat": 39.9236423,
       "lng": 20.1924637,
@@ -553,7 +589,7 @@
     },
     {
       "id": "sopot-waterfall",
-      "order": 30,
+      "order": 32,
       "name": "Sopot Waterfall",
       "lat": 40.1442433,
       "lng": 20.4425384,
@@ -570,26 +606,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "arbri-olive-oil",
-      "order": 31,
-      "name": "Arbri Olive Oil",
-      "lat": 40.3274774,
-      "lng": 19.5110889,
-      "category": null,
-      "desc": "",
-      "near": "Tragjas",
-      "country": "Shqipëri",
-      "types": [
-        "food"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
-      "thumb": "photos/arbri-olive-oil/01_thumb.webp",
-      "photos": 3,
-      "updated": "2026-11-18"
-    },
-    {
       "id": "fish-hub-albadriatico",
-      "order": 32,
+      "order": 33,
       "name": "Fish HUB AlbAdriatico",
       "lat": 40.2955308,
       "lng": 19.4882518,
@@ -607,7 +625,7 @@
     },
     {
       "id": "mrizi-i-pishave",
-      "order": 33,
+      "order": 34,
       "name": "Mrizi I pishave",
       "lat": 40.25362,
       "lng": 19.535055,

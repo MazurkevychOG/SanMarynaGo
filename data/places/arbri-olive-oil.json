@@ -1,6 +1,6 @@
 {
   "id": "arbri-olive-oil",
-  "order": 31,
+  "order": 5,
   "name": "Arbri Olive Oil",
   "lat": 40.3274774,
   "lng": 19.5110889,
@@ -34,9 +34,27 @@
       "height": 900,
       "bytes": 190782,
       "srcSha256": "acbd8b713090375c21a116234bad58831636d906a7b7d3759b63cda1aad5de7b"
+    },
+    {
+      "type": "image",
+      "file": "photos/arbri-olive-oil/04.webp",
+      "thumb": "photos/arbri-olive-oil/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 231056,
+      "srcSha256": "76ac494ed3be1e2541871cc91854d8118ce04b9716b578e726be6f27e4677967"
+    },
+    {
+      "type": "image",
+      "file": "photos/arbri-olive-oil/05.webp",
+      "thumb": "photos/arbri-olive-oil/05_thumb.webp",
+      "width": 900,
+      "height": 1600,
+      "bytes": 345732,
+      "srcSha256": "fee9fe1797b2176353e44da3538363f68fd2edb489fc21a0d7d3ea6b5f60fae8"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-19",
   "country": "Shqipëri",
   "near": "Tragjas",
   "types": [

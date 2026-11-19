@@ -34,13 +34,13 @@
     }
   ],
   "settings": {
-    "theme": "light",
+    "theme": "dark",
     "fab": {
       "fx": 0.9936,
       "fy": 0.9263
     }
   },
-  "updated": "2026-11-18",
+  "updated": "2026-11-19",
   "deletedRoutes": [
     "mwgbbiu1wd8h"
   ]
