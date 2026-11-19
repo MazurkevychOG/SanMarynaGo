@@ -268,27 +268,8 @@
       "updated": "2026-11-18"
     },
     {
-      "id": "argjiro-winery-gjirokaster",
-      "order": 15,
-      "name": "\"Argjiro\" Winery (Gjirokastër)",
-      "lat": 40.0990336,
-      "lng": 20.1501935,
-      "category": null,
-      "desc": "",
-      "near": "Arshi Lengo",
-      "country": "Shqipëri",
-      "types": [
-        "winery",
-        "food"
-      ],
-      "gmapsUrl": "https://maps.app.goo.gl/DTenKLZa6SrF8jb26?g_st=ic",
-      "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
-      "photos": 1,
-      "updated": "2026-11-18"
-    },
-    {
       "id": "bridge-of-brataj",
-      "order": 16,
+      "order": 15,
       "name": "Bridge of Brataj",
       "lat": 40.2668864,
       "lng": 19.6718241,
@@ -308,7 +289,7 @@
     },
     {
       "id": "plyazh-dhermi",
-      "order": 17,
+      "order": 16,
       "name": "Beach Dhermi",
       "lat": 40.135637,
       "lng": 19.647457,
@@ -320,13 +301,13 @@
         "beach"
       ],
       "gmapsUrl": "https://maps.app.goo.gl/Tj1sF7Jyc37vKH8Y6?g_st=ic",
-      "thumb": "photos/plyazh-dhermi/03_thumb.webp",
+      "thumb": "photos/plyazh-dhermi/02_thumb.webp",
       "photos": 3,
-      "updated": "2026-11-18"
+      "updated": "2026-11-19"
     },
     {
       "id": "footbridge-ura-e-walesatit-lepenice",
-      "order": 18,
+      "order": 17,
       "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
       "lat": 40.3038256,
       "lng": 19.6524006,
@@ -344,7 +325,7 @@
     },
     {
       "id": "llogara-view-point",
-      "order": 19,
+      "order": 18,
       "name": "Llogora View point",
       "lat": 40.1894877,
       "lng": 19.6000919,
@@ -363,7 +344,7 @@
     },
     {
       "id": "vjosa-albania-rafting-group-glamping",
-      "order": 20,
+      "order": 19,
       "name": "Vjosa Albania Rafting Group Glamping",
       "lat": 40.224062,
       "lng": 19.373812,
@@ -382,7 +363,7 @@
     },
     {
       "id": "gjirokaster-castle",
-      "order": 21,
+      "order": 20,
       "name": "Фортеця Гірокастра (Gjirokastër Castle)",
       "lat": 40.0727906,
       "lng": 20.1392199,
@@ -402,7 +383,7 @@
     },
     {
       "id": "ferma-ajson-armando",
-      "order": 22,
+      "order": 21,
       "name": "Ferma Ajson - Armando",
       "lat": 40.382712,
       "lng": 19.612297,
@@ -417,6 +398,25 @@
       "thumb": "photos/ferma-ajson-armando/01_thumb.webp",
       "photos": 2,
       "updated": "2026-11-18"
+    },
+    {
+      "id": "argjiro-winery-gjirokaster",
+      "order": 22,
+      "name": "\"Argjiro\" Winery (Gjirokastër)",
+      "lat": 40.0990336,
+      "lng": 20.1501935,
+      "category": null,
+      "desc": "",
+      "near": "Arshi Lengo",
+      "country": "Shqipëri",
+      "types": [
+        "winery",
+        "food"
+      ],
+      "gmapsUrl": "https://maps.app.goo.gl/DTenKLZa6SrF8jb26?g_st=ic",
+      "thumb": "photos/argjiro-winery-gjirokaster/01_thumb.webp",
+      "photos": 4,
+      "updated": "2026-11-19"
     },
     {
       "id": "ile-bridge-kutal",

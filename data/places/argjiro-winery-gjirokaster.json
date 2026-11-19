@@ -1,6 +1,6 @@
 {
   "id": "argjiro-winery-gjirokaster",
-  "order": 15,
+  "order": 22,
   "name": "\"Argjiro\" Winery (Gjirokastër)",
   "lat": 40.0990336,
   "lng": 20.1501935,
@@ -15,9 +15,36 @@
       "width": 1035,
       "height": 813,
       "bytes": 205594
+    },
+    {
+      "type": "image",
+      "file": "photos/argjiro-winery-gjirokaster/02.webp",
+      "thumb": "photos/argjiro-winery-gjirokaster/02_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 125540,
+      "srcSha256": "a8dae6dbbebef3fb8781d84af40af489a28ccf3df0fcc00a84eebf4796169647"
+    },
+    {
+      "type": "image",
+      "file": "photos/argjiro-winery-gjirokaster/03.webp",
+      "thumb": "photos/argjiro-winery-gjirokaster/03_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 371054,
+      "srcSha256": "32b25e990f6e551a178012baaa1b651d138a3f594f4a18e03ccfe624e2e10390"
+    },
+    {
+      "type": "image",
+      "file": "photos/argjiro-winery-gjirokaster/04.webp",
+      "thumb": "photos/argjiro-winery-gjirokaster/04_thumb.webp",
+      "width": 1600,
+      "height": 900,
+      "bytes": 352710,
+      "srcSha256": "74e339ed4abc5f7bbbca87ea3e7e68156937495747d663c94dc1674fca4156b8"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-19",
   "country": "Shqipëri",
   "types": [
     "winery",
