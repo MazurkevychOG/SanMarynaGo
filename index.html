@@ -2370,7 +2370,7 @@
     }
     const LEDGER_KEY = 'mymaps_uploaded';
     const ledgerLoad = () => { try { return JSON.parse(localStorage.getItem(LEDGER_KEY) || '{}'); } catch (e) { return {}; } };
-    let _lastExportFp = null, _lastExportOrder = false;
+    let _lastExportFp = null, _lastExportOrder = false, _lastExportReport = [];
     function ledgerCommit() {                                 // called when the export files have been handed over
         if (_lastExportFp) {
             const l = ledgerLoad();
@@ -2407,18 +2407,19 @@
         return false;
     }
     function healFromRepo() {                                 // before an export / on Update: places that the repo already has stop being «changed»
-        const legacy = !localStorage.getItem('mymaps_adopt_legacy_v2');
+        const legacy = !localStorage.getItem('mymaps_adopt_legacy_v3');
         let n = 0;
         places.forEach(p => { try { if (adoptFromRepo(p, null, legacy) && !missingOnGithub(p)) { p.dirty = false; n++; } } catch (e) { } });
-        try { localStorage.setItem('mymaps_adopt_legacy_v2', '1'); } catch (e) { }
+        if (catalogRaw.size) { try { localStorage.setItem('mymaps_adopt_legacy_v3', '1'); } catch (e) { } }      // only after a pass against a really loaded catalog
         if (n) { try { persistPlaces(true); } catch (e) { } }
         return n;
     }
+    const gmNorm = u => String(u || '').replace(/([?&])(g_st|g_ep|entry|utm_[a-z]+)=[^&#]*/gi, '$1').replace(/[?&]+$/, '').replace(/\?&/, '?');
     function diffFields(p) {                                  // why a place differs from the repo (for the export report)
         const r = catalogRaw.get(p.id); if (!r) return ['not on GitHub'];
         const l = localSnap(p), out = [];
         if (l.name !== r.name) out.push('name'); if (l.lat !== r.lat || l.lng !== r.lng) out.push('coords'); if (l.desc !== r.desc) out.push('desc');
-        if (l.gmaps !== r.gmaps) out.push('link'); if (l.types !== r.types) out.push('types'); if (l.aliases !== r.aliases) out.push('aliases');
+        if (gmNorm(l.gmaps) !== gmNorm(r.gmaps)) out.push('link'); if (l.types !== r.types) out.push('types'); if (l.aliases !== r.aliases) out.push('aliases');
         if (l.media !== r.media && !ledgerCovers(p, r)) out.push('photos'); if (l.near && l.near !== r.near) out.push('town'); if (l.country && l.country !== r.country) out.push('country');
         return out;
     }
@@ -2427,7 +2428,7 @@
         const r = catalogRaw.get(p.id);
         if (!r) return true;                                      // the place is not on GitHub at all
         const l = localSnap(p);
-        return l.name !== r.name || l.lat !== r.lat || l.lng !== r.lng || l.desc !== r.desc || l.gmaps !== r.gmaps || l.types !== r.types ||
+        return l.name !== r.name || l.lat !== r.lat || l.lng !== r.lng || l.desc !== r.desc || gmNorm(l.gmaps) !== gmNorm(r.gmaps) || l.types !== r.types ||
                l.aliases !== r.aliases || (l.media !== r.media && !ledgerCovers(p, r)) || (l.near && l.near !== r.near) || (l.country && l.country !== r.country);
     }
     let deletedNames = [];               // назви видалених вами карток — Update не повертає їх навіть якщо в каталозі інший id
@@ -4475,7 +4476,7 @@
                     Object.assign(target, c, { selected: target.selected, dirty: false });
                     continue;
                 }
-                const adopted = adoptFromRepo(target, c, !localStorage.getItem('mymaps_adopt_legacy_v2'));
+                const adopted = adoptFromRepo(target, c, !localStorage.getItem('mymaps_adopt_legacy_v3'));
                 let changed = false;
                 { const before = JSON.stringify([target.id, target.aliases, target.country, target.types, target.near]); quickEnrich(target, c); if (before !== JSON.stringify([target.id, target.aliases, target.country, target.types, target.near])) changed = true; }
                 for (const d of extra) {                           // зливаємо дублі: фото й порожні поля переходять у головну
@@ -4494,7 +4495,7 @@
                 if (changed) { target.dirty = true; enriched++; }
                 else if (adopted && !missingOnGithub(target)) { target.dirty = false; released++; }       // nothing differs from GitHub any more
             }
-            try { localStorage.setItem('mymaps_adopt_legacy_v2', '1'); } catch (e) { }
+            try { localStorage.setItem('mymaps_adopt_legacy_v3', '1'); } catch (e) { }
             _hashCache.clear(); _sizeCache.clear();
             catalogIds = new Set(cat.map(c => c.id));
             places.forEach(normalize);
@@ -5224,6 +5225,7 @@
             const deferred = [], tooBig = [];                         // photos that did not fit into this package / can never fit
             const _expFp = {}; _lastExportFp = _expFp; _lastExportOrder = !!orderOut;
             const why = {}; missing.forEach(p => diffFields(p).forEach(f => { why[f] = (why[f] || 0) + 1; }));
+            _lastExportReport = missing.map(p => ({ id: p.id, name: p.name, fields: diffFields(p) }));
             console.info('Export: places that differ from GitHub →', Object.fromEntries(missing.map(p => [p.name, diffFields(p).join(', ')])));
             for (const p of missing) {
                 const base = { id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}) };
@@ -5315,6 +5317,25 @@
         const mm = document.getElementById('mediaModal'); if (mm && mm.style.display && mm.style.display !== 'none') t(closeGallery);
         t(openSettings);
     }
+    // After an export: say WHY each place was exported; for places that differ only in photos offer «GitHub already has them».
+    async function explainExport() {
+        const rep = _lastExportReport.filter(x => x.fields.length); _lastExportReport = [];
+        if (!rep.length) return;
+        const lines = rep.slice(0, 12).map(x => '• ' + x.name + ' — ' + x.fields.join(', ')).join('\n') + (rep.length > 12 ? '\n… +' + (rep.length - 12) : '');
+        const photoOnly = rep.filter(x => x.fields.includes('photos'));
+        let msg = 'Exported places and what differs from GitHub:\n' + lines;
+        if (photoOnly.length) msg += '\n\nIf the photos of these places are ALREADY on GitHub (you uploaded them before), press OK: the app takes GitHub’s photos for them and will not export them again. Cancel = keep local photos.';
+        let ok = false; try { ok = photoOnly.length ? confirm(msg) : (alert(msg), false); } catch (e) { }
+        if (!ok) return;
+        let n = 0;
+        for (const x of photoOnly) {
+            const p = places.find(q => q.id === x.id), r = catalogRaw.get(x.id); if (!p || !r) continue;
+            p.media = mediaFromRaw(r);
+            if (!missingOnGithub(p)) p.dirty = false;
+            n++;
+        }
+        if (n) { try { persistPlaces(true); render(); } catch (e) { } toast('GitHub photos taken for ' + n + ' place' + (n === 1 ? '' : 's')); }
+    }
     async function exportData() {
         if (_runExp) return;
         _runExp = true;
@@ -5327,7 +5348,10 @@
         hideWait(); stopWaitSound();
         try {
             if (failed) alert('Could not prepare export: ' + failed.message);
-            else if (files) { await deliverFiles(files); ledgerCommit(); }
+            else if (files) {
+                await deliverFiles(files); ledgerCommit();
+                await explainExport();
+            }
         } finally { _runExp = false; collapseToSettings(); }
     }
 
