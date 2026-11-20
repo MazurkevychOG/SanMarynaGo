@@ -961,7 +961,7 @@
         #tripCostModal .tc-total { border-bottom: 0; font-size: 18px; padding-top: 10px; }
         #tripCostModal .tc-note { font-size: 12px; opacity: .7; margin-top: 8px; }
         /* ===== Search box on the map ===== */
-        .map-search { position: absolute; top: 10px; left: 64px; right: 64px; max-width: 340px; margin: 0 auto; z-index: 1000; }
+        .map-search { position: absolute; top: 10px; left: 64px; right: auto; width: calc((100% - 128px) / 2); min-width: 128px; max-width: 170px; margin: 0; z-index: 1000; }
         .map-search .ms-clear { position: absolute; right: 6px; top: 5px; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: #e2e8f0; color: #4a5568; font-size: 15px; line-height: 28px; text-align: center; cursor: pointer; z-index: 2; }
         .map-search .ms-clear[hidden] { display: none; }
         #mapSearchInput { padding-right: 42px !important; }
@@ -5700,7 +5700,7 @@
         if (!el || el.querySelector('.map-search')) return;
         const box = document.createElement('div');
         box.className = 'map-search';
-        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search on map or card №" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><button type="button" class="ms-clear" id="msClear" hidden aria-label="Clear search" title="Clear">✕</button><div class="ms-list" id="msList"></div>';
+        box.innerHTML = '<input type="search" id="mapSearchInput" placeholder="Search / №" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search on map"><button type="button" class="ms-clear" id="msClear" hidden aria-label="Clear search" title="Clear">✕</button><div class="ms-list" id="msList"></div>';
         el.appendChild(box);
         L.DomEvent.disableClickPropagation(box); L.DomEvent.disableScrollPropagation(box);
         const inp = box.querySelector('input'), list = box.querySelector('.ms-list');
@@ -5792,6 +5792,15 @@
         });
         esriStreet.addTo(map);
         L.control.layers({ 'Streets (Esri)': esriStreet, 'Satellite (Esri)': esriSat, 'Topo (Esri)': esriTopo, 'OpenStreetMap': osm }, null, { position: 'topright' }).addTo(map);
+        {   // when the list of map types is open, Rec / Trips move below it (they must not cover it)
+            const lc = map.getContainer().querySelector('.leaflet-control-layers');
+            const adjust = () => {
+                const tb = map.getContainer().querySelector('.trk-btns'); if (!tb || !lc) return;
+                if (lc.classList.contains('leaflet-control-layers-expanded')) { const mr = map.getContainer().getBoundingClientRect(), r = lc.getBoundingClientRect(); tb.style.top = Math.round(r.bottom - mr.top + 8) + 'px'; }
+                else tb.style.top = '';
+            };
+            if (lc) { try { new MutationObserver(adjust).observe(lc, { attributes: true, attributeFilter: ['class'] }); } catch (e) { } window.addEventListener('resize', adjust); }
+        }
         markersLayer = L.layerGroup().addTo(map);
 
         setupWheelAndGestures(el);
