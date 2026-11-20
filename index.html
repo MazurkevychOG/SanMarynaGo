@@ -1322,7 +1322,7 @@
   const GAP_WALK_MS = 90000;                        // walking: a signal gap up to 90 s is bridged (dashed), longer = break
   const MAX_MS_WALK = 15;                           // m/s: faster implied movement while walking = GPS jump
   const COLOR = '#16a34a';     // actual track — green (planned OSRM route is blue/orange)
-  const FOLLOW = { on: true, zoomDone: false, bound: false, minZoom: 16.5, mapMode: false, wasOpen: false };   // 1.5× smaller than 17 would be zoom 16.41; the map snaps to 0.25 steps → 16.5 (≈1.41×)   // map follows the current point while recording
+  const FOLLOW = { on: true, zoomDone: false, bound: false, minZoom: 16.5, mapZoom: 11, mapMode: false, wasOpen: false };   // 1.5× smaller than 17 would be zoom 16.41; the map snaps to 0.25 steps → 16.5 (≈1.41×)   // map follows the current point while recording
 
   const $ = id => document.getElementById(id);
   const getMap = () => { try { return (typeof map !== 'undefined' && map) ? map : null; } catch (e) { return null; } };
@@ -1851,7 +1851,7 @@
       let ll = null; try { if (typeof lastGps !== 'undefined' && lastGps && lastGps.ll) ll = lastGps.ll; } catch (e) { }
       if (!ll && S.anchor) ll = S.anchor.ll;
       if (!ll) return;
-      if (!FOLLOW.zoomDone) { FOLLOW.zoomDone = true; m.setView(ll, Math.max(m.getZoom(), FOLLOW.minZoom), { animate: false }); return; }
+      if (!FOLLOW.zoomDone) { FOLLOW.zoomDone = true; m.setView(ll, Math.max(m.getZoom(), S.state === 'rec' ? FOLLOW.minZoom : FOLLOW.mapZoom), { animate: false }); return; }   // recording: close (roads); looking at the map: the wider scale (zoom 11)
       const d = m.latLngToContainerPoint(ll).distanceTo(m.getSize().divideBy(2));
       if (d > 6) m.panTo(ll, { animate: true, duration: 0.6, easeLinearity: 1, noMoveStart: true });
     } catch (e) { }
