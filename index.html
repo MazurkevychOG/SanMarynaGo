@@ -314,6 +314,12 @@
         .gps-dot { width: 20px; height: 20px; border-radius: 50%; background: #2ecc71; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(46,204,113,.45), 0 2px 6px rgba(0,0,0,.4); }
         .gear-w { color: #fff !important; -webkit-text-fill-color: #fff; font-family: 'Segoe UI Symbol', 'Arial Unicode MS', sans-serif; font-variant-emoji: text; }
         .map-name-tip { font-size: 15px; font-weight: 700; color: #2d3748; padding: 4px 10px; border-radius: 8px; pointer-events: none; }
+        .map-filter { display: flex; flex-direction: column; }
+        .map-filter button { margin: 0; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 0; background: #fff; color: #4a5568; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+        .map-filter button.on { background: #4285F4; color: #fff; }
+        .map-filter button + button { border-top: 1px solid #ccc; }
+        html[data-theme="dark"] .map-filter button { background: #252d3a; color: #d3dae5; }
+        html[data-theme="dark"] .map-filter button.on { background: #4285F4; color: #fff; }
         .map-reset a { width: 34px; height: 34px; line-height: 34px; font-size: 20px; font-weight: 700; text-align: center; color: #e74c3c !important; cursor: pointer; display: block; text-decoration: none; }
         .btn-map-close { width: auto !important; padding: 0 14px !important; font-size: 14px !important; background: #4285F4 !important; }
     
@@ -768,7 +774,7 @@
         html[data-theme="dark"] .route-summary { background:rgba(30,37,48,0.95) }
         html[data-theme="dark"] .route-summary small { color:#aeb9ca }
         html[data-theme="dark"] .gps-dot { border:3px solid #364054 }
-        html[data-theme="dark"] .map-name-tip { color:#d3dae5 }
+        html[data-theme="dark"] .map-name-tip { color:#0d131c; background:#f4f6fa; border-color:#9aa6b8; text-shadow:none }
         html[data-theme="dark"] .map-reset a { color:#ee8277 !important }
         html[data-theme="dark"] .return-toggle { background:#1e2530;color:#aeb9ca;border:2px solid #465068 }
         html[data-theme="dark"] .return-toggle.on { background:#361f47;color:#bd8adb }
@@ -5791,6 +5797,7 @@
         setupWheelAndGestures(el);
         addLocateControl();
         addResetControl();
+        addFilterControl();
         addMapSearch(el);
         if (window.addTrackUi) addTrackUi(el);
         startGps();
@@ -5963,6 +5970,22 @@
         shownNames.clear();
         if (had) { places.forEach(p => { p.selected = false; }); persistSelection(); refreshSelectionUI(); toast('⟲ All points reset'); }
         else { updateMapMarkers(); toast(closedTrips ? (closedTrips > 1 ? closedTrips + ' tracks closed' : 'Track closed') : 'No points selected'); }
+    }
+    function addFilterControl() {                            // funnel (filter) and arrows (sort) on the map: they open the same window as on the main screen
+        const Ctl = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd() {
+                const box = L.DomUtil.create('div', 'leaflet-bar map-filter');
+                box.innerHTML = '<button type="button" class="filter-btn" title="Filter" aria-label="Filter"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M3 5h18l-7 8.2V20l-4-2v-4.8z" fill="currentColor"/></svg><span class="fbadge" hidden></span></button>' +
+                    '<button type="button" class="sort-btn" title="Sort" aria-label="Sort"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M8 4v13M4.5 13.5L8 17l3.5-3.5M16 20V7M12.5 10.5L16 7l3.5 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+                L.DomEvent.disableClickPropagation(box);
+                const [fb, sb] = box.querySelectorAll('button');
+                L.DomEvent.on(fb, 'click', ev => { L.DomEvent.stop(ev); openFilter(); });
+                L.DomEvent.on(sb, 'click', ev => { L.DomEvent.stop(ev); openFilter(); setTimeout(() => { const t = document.getElementById('fltSort'); if (t) t.scrollIntoView({ block: 'center' }); }, 60); });
+                return box;
+            }
+        });
+        new Ctl().addTo(map);
     }
     function addResetControl() {
         const Ctl = L.Control.extend({
@@ -6603,9 +6626,11 @@
         markersLayer.clearLayers();
         markerByIdx = [];
         const sz = isCoarse() ? 34 : 26;
+        const hasF = filterActive(), fRef = hasF ? filterRef() : null;
         places.forEach((p, i) => {
             const c = parseCoords(p.coords);
             if (!c) return;
+            if (hasF && !p.selected && !passFilter(p, fRef)) return;                  // filtered out (the card numbers stay the same)
             const icon = markerIcon(p, i, sz);
             const mk = L.marker(c, { icon, keyboard: false, zIndexOffset: p.selected ? 500 : 0 });
             mk._sel = !!p.selected; markerByIdx[i] = mk;
@@ -6828,7 +6853,7 @@
     const FLT_KEY = 'mymaps_filter';
     let flt = { countries: [], types: [], tMin: '', tMax: '', dMin: '', dMax: '' };
     try { const o = JSON.parse(localStorage.getItem(FLT_KEY) || '{}'); if (o && typeof o === 'object') flt = { ...flt, ...o, countries: Array.isArray(o.countries) ? o.countries : [], types: Array.isArray(o.types) ? o.types : [] }; } catch (e) { }
-    function saveFilter() { try { localStorage.setItem(FLT_KEY, JSON.stringify(flt)); } catch (e) { } }
+    function saveFilter() { try { localStorage.setItem(FLT_KEY, JSON.stringify(flt)); } catch (e) { } try { updateMapMarkers(); } catch (e) { } }
     const fnum = v => { const n = parseFloat(String(v ?? '').replace(',', '.')); return isFinite(n) && n >= 0 ? n : NaN; };
     function filterCount() {
         let n = 0;
@@ -7091,6 +7116,7 @@
         if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
         else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
         renderSortChips();
+        try { updateMapMarkers(); } catch (e) { }                // marker numbers follow the new order
     }
     function renderSortChips() {
         const box = document.getElementById('fltSort');
