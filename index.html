@@ -226,8 +226,33 @@
         .place-name-link { display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; font-size: 28px; line-height: 1.2; }
         .cell-near { font-size: 20px; color: #5a7184; margin-top: 6px; overflow-wrap: anywhere; }
         .cell-near .nw { white-space: nowrap; }
-        .cell-near .wheel { width: 1em; height: 1em; vertical-align: -.13em; }
+        .wheel { width: 1em; height: 1em; vertical-align: -.15em; flex: none; }
+        .cell-near .wheel { vertical-align: -.13em; }
         .cell-desc { font-size: 18px; color: #718096; margin-top: 4px; overflow-wrap: anywhere; }
+        .rc { display: inline-block; color: #d62828; background: #fff; border-radius: 4px; padding: 0 3px; line-height: 1.15; font-weight: 700; box-shadow: 0 0 0 1px #e8b9b9; font-variant-emoji: text; }
+        .cell-rv { margin-top: 6px; }
+        .rv { background: #f3f6fa; border-left: 3px solid #4285F4; border-radius: 6px; padding: 5px 8px; margin: 4px 0; }
+        .rv-h { display: flex; align-items: center; gap: 6px; font-size: 15px; color: #5a7184; flex-wrap: wrap; }
+        .rv-h b { color: #2d3748; font-size: 16px; }
+        .rv-h .rv-sp { flex: 1; }
+        .rv-t { font-size: 17px; color: #2d3748; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px; }
+        .rv-b, .rv-add, .rv-more { font: inherit; border: 0; background: transparent; color: #4285F4; cursor: pointer; padding: 2px 6px; font-size: 15px; }
+        .rv-b { color: #718096; font-size: 16px; }
+        .rv-add { background: #e8f0fe; border-radius: 12px; padding: 3px 10px; margin-top: 2px; }
+        .rv-box { background: #fff; border-radius: 14px; padding: 16px; width: min(440px, 92vw); display: flex; flex-direction: column; gap: 10px; }
+        .rv-box h3 { margin: 0; font-size: 18px; }
+        .rv-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; padding: 8px; border: 1px solid #cbd5e0; border-radius: 8px; resize: vertical; }
+        .rv-who { font-size: 14px; color: #718096; }
+        .rv-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .rv-btns button { font: inherit; padding: 8px 16px; border-radius: 10px; border: 0; cursor: pointer; background: #edf2f7; }
+        .rv-btns .rv-save { background: #4285F4; color: #fff; }
+        html[data-theme="dark"] .rv { background: #232b38; }
+        html[data-theme="dark"] .rv-t, html[data-theme="dark"] .rv-h b { color: #e2e8f0; }
+        html[data-theme="dark"] .rv-h { color: #9fb0c6; }
+        html[data-theme="dark"] .rv-add { background: #2a3649; }
+        html[data-theme="dark"] .rv-box { background: #1f2630; color: #e2e8f0; }
+        html[data-theme="dark"] .rv-box textarea { background: #151a22; color: #e2e8f0; border-color: #3a4558; }
+        html[data-theme="dark"] .rv-btns button { background: #2a3140; color: #e2e8f0; }
         .drag-handle { align-self: stretch; margin: -12px 0; display: flex; align-items: center; justify-content: center; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; color: #a0aec0; }
         .drag-handle.grip { font-size: 30px; color: #b8c2cc; }
         .drag-handle.num { font-weight: 700; font-size: 26px; }
@@ -2269,8 +2294,8 @@
                     <input type="text" id="placeCoords" placeholder="41.047, 19.496 or Plus Code" title="Decimal coordinates, degrees, full Plus Code (8FGXPFC9+GX) or short with city (PFC9+GX9, Fier)">
                 </div>
                 <div class="input-wrapper">
-                    <label>Description</label>
-                    <input type="text" id="placeDesc" placeholder="Notes">
+                    <label>Review</label>
+                    <input type="text" id="placeDesc" placeholder="Your review (optional) — more reviews are added on the card">
                 </div>
                 <div class="input-wrapper">
                     <label>Google Maps link</label>
@@ -2596,8 +2621,8 @@
                     <div class="c-name">
                         <div>${link}</div>
                         <div class="cell-near">${nearHtml(p)}</div>
-                        ${(p.types && p.types.length) ? `<div class="cell-types">${p.types.map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${esc(typeLabel(t))}</span>` : ''; }).join('')}</div>` : ''}
-                        ${p.desc ? `<div class="cell-desc">${esc(p.desc)}</div>` : ''}
+                        ${(p.types && p.types.length) ? `<div class="cell-types">${p.types.map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${typeLabelHtml(t)}</span>` : ''; }).join('')}</div>` : ''}
+                        ${reviewsHtml(p)}
                     </div>
                 </div>`;
             tbody.appendChild(row);
@@ -3736,7 +3761,7 @@
         const data = {
             id: old ? old.id : uid(),
             name, coords,
-            desc: document.getElementById('placeDesc').value,
+            desc: old ? (old.desc || '') : reviewFromText(document.getElementById('placeDesc').value),       // reviews of an existing place are edited on its card
             gmapsUrl: document.getElementById('placeGmapsUrl').value.trim(),
             media: [...currentEditMedia],
             selected: old ? !!old.selected : false,   // редагування більше не скидає вибір
@@ -3763,7 +3788,8 @@
         const p = places[i];
         document.getElementById('placeName').value = p.name;
         document.getElementById('placeCoords').value = p.coords;
-        document.getElementById('placeDesc').value = p.desc || '';
+        document.getElementById('placeDesc').value = '';
+        document.getElementById('placeDesc').closest('.input-wrapper').style.display = 'none';          // existing place: reviews live on the card
         document.getElementById('placeGmapsUrl').value = p.gmapsUrl || '';
         document.getElementById('placeCountry').value = p.country || '';
         formTypes = [...(p.types || [])]; renderFormTypes();
@@ -3780,6 +3806,7 @@
 
     function clearForm() {
         ['placeName', 'placeCoords', 'placeDesc', 'placeGmapsUrl', 'placeCountry', 'editIndex'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('placeDesc').closest('.input-wrapper').style.display = '';
         formTypes = []; renderFormTypes();
         setSaveLabel(false);
         currentEditMedia = []; renderMediaEdit();
@@ -4857,7 +4884,7 @@
         const row = (l, v) => '<div class="tc-row"><span>' + l + '</span><b>' + v + '</b></div>';
         let html = '<h3>💶 Trip cost</h3>';
         const notes = [];
-        html += row('🧭 Distance', meters != null ? (routeM != null && routeTotals.estimated ? '≈ ' : '') + fmtKm(meters) : '—');
+        html += row(WHEEL_SVG + ' Distance', meters != null ? (routeM != null && routeTotals.estimated ? '≈ ' : '') + fmtKm(meters) : '—');
         if (trips.length) {                                   // what the distance is made of: open route points + open recorded trips
             if (routeM != null) html += row('📍 Route · ' + eff + ' points', fmtKm(routeM));
             html += row('🚗 Recorded trips · ' + trips.length, fmtKm(tripsM));
@@ -5063,10 +5090,132 @@
     // Card line: 📍 town · (modern alloy wheel) distance · ⛰ height. Every unit is "no-wrap": an icon is never separated from its number —
     // when the line is too narrow the whole unit (icon + number) moves to the next line.
     const WHEEL_SVG = '<svg class="wheel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3.4"/><circle cx="12" cy="12" r="6.9" fill="none" stroke="currentColor" stroke-width="1"/><path d="M10.9 9.7L11.1 5.5M13.1 9.7L12.9 5.5M13.9 10.2L17.9 9.1M14.6 12.4L18.5 10.9M14.3 13.2L16.6 16.7M12.5 14.6L15.1 17.8M11.5 14.6L8.9 17.8M9.7 13.2L7.4 16.7M9.4 12.4L5.5 10.9M10.1 10.2L6.1 9.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/></svg>';
+    // ===== Reviews: «notes» are now a history of reviews (who added + their feedback). Stored inside `desc` as readable blocks:
+    //   [Alex · 2026-11-19 14:05]\ntext\n\n[Nadya · 2026-11-20 09:00]\ntext      (a plain old note = one review by Alex)
+    const RV_HEAD = /^\[([^\]\n·]+?) · (\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2}))?\]\s*$/;
+    function parseReviews(desc) {
+        const t = String(desc || '').trim(); if (!t) return [];
+        const out = []; let cur = null;
+        for (const ln of t.split('\n')) {
+            const m = ln.match(RV_HEAD);
+            if (m) { if (cur) out.push(cur); cur = { author: m[1].trim(), date: m[2], time: m[3] || '', text: '' }; }
+            else if (cur) cur.text += (cur.text ? '\n' : '') + ln;
+            else cur = { author: 'Alex', date: '', time: '', text: ln, legacy: true };
+        }
+        if (cur) out.push(cur);
+        out.forEach(r => { r.text = r.text.trim(); });
+        return out.filter(r => r.text);
+    }
+    function serializeReviews(arr) { return arr.map(r => (r.legacy && !r.date) ? r.text : `[${r.author} · ${r.date}${r.time ? ' ' + r.time : ''}]\n${r.text}`).join('\n\n'); }
+    function myName() { let n = ''; try { n = String(curRec().name || '').trim(); } catch (e) { } return n.replace(/[\[\]·\n]/g, ' ').trim() || 'Guest'; }
+    const isOwner = () => myName().toLowerCase() === 'alex';                 // Alex can edit any review; everybody else only their own
+    const canEditReview = r => isOwner() || r.author === myName();
+    const _rvOpen = new Set();
+    const rvDate = r => { if (!r.date) return ''; const d = new Date(r.date + 'T00:00:00'); return (isNaN(d.getTime()) ? r.date : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })) + (r.time ? ' ' + r.time : ''); };
+    function reviewsHtml(p) {
+        const list = parseReviews(p.desc), n = list.length, all = _rvOpen.has(p.id), start = all ? 0 : Math.max(0, n - 2);
+        let h = '<div class="cell-rv">';
+        if (start > 0) h += `<button type="button" class="rv-more" data-pid="${esc(p.id)}">▸ ${start} earlier review${start === 1 ? '' : 's'}</button>`;
+        for (let i = start; i < n; i++) {
+            const r = list[i], can = canEditReview(r);
+            h += `<div class="rv"><div class="rv-h"><b>${esc(r.author)}</b><span>${esc(rvDate(r))}</span><span class="rv-sp"></span>` +
+                (can ? `<button type="button" class="rv-b rv-edit" data-pid="${esc(p.id)}" data-i="${i}" title="Edit">✎</button><button type="button" class="rv-b rv-del" data-pid="${esc(p.id)}" data-i="${i}" title="Delete">✕</button>` : '') +
+                `</div><div class="rv-t">${esc(r.text)}</div></div>`;
+        }
+        if (all && n > 2) h += `<button type="button" class="rv-more" data-pid="${esc(p.id)}" data-less="1">▾ show less</button>`;
+        return h + `<button type="button" class="rv-add" data-pid="${esc(p.id)}">＋ Review</button></div>`;
+    }
+    function reviewFromText(text) {                          // the first review of a NEW place (from the add form)
+        const t = String(text || '').trim(); if (!t) return '';
+        const d = new Date(), pad = n => String(n).padStart(2, '0');
+        return serializeReviews([{ author: myName(), date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, text: t }]);
+    }
+    function openReviewDialog(pid, idx) {
+        const p = places.find(x => x.id === pid); if (!p) return;
+        const list = parseReviews(p.desc), r = idx >= 0 ? list[idx] : null;
+        if (r && !canEditReview(r)) { toast('You can edit only your own reviews'); return; }
+        let m = document.getElementById('reviewModal');
+        if (!m) {
+            m = document.createElement('div'); m.id = 'reviewModal'; m.className = 'mdl';
+            m.innerHTML = '<div class="mdl-box rv-box"><h3 id="rvTitle"></h3><div class="rv-who" id="rvWho"></div><textarea id="rvText" rows="5" maxlength="1500" placeholder="Your review…"></textarea><div class="rv-btns"><button type="button" id="rvCancel">Cancel</button><button type="button" class="rv-save" id="rvSave">Save</button></div></div>';
+            document.body.appendChild(m);
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+            m.querySelector('#rvCancel').onclick = () => m.classList.remove('open');
+        }
+        m.querySelector('#rvTitle').textContent = (r ? 'Edit review · ' : 'New review · ') + p.name;
+        m.querySelector('#rvWho').textContent = 'By ' + (r ? r.author : myName());
+        const ta = m.querySelector('#rvText'); ta.value = r ? r.text : '';
+        m.querySelector('#rvSave').onclick = () => {
+            const text = ta.value.trim(); if (!text) { toast('Write something first'); return; }
+            const cur = parseReviews(p.desc);
+            if (r) { if (cur[idx]) cur[idx].text = text; }
+            else { const d = new Date(), pad = n => String(n).padStart(2, '0'); cur.push({ author: myName(), date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, text }); }
+            p.desc = serializeReviews(cur); p.dirty = true;
+            m.classList.remove('open'); _rvOpen.add(p.id); sync();
+        };
+        m.classList.add('open'); setTimeout(() => ta.focus(), 50);
+    }
+    document.addEventListener('pointerdown', e => { if (e.target.closest && e.target.closest('.rv-add,.rv-b,.rv-more')) e.stopPropagation(); }, true);   // review buttons never start a drag / swipe
+    document.addEventListener('click', e => {
+        const b = e.target.closest && e.target.closest('.rv-add,.rv-edit,.rv-del,.rv-more'); if (!b) return;
+        e.preventDefault(); e.stopPropagation();
+        const pid = b.dataset.pid, i = b.dataset.i !== undefined ? Number(b.dataset.i) : -1;
+        if (b.classList.contains('rv-add')) openReviewDialog(pid, -1);
+        else if (b.classList.contains('rv-edit')) openReviewDialog(pid, i);
+        else if (b.classList.contains('rv-more')) { if (b.dataset.less) _rvOpen.delete(pid); else _rvOpen.add(pid); render(); }
+        else if (b.classList.contains('rv-del')) {
+            const p = places.find(x => x.id === pid); if (!p) return;
+            const list = parseReviews(p.desc); if (!list[i] || !canEditReview(list[i])) { toast('You can edit only your own reviews'); return; }
+            if (!confirm('Delete this review?')) return;
+            list.splice(i, 1); p.desc = serializeReviews(list); p.dirty = true; sync();
+        }
+    }, true);
+
+    // ===== Travel time by car from the current place (OSRM table, one request for all cards; estimate if offline) =====
+    const DRIVE_KEY = 'mymaps_drive', TABLE_SERVERS = ['https://routing.openstreetmap.de/routed-car/table/v1/driving/', 'https://router.project-osrm.org/table/v1/driving/'];
+    let driveMap = new Map(), driveEst = new Set(), driveOrigin = null, driveAt = 0, driveBusy = false, driveFailAt = 0;
+    try { const c = JSON.parse(localStorage.getItem(DRIVE_KEY) || 'null'); if (c && c.o && c.d) { driveOrigin = c.o; driveAt = c.t || 0; Object.entries(c.d).forEach(([k, v]) => driveMap.set(k, v)); } } catch (e) { }
+    function fmtDrive(sec) { const m = Math.max(1, Math.round(sec / 60)); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); }
+    function driveText(p) {
+        const sec = driveMap.get(p.id); if (sec == null) return '';
+        let ref = null; try { ref = sortRef(); } catch (e) { }
+        if (ref && driveOrigin && haversine(ref, driveOrigin) > 5000) return '';              // numbers are for another place: wait for the fresh ones
+        return (driveEst.has(p.id) ? '≈ ' : '') + fmtDrive(sec);
+    }
+    async function refreshDrive() {
+        if (driveBusy) return;
+        let ref = null; try { ref = sortRef(); } catch (e) { } if (!ref) return;
+        const now = Date.now(), moved = !driveOrigin || haversine(ref, driveOrigin) > 1000;
+        const pts = places.map(p => ({ p, c: parseCoords(p.coords) })).filter(x => x.c);
+        const missing = pts.some(x => !driveMap.has(x.p.id));
+        if (!moved && !missing && now - driveAt < 600000) return;
+        if (now - driveFailAt < 120000) return;
+        driveBusy = true;
+        try {
+            const nm = new Map();
+            for (let k = 0; k < pts.length; k += 99) {
+                const ch = pts.slice(k, k + 99), coords = [ref, ...ch.map(x => x.c)].map(c => (+c[1]).toFixed(5) + ',' + (+c[0]).toFixed(5)).join(';');
+                let row = null;
+                for (const base of TABLE_SERVERS) { try { const r = await fetch(base + coords + '?sources=0&annotations=duration'); if (!r.ok) continue; const j = await r.json(); if (j && j.code === 'Ok' && j.durations && j.durations[0]) { row = j.durations[0]; break; } } catch (e) { } }
+                if (!row) throw new Error('routing unavailable');
+                ch.forEach((x, i) => { if (Number.isFinite(row[i + 1])) nm.set(x.p.id, row[i + 1]); });
+            }
+            driveMap = nm; driveEst.clear(); driveOrigin = ref.slice(); driveAt = Date.now();
+            try { localStorage.setItem(DRIVE_KEY, JSON.stringify({ o: driveOrigin, t: driveAt, d: Object.fromEntries(nm) })); } catch (e) { }
+        } catch (e) {
+            driveFailAt = Date.now();
+            if (moved || !driveMap.size) {                                                  // offline: a rough estimate (straight line × 1.4 at 50 km/h), marked with ≈
+                driveMap = new Map(); driveEst.clear();
+                pts.forEach(x => { driveMap.set(x.p.id, haversine(ref, x.c) * 1.4 / (50 / 3.6)); driveEst.add(x.p.id); });
+                driveOrigin = ref.slice();
+            }
+        } finally { driveBusy = false; try { refreshDistances(); } catch (e) { } }
+    }
     function nearHtml(p) {
         const units = [];
         if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
         const dt = distText(p); if (dt) units.push('<span class="nw">' + WHEEL_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
+        const dr = driveText(p); if (dr) units.push('<span class="nw">⏱&nbsp;' + esc(dr).replace(/ /g, '&nbsp;') + '</span>');
         const e = elevOf(p); if (e !== null && Math.round(e) >= 100) units.push('<span class="nw">⛰&nbsp;' + Math.round(e) + '&nbsp;m</span>');
         return units.map((u, i) => i < units.length - 1 ? u.replace(/<\/span>$/, '&nbsp;·</span>') : u).join(' ');
     }
@@ -6549,7 +6698,7 @@
         const ex = extrasTotals(), cur = pfLoad().cur || '€';
         const hasEx = ex.min > 0;
         const total = routeSum.t + ex.min * 60;
-        routeSumEl.innerHTML = `🧭 <b>${fmtKm(routeSum.d)}</b> · <b>${fmtTime(total)}</b>` +
+        routeSumEl.innerHTML = `${WHEEL_SVG} <b>${fmtKm(routeSum.d)}</b> · <b>${fmtTime(total)}</b>` +
             (hasEx ? `<small style="font-size:16px;color:#2d3748">🚗 ${fmtTime(routeSum.t)}${ex.min ? ' + ⏱ ' + fmtTime(ex.min * 60) : ''}</small>` : '') +
             `<small>${routeSum.n} points${routeSum.est ? ' · straight-line est.' : ' · car · OSRM routes, © OpenStreetMap'}</small>`;
     }
@@ -6754,6 +6903,19 @@
     let formTypes = [];                                     // типи, відмічені у формі картки
     function typeById(id) { return typeDefs.find(t => t.id === id); }
     function typeLabel(t) { return (t.icon ? t.icon + ' ' : '') + t.name; }
+    // «✚» is drawn as a red cross (medicine); every other icon is a normal emoji
+    const typeIconHtml = icon => icon === '✚' ? '<span class="rc">✚</span>' : esc(icon);
+    const typeLabelHtml = t => (t.icon ? typeIconHtml(t.icon) + ' ' : '') + esc(t.name);
+    const MED_RE = /med|hospital|pharm|clinic|doctor|health|emergency|first.?aid|лікар|аптек|клінік|медиц|здоров|шпитал|spital|farmaci|klinik|mjek|shëndet/i;
+    function seedMedicalTypes() {                            // medicine types get the red cross; if there is no medicine type at all, Hospital / Pharmacy are added once
+        let changed = false;
+        typeDefs.forEach(t => { if (MED_RE.test(t.name) && !t.icon) { t.icon = '✚'; t.dirty = true; changed = true; } });
+        let flag = false; try { flag = !!localStorage.getItem('mymaps_med_types_v1'); localStorage.setItem('mymaps_med_types_v1', '1'); } catch (e) { flag = true; }
+        if (!flag && !typeDefs.some(t => MED_RE.test(t.name))) {
+            [['hospital', 'Hospital'], ['pharmacy', 'Pharmacy'], ['clinic', 'Clinic']].forEach(([id, name]) => { if (!typeDefs.some(t => t.id === id)) { typeDefs.push({ id, name, icon: '✚', dirty: true }); changed = true; } });
+        }
+        return changed;
+    }
     function newTypeId(name) {
         const base = translit(name).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30) || 'type';
         const used = new Set([...typeDefs.map(t => t.id), ...catalogTypes.map(t => t.id), ...typesDeleted]);
@@ -6779,7 +6941,7 @@
         const box = document.getElementById('typeChips');
         if (!box) return;
         formTypes = formTypes.filter(id => typeById(id));
-        box.innerHTML = typeDefs.length ? typeDefs.map(t => `<button type="button" class="tchip${formTypes.includes(t.id) ? ' on' : ''}" data-id="${esc(t.id)}">${esc(typeLabel(t))}</button>`).join('')
+        box.innerHTML = typeDefs.length ? typeDefs.map(t => `<button type="button" class="tchip${formTypes.includes(t.id) ? ' on' : ''}" data-id="${esc(t.id)}">${typeLabelHtml(t)}</button>`).join('')
             : '<span class="tm-empty">No types yet — add them in ⚙ → Place types</span>';
         box.querySelectorAll('.tchip').forEach(b => b.onclick = () => {
             const id = b.dataset.id, i = formTypes.indexOf(id);
@@ -6915,10 +7077,10 @@
     function closeFilter() { document.getElementById('filterModal').classList.remove('open'); document.body.classList.remove('mdl-open'); }
     function renderFilter() {
         const countries = [...new Set(places.map(p => p.country || ''))].sort((a, b) => (a || '\uffff').localeCompare(b || '\uffff'));
-        const chip = (cls, val, label, on) => `<button type="button" class="tchip${on ? ' on' : ''}" data-k="${cls}" data-v="${esc(val)}">${esc(label)}</button>`;
+        const chip = (cls, val, label, on, html) => `<button type="button" class="tchip${on ? ' on' : ''}" data-k="${cls}" data-v="${esc(val)}">${html ? label : esc(label)}</button>`;
         document.getElementById('fltCountries').innerHTML = countries.map(c => chip('c', c, c || 'unknown', flt.countries.includes(c))).join('') || '<span class="tm-empty">No data</span>';
         const hasNone = places.some(p => !(p.types || []).length);
-        document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabel(t), flt.types.includes(t.id))).join('') + (hasNone ? chip('t', '__none__', 'no type', flt.types.includes('__none__')) : '') || '<span class="tm-empty">No types yet</span>';
+        document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabelHtml(t), flt.types.includes(t.id), true)).join('') + (hasNone ? chip('t', '__none__', 'no type', flt.types.includes('__none__')) : '') || '<span class="tm-empty">No types yet</span>';
         ['tMin', 'tMax', 'dMin', 'dMax'].forEach(k => { document.getElementById('flt_' + k).value = flt[k]; });
         document.querySelectorAll('#filterModal .tchip').forEach(b => b.onclick = () => {
             const arr = b.dataset.k === 'c' ? flt.countries : flt.types, v = b.dataset.v, i = arr.indexOf(v);
@@ -7076,7 +7238,7 @@
     try { if (!localStorage.getItem('mymaps_sort_def2')) { localStorage.setItem('mymaps_sort_def2', '1'); if (localStorage.getItem(SORT_KEY) === 'group') localStorage.removeItem(SORT_KEY); } } catch (e) { }
     let sortMode = 'manual', sortSaved = false;               // default: «My order» (a saved choice of the user is kept)
     try { const v = localStorage.getItem(SORT_KEY); if (v === 'manual' || v === 'group') { sortMode = v; sortSaved = true; } } catch (e) { }
-    let _defaultPending = !sortSaved, _defTimer = 0;          // first run: build «My order» from the nearest place once the position is known
+    let _defaultPending = true, _defTimer = 0, _freshPending = true, _defaultRef = null;   // «My order» is rebuilt (nearest first) EVERY time the site is opened
     let cachedPos = null, _sortRef = null, _posSavedAt = 0, _sortTimer = 0, _lastTouch = 0, SORT_DEBOUNCE = 1500, SORT_IDLE = 3000, SORT_MOVE_M = 1000;
     try { const a = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); if (Array.isArray(a) && isFinite(a[0]) && isFinite(a[1])) cachedPos = [a[0], a[1]]; } catch (e) { }
     ['pointerdown', 'touchmove', 'wheel', 'scroll'].forEach(ev => document.addEventListener(ev, () => { _lastTouch = Date.now(); }, { passive: true, capture: true }));
@@ -7102,10 +7264,11 @@
         places = it.map(x => x.p);
         return true;
     }
-    function buildDefaultOrder() {                           // one time: nearest first; then it is the user's own order
-        if (!_defaultPending || sortMode !== 'manual' || !sortRef()) return false;
-        _defaultPending = false;
-        try { localStorage.setItem(SORT_KEY, 'manual'); } catch (e) { }
+    function buildDefaultOrder() {                           // nearest first; the order of the previous visit is not kept
+        if (!_defaultPending || sortMode !== 'manual') return false;
+        const ref = sortRef(); if (!ref) return false;
+        _defaultPending = false; _defaultRef = ref.slice();
+        try { localStorage.setItem(SORT_KEY, 'manual'); localStorage.removeItem('mymaps_order_dirty'); } catch (e) { }
         return orderByDistance();
     }
     function scheduleDefaultBuild() {
@@ -7130,7 +7293,7 @@
     function renderSortChips() {
         const box = document.getElementById('fltSort');
         if (!box) return;
-        box.innerHTML = [['group', '🧭 By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
+        box.innerHTML = [['group', WHEEL_SVG + ' By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
         if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down; hold a card and drag to change.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
@@ -7142,8 +7305,9 @@
     }
     function sortOnFix(ll) {                                 // викликається з GPS-підписки
         const now = Date.now();
-        if (now - _distAt > 4000 && (!_distRef || haversine(_distRef, ll) > 30)) { _distAt = now; _distRef = ll.slice(); refreshDistances(); }
+        if (now - _distAt > 4000 && (!_distRef || haversine(_distRef, ll) > 30)) { _distAt = now; _distRef = ll.slice(); refreshDistances(); refreshDrive(); }
         if (now - _posSavedAt > 20000) { _posSavedAt = now; cachedPos = ll.slice(); try { localStorage.setItem(POS_KEY, JSON.stringify([ll[0], ll[1], now])); } catch (e) { } }
+        if (sortMode === 'manual' && _freshPending) { _freshPending = false; if (!_defaultRef || haversine(_defaultRef, ll) > 1000) _defaultPending = true; }   // the first real GPS fix differs from the saved position → sort once more
         if (_defaultPending && sortMode === 'manual') scheduleDefaultBuild();
         if (sortMode !== 'group') return;
         if (_sortRef && haversine(_sortRef, ll) < SORT_MOVE_M) return;     // ще поруч із місцем останнього сортування
@@ -7244,7 +7408,7 @@
                 else { p.near = nc[p.id] || ''; if (cc[p.id] !== undefined) p.country = cc[p.id]; }
             });
         }
-        mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
+        mergeTypes(catalogTypes); const _medNew = seedMedicalTypes(); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
         if (sl && Array.isArray(sl.ids)) { const ids = new Set(sl.ids.map(id => idRemap.get(id) || id)); places.forEach(p => { p.selected = ids.has(p.id); }); }
         placeMap();
         restoreReturnToggle();
@@ -7255,6 +7419,8 @@
         syncStickyOffset();
         initMap();
         stateReady = true;
+        if (_medNew) { try { persistPlaces(true); } catch (e) { } }
+        setTimeout(refreshDrive, 1200);                          // travel time from the last known position
         buildSplashCities();
         window.splashHide && window.splashHide();
     }
