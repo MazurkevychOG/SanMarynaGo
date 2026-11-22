@@ -223,7 +223,9 @@
         .cell-photo-img { width: 140px; height: 140px; border-radius: 10px; }
         .photo-count-badge { font-size: 16px; padding: 3px 7px; }
         .c-name { min-width: 0; padding-left: 12px; }
-        .place-name-link { display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; font-size: 28px; line-height: 1.2; }
+        .c-reviews { grid-column: 2 / -1; min-width: 0; padding-top: 6px; }
+        .c-reviews .cell-rv { margin-top: 0; }
+        .place-name-link { display: inline-block; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; font-size: 22.4px; line-height: 1.2; }
         .cell-near { font-size: 20px; color: #5a7184; margin-top: 6px; overflow-wrap: anywhere; }
         .cell-near .nw { white-space: nowrap; }
         .wheel { width: 1em; height: 1em; vertical-align: -.15em; flex: none; }
@@ -266,7 +268,7 @@
             .c-chk input { width: 28px; height: 28px; }
             .cell-photo-img { width: 100px; height: 100px; }
             .c-name { padding-left: 8px; }
-            .place-name-link { font-size: 28px; line-height: 1.15; }
+            .place-name-link { font-size: 22.4px; line-height: 1.15; }
             .cell-near { font-size: 18px; }
             .cell-desc { font-size: 16px; }
             .drag-handle { margin: -10px 0; }
@@ -2622,8 +2624,8 @@
                         <div>${link}</div>
                         <div class="cell-near">${nearHtml(p)}</div>
                         ${(p.types && p.types.length) ? `<div class="cell-types">${p.types.map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${typeLabelHtml(t)}</span>` : ''; }).join('')}</div>` : ''}
-                        ${reviewsHtml(p)}
                     </div>
+                    <div class="c-reviews">${reviewsHtml(p)}</div>
                 </div>`;
             tbody.appendChild(row);
 
