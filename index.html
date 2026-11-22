@@ -2644,8 +2644,8 @@
             row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(true); hideRowActions(row); handleEdit(i); };
             row.querySelector('[data-a="del"]').onclick = () => { closeOpenRow(true); handleDelete(i); };
 
-            // Зміна порядку: утримуйте палець (або кнопку миші) на картці — фото чи назві — і тягніть
-            initRowReorder(row, i, tbody);
+            // Перетягування карток вимкнено (порядок задає сортування); функцію initRowReorder збережено
+            // initRowReorder(row, i, tbody);
             initSwipe(row);
         });
         applySearch();
@@ -7373,7 +7373,7 @@
         sortMode = m;
         try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
         if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
-        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
+        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first' : (noResort ? 'Manual order' : 'GPS not found yet — order kept')); }
         renderSortChips();
         try { updateMapMarkers(); } catch (e) { }                // marker numbers follow the new order
     }
@@ -7383,7 +7383,7 @@
         box.innerHTML = [['group', WHEEL_SVG + ' By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
-        if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down; hold a card and drag to change.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
+        if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down every time the site is opened.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
     }
     let _distAt = 0, _distRef = null;
     function refreshDistances() {                            // card texts follow the current place
