@@ -470,6 +470,14 @@
         .settings-section { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
         .settings-section h3 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: #718096; }
         .set-btn { display: flex; width: 100%; justify-content: flex-start; background: #f1f4f8; color: #2d3748; padding: 14px; margin-bottom: 8px; font-size: 16px; font-weight: 600; border-radius: 10px; text-align: left; }
+        /* software update: red star on the gear, the «Update Software» button glows when the settings are open */
+        .btn-save-file { position: relative; }
+        .upd-star { display: none; position: absolute; top: -5px; right: -5px; color: #e53e3e; font-size: 17px; line-height: 1; text-shadow: 0 0 0 #fff, 0 0 3px #fff; pointer-events: none; }
+        body.app-update .upd-star { display: block; }
+        .upd-new { display: none; margin-left: 6px; background: #e53e3e; color: #fff; border-radius: 9px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+        body.app-update #updSoftBtn .upd-new { display: inline-block; }
+        body.app-update.settings-open #updSoftBtn { box-shadow: 0 0 0 3px rgba(229, 62, 62, .65); animation: updPulse 1.3s ease-in-out infinite; }
+        @keyframes updPulse { 0%, 100% { box-shadow: 0 0 0 2px rgba(229, 62, 62, .35); } 50% { box-shadow: 0 0 0 6px rgba(229, 62, 62, .7); } }
         .set-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 16px; }
         .set-row > span:first-child { flex: none; width: 92px; }
         .set-row input[type="range"] { flex: 1; min-width: 0; height: 32px; }
@@ -2157,6 +2165,7 @@
             <h3>Exchange file</h3>
             <div class="set-note" id="localInfo"></div>
             <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update Data</button>
+            <button type="button" class="set-btn" id="updSoftBtn" onclick="settingsAction('software')">⟳ Update Software <span class="upd-new">new</span></button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
             <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Export</button>
             <button type="button" class="set-btn" onclick="settingsAction('import')">⬆ Import</button>
@@ -2260,7 +2269,7 @@
             <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Map" aria-label="Map"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
             <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
             <label class="return-toggle sq-btn" id="returnToggle" data-tip="Return to start"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
-            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span></button>
+            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-star" aria-hidden="true">★</span></button>
         </div>
     </div>
         <div class="search-bar" id="searchBar">
@@ -2294,7 +2303,7 @@
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Add place" aria-label="Add place">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
-                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span></button>
+                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-star" aria-hidden="true">★</span></button>
             </div>
         </div>
         <div class="form-container">
@@ -4608,7 +4617,7 @@
         const pad = n => String(n).padStart(2, '0');
         el.textContent = `v.${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}.${pad(d.getMinutes())}.${pad(d.getSeconds())}`;
     }
-    function openSettings() { closeCtx(); refreshLocalInfo(); refreshAppVersion(); document.body.classList.add('settings-open'); }
+    function openSettings() { closeCtx(); refreshLocalInfo(); refreshAppVersion(); document.body.classList.add('settings-open'); if (Date.now() - _lastAppCheck > 60000) checkAppUpdate(false); }
     function closeSettings() { document.body.classList.remove('settings-open'); }
 
     // ===== Оновлення самого додатку з обходом кешу =====
@@ -4621,6 +4630,10 @@
         return document.body.classList.contains('form-open') || document.getElementById('sidebar').classList.contains('open') ||
             !!(document.getElementById('placeName') && document.getElementById('placeName').value);
     }
+    // The check on load is SILENT: it only tells that a new version exists (red star on the gear, glowing «Update Software» button).
+    // The page is reloaded with the new version only when the button «Update Software» is pressed (manual = true).
+    function setAppUpdate(on) { document.body.classList.toggle('app-update', !!on); try { localStorage.setItem('app_update_avail', on ? '1' : '0'); } catch (e) { } }
+    try { setAppUpdate(localStorage.getItem('app_update_avail') === '1'); } catch (e) { }
     async function checkAppUpdate(manual) {
         if (!manual && navigator.onLine === false) return false;
         _lastAppCheck = Date.now();
@@ -4630,24 +4643,31 @@
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const h = hashText(await r.text());
             let prev = null; try { prev = localStorage.getItem(APP_HASH_KEY); } catch (e) { }
-                        if (prev && prev !== h) {
-                if (appBusy()) { toast('New version — updates on next open'); return false; }
-                try {
-                    localStorage.setItem(APP_HASH_KEY, h);
-                    localStorage.setItem(VER_KEY, String(Date.now()));
-                } catch (e) { }
+            if (!prev) {                                              // first visit: remember this version
+                try { localStorage.setItem(APP_HASH_KEY, h); if (!localStorage.getItem(VER_KEY)) localStorage.setItem(VER_KEY, String(Date.now())); } catch (e) { }
+                setAppUpdate(false); if (manual) toast('Software is up to date');
+                return false;
+            }
+            if (prev !== h) {
+                if (!manual) { setAppUpdate(true); return false; }    // only a hint
+                try { localStorage.setItem(APP_HASH_KEY, h); localStorage.setItem(VER_KEY, String(Date.now())); } catch (e) { }
+                setAppUpdate(false);
                 toast('New version found — updating…');
                 setTimeout(() => location.replace(base + '?v=' + Date.now()), 500);
                 return true;
             }
-            if (!prev) {
-                try {
-                    localStorage.setItem(APP_HASH_KEY, h);
-                    if (!localStorage.getItem(VER_KEY)) localStorage.setItem(VER_KEY, String(Date.now()));
-                } catch (e) { }
-            }
+            setAppUpdate(false); if (manual) toast('Software is up to date');
         } catch (e) { if (manual) toast('No connection — using local version'); }
         return false;
+    }
+    let _runSw = false;
+    async function runSoftwareUpdate() {
+        if (_runSw) return; _runSw = true;
+        showWait('Updating software…'); startWaitSound();
+        let reloading = false;
+        try { reloading = await checkAppUpdate(true); } finally {
+            if (!reloading) { await new Promise(r => setTimeout(r, 600)); hideWait(); stopWaitSound(); _runSw = false; }
+        }
     }
     //document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - _lastAppCheck > 30000) checkAppUpdate(false); });
     // Офлайн-режим: service worker (файл sw.js поруч з index.html) — спершу мережа (свіжа версія з GitHub), без інтернету — кеш
@@ -4698,6 +4718,7 @@
     }
     function settingsAction(kind) {
         if (kind === 'update') runUpdate();
+        else if (kind === 'software') runSoftwareUpdate();
         else if (kind === 'export') exportData();
         else if (kind === 'import') document.getElementById('importFile').click();
     }
@@ -7054,8 +7075,15 @@
             || '<div class="tm-empty">No types. Press «＋ Add type».</div>';
         box.querySelectorAll('.tm-row').forEach(row => {
             const i = +row.dataset.i;
-            row.querySelector('.tm-ico').oninput = e => { _tmRows[i].icon = e.target.value.trim(); };
-            row.querySelector('.tm-name').oninput = e => { _tmRows[i].name = e.target.value; };
+            row.querySelector('.tm-ico').oninput = e => { _tmRows[i].icon = e.target.value.trim(); _tmRows[i].autoIcon = false; };       // your own icon is never replaced
+            row.querySelector('.tm-name').oninput = e => {
+                _tmRows[i].name = e.target.value;
+                if (!_tmRows[i].icon || _tmRows[i].autoIcon) {                                  // no icon yet (or it was picked automatically) → pick one right away
+                    const ic = e.target.value.trim() ? defaultTypeIcon(e.target.value, '') : '';
+                    _tmRows[i].icon = ic; _tmRows[i].autoIcon = !!ic;
+                    const inp = row.querySelector('.tm-ico'); if (inp) inp.value = ic;
+                }
+            };
             row.querySelector('.tm-del').onclick = () => {
                 const r = _tmRows[i], n = r.id ? used(r.id) : 0;
                 if (n && !confirm('Delete type «' + (r.name || '') + '»? It will be removed from ' + n + ' places.')) return;
