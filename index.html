@@ -456,7 +456,8 @@
         .place-name-link, .cell-photo-img img { -webkit-touch-callout: none; -webkit-user-drag: none; }
 
         /* ===== Без «відскоку» прокрутки на iPhone (артефакти знизу списку), шапка списку може переноситись ===== */
-        html, body, .content-area { overscroll-behavior: none; }
+        html, body { overscroll-behavior: none; }
+        .content-area { overscroll-behavior-y: auto; -webkit-overflow-scrolling: touch; scroll-behavior: auto; }          /* native iPhone scrolling: inertia + elastic bounce */
         .list-head { flex-wrap: wrap; height: auto; min-height: 56px; padding-top: 6px; padding-bottom: 6px; row-gap: 6px; }
         @media (max-width: 700px) { .list-head { min-height: 50px; } .lh-count { font-size: 13px; } }
         /* ===== Сторінка налаштувань ===== */
@@ -3016,6 +3017,7 @@
     // Швидкий «кидок» пальцем прокручує далеко: до ~10 карток за раз (рідна інерція браузера давала лише 2–3)
     // Швидкий «кидок»: до ~10 карток, одна плавна прокрутка (без scrollTop на кожен кадр — без миготіння фото на iOS)
 (function initFling() {
+    return;                                                   // custom «fling» is off: the list scrolls with the native (iPhone) inertia
     const ca = document.querySelector('.content-area');
     if (!ca) return;
     let samples = [], active = false, horizontal = false, startX = 0, startY = 0, snapRestoreTimer = 0;
