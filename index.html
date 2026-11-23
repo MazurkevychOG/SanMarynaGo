@@ -4635,9 +4635,10 @@
     }
     // The check on load is SILENT: it only tells that a new version exists (red star on the gear, glowing «Update Software» button).
     // The page is reloaded with the new version only when the button «Update Software» is pressed (manual = true).
-    function renderUpdBadges() {                              // «1» — a new version of the software, «2» — new data (catalog); both → «1 2»
+    function renderUpdBadges() {                              // one red number = how many updates are waiting: software and/or data (1 or 2)
         const sw = document.body.classList.contains('app-update'), dt = document.body.classList.contains('data-update');
-        document.querySelectorAll('.upd-badge').forEach(b => { b.innerHTML = (sw ? '<i>1</i>' : '') + (dt ? '<i>2</i>' : ''); });
+        const n = (sw ? 1 : 0) + (dt ? 1 : 0);                 // the number of pending updates (software + data)
+        document.querySelectorAll('.upd-badge').forEach(b => { b.innerHTML = n ? '<i>' + n + '</i>' : ''; });
     }
     function setAppUpdate(on) { document.body.classList.toggle('app-update', !!on); try { localStorage.setItem('app_update_avail', on ? '1' : '0'); } catch (e) { } renderUpdBadges(); }
     function setDataUpdate(on) { document.body.classList.toggle('data-update', !!on); try { localStorage.setItem('data_update_avail', on ? '1' : '0'); } catch (e) { } renderUpdBadges(); }
