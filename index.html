@@ -472,11 +472,12 @@
         .set-btn { display: flex; width: 100%; justify-content: flex-start; background: #f1f4f8; color: #2d3748; padding: 14px; margin-bottom: 8px; font-size: 16px; font-weight: 600; border-radius: 10px; text-align: left; }
         /* software update: red star on the gear, the «Update Software» button glows when the settings are open */
         .btn-save-file { position: relative; }
-        .upd-star { display: none; position: absolute; top: -5px; right: -5px; color: #e53e3e; font-size: 17px; line-height: 1; text-shadow: 0 0 0 #fff, 0 0 3px #fff; pointer-events: none; }
-        body.app-update .upd-star { display: block; }
+        .upd-badge { display: none; position: absolute; top: -7px; right: -7px; gap: 2px; pointer-events: none; }
+        body.app-update .upd-badge, body.data-update .upd-badge { display: flex; }
+        .upd-badge i { font-style: normal; background: #e53e3e; color: #fff; border-radius: 9px; min-width: 17px; height: 17px; line-height: 17px; text-align: center; font-size: 12px; font-weight: 800; box-shadow: 0 0 0 1.5px #fff; }
         .upd-new { display: none; margin-left: 6px; background: #e53e3e; color: #fff; border-radius: 9px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
-        body.app-update #updSoftBtn .upd-new { display: inline-block; }
-        body.app-update.settings-open #updSoftBtn { box-shadow: 0 0 0 3px rgba(229, 62, 62, .65); animation: updPulse 1.3s ease-in-out infinite; }
+        body.app-update #updSoftBtn .upd-new, body.data-update #updDataBtn .upd-new { display: inline-block; }
+        body.app-update.settings-open #updSoftBtn, body.data-update.settings-open #updDataBtn { box-shadow: 0 0 0 3px rgba(229, 62, 62, .65); animation: updPulse 1.3s ease-in-out infinite; }
         @keyframes updPulse { 0%, 100% { box-shadow: 0 0 0 2px rgba(229, 62, 62, .35); } 50% { box-shadow: 0 0 0 6px rgba(229, 62, 62, .7); } }
         .set-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; font-size: 16px; }
         .set-row > span:first-child { flex: none; width: 92px; }
@@ -2164,7 +2165,7 @@
         <div class="settings-section">
             <h3>Exchange file</h3>
             <div class="set-note" id="localInfo"></div>
-            <button type="button" class="set-btn" onclick="settingsAction('update')">⟳ Update Data</button>
+            <button type="button" class="set-btn" id="updDataBtn" onclick="settingsAction('update')">⟳ Update Data <span class="upd-new">new</span></button>
             <button type="button" class="set-btn" id="updSoftBtn" onclick="settingsAction('software')">⟳ Update Software <span class="upd-new">new</span></button>
             <div class="set-note" id="appVersion" style="text-align:center;margin-top:6px;">v.</div>
             <button type="button" class="set-btn" onclick="settingsAction('export')">⬇ Export</button>
@@ -2269,7 +2270,7 @@
             <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Map" aria-label="Map"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
             <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
             <label class="return-toggle sq-btn" id="returnToggle" data-tip="Return to start"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
-            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-star" aria-hidden="true">★</span></button>
+            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-badge" aria-hidden="true"></span></button>
         </div>
     </div>
         <div class="search-bar" id="searchBar">
@@ -2303,7 +2304,7 @@
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Add place" aria-label="Add place">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
-                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-star" aria-hidden="true">★</span></button>
+                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-badge" aria-hidden="true"></span></button>
             </div>
         </div>
         <div class="form-container">
@@ -4590,10 +4591,12 @@
             try { localStorage.setItem('mymaps_adopt_legacy_v3', '1'); } catch (e) { }
             _hashCache.clear(); _sizeCache.clear();
             catalogIds = new Set(cat.map(c => c.id));
+            { const ids = new Set(cat.map(c => c.id)); places = places.filter(p => p.dirty || ids.has(p.id) || (p.aliases || []).some(a => ids.has(a))); }      // unchanged cards that are gone from the catalog are removed (as it was done on load before)
             places.forEach(normalize);
             mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
             sync();
             touchVersion();
+            markDataApplied();                                    // «2» disappears: this catalog is applied now
             toast(added || enriched || merged || released
                 ? `Update: added new ${added}, enriched ${enriched}` + (merged ? `, merged dupes ${merged}` : '') + (released ? `, already on GitHub ${released}` : '')
                 : 'Update: no new data — you are up to date');
@@ -4632,8 +4635,16 @@
     }
     // The check on load is SILENT: it only tells that a new version exists (red star on the gear, glowing «Update Software» button).
     // The page is reloaded with the new version only when the button «Update Software» is pressed (manual = true).
-    function setAppUpdate(on) { document.body.classList.toggle('app-update', !!on); try { localStorage.setItem('app_update_avail', on ? '1' : '0'); } catch (e) { } }
-    try { setAppUpdate(localStorage.getItem('app_update_avail') === '1'); } catch (e) { }
+    function renderUpdBadges() {                              // «1» — a new version of the software, «2» — new data (catalog); both → «1 2»
+        const sw = document.body.classList.contains('app-update'), dt = document.body.classList.contains('data-update');
+        document.querySelectorAll('.upd-badge').forEach(b => { b.innerHTML = (sw ? '<i>1</i>' : '') + (dt ? '<i>2</i>' : ''); });
+    }
+    function setAppUpdate(on) { document.body.classList.toggle('app-update', !!on); try { localStorage.setItem('app_update_avail', on ? '1' : '0'); } catch (e) { } renderUpdBadges(); }
+    function setDataUpdate(on) { document.body.classList.toggle('data-update', !!on); try { localStorage.setItem('data_update_avail', on ? '1' : '0'); } catch (e) { } renderUpdBadges(); }
+    try { document.body.classList.toggle('app-update', localStorage.getItem('app_update_avail') === '1'); document.body.classList.toggle('data-update', localStorage.getItem('data_update_avail') === '1'); renderUpdBadges(); } catch (e) { }
+    // fingerprint of the catalog (what GitHub has now): when it differs from the one that was applied by «Update Data», there is a data update
+    function computeCatHash() { try { return hashText(JSON.stringify([[...catalogRaw.entries()], catalogTypes])); } catch (e) { return ''; } }
+    function markDataApplied() { try { localStorage.setItem('cat_applied_hash', computeCatHash()); } catch (e) { } setDataUpdate(false); }
     async function checkAppUpdate(manual) {
         if (!manual && navigator.onLine === false) return false;
         _lastAppCheck = Date.now();
@@ -7493,10 +7504,16 @@
         typeDefs = st && Array.isArray(st.types) ? st.types : [];
         typesDeleted = st && Array.isArray(st.typesDeleted) ? st.typesDeleted : [];
         const idRemap = new Map();
+        let _appliedAtStart = null; try { _appliedAtStart = localStorage.getItem('cat_applied_hash'); } catch (e) { }
+        const _applyCat = !localList || !_appliedAtStart;        // first run or the one-time migration → the catalog is applied; otherwise it is only checked
         if (localList) localList.forEach(p => { if (!('base' in st) && p.dirty === undefined) p.dirty = true; });   // стан зі старої версії сайту — це ваші дані, лишаємо їх
         if (cat) {
             catalogIds = new Set(cat.map(p => p.id));
-            if (localList) {
+            let _appliedH = null; try { _appliedH = localStorage.getItem('cat_applied_hash'); } catch (e) { }
+            if (localList && _appliedH) {                       // only a CHECK: nothing from the catalog is applied before «Update Data»
+                deletedIds = Array.isArray(st.deleted) ? st.deleted : [];
+                places = localList;
+            } else if (localList) {                             // one time (a version without the check): apply as before and remember what was applied
                 const byId = new Map(cat.map(p => [p.id, p]));
                 deletedIds = Array.isArray(st.deleted) ? st.deleted : [];
                 places = [];
@@ -7520,6 +7537,11 @@
             toast('Catalog unavailable — showing your local copy');
         } else { showLoadError(catErr); window.splashHide && window.splashHide(); return; }
         places.forEach(normalize);
+        if (cat) {                                               // is there new data? (badge «2»)
+            const h = computeCatHash(); let applied = null; try { applied = localStorage.getItem('cat_applied_hash'); } catch (e) { }
+            if (!localList || !applied) { try { localStorage.setItem('cat_applied_hash', h); } catch (e) { } setDataUpdate(false); }
+            else setDataUpdate(applied !== h);
+        }
         {   // Albanian names: cards not refreshed yet get re-detected in the background; refreshed ones use the saved Albanian values
             const gd = geoSqDone(), nc = nearCache(), cc = countryCache();
             places.forEach(p => {
@@ -7527,7 +7549,8 @@
                 else { p.near = nc[p.id] || ''; if (cc[p.id] !== undefined) p.country = cc[p.id]; }
             });
         }
-        mergeTypes(catalogTypes); const _medNew = seedMedicalTypes() | seedDefaultIcons(); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
+        if (_applyCat) mergeTypes(catalogTypes);                 // types of the catalog are applied only on the first run / by «Update Data»
+        const _medNew = seedMedicalTypes() | seedDefaultIcons(); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
         if (sl && Array.isArray(sl.ids)) { const ids = new Set(sl.ids.map(id => idRemap.get(id) || id)); places.forEach(p => { p.selected = ids.has(p.id); }); }
         placeMap();
         restoreReturnToggle();
