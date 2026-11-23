@@ -2644,8 +2644,8 @@
             row.querySelector('[data-a="edit"]').onclick = () => { closeOpenRow(true); hideRowActions(row); handleEdit(i); };
             row.querySelector('[data-a="del"]').onclick = () => { closeOpenRow(true); handleDelete(i); };
 
-            // Перетягування карток вимкнено (порядок задає сортування); функцію initRowReorder збережено
-            // initRowReorder(row, i, tbody);
+            // Зміна порядку: утримуйте палець (або кнопку миші) на картці — фото чи назві — і тягніть
+            initRowReorder(row, i, tbody);
             initSwipe(row);
         });
         applySearch();
@@ -2842,7 +2842,7 @@
     // Власна анімація scrollTop на кожен кадр (швидкий кидок, дотягування, випереджальне дотягування) після оновлення iOS ламала відмальовування:
     // фото зникали під час гортання, а дотягування спрацьовувало некоректно. Тому на пристроях із дотиком вони вимкнені й замінені рідними механізмами браузера;
     // для миші (комп'ютер) власне дотягування лишається. Щоб повернути старе, змініть значення нижче на false.
-    const NATIVE_SNAP = (() => { try { return matchMedia('(pointer: coarse)').matches && !!(window.CSS && CSS.supports && CSS.supports('scroll-snap-type', 'y mandatory')); } catch (e) { return false; } })();
+    const NATIVE_SNAP = false;                              // the list no longer snaps to cards (native CSS scroll-snap is off)
     if (NATIVE_SNAP) document.documentElement.classList.add('native-snap');
     function syncStickyOffset() {
         const ca = document.querySelector('.content-area');
@@ -2869,6 +2869,7 @@
     const scrollCtl = { flinging: false };
     function snapScrollTarget(ca, T, dir) {
         const max = ca.scrollHeight - ca.clientHeight;
+        if (true) return Math.max(0, Math.min(max, T));          // no alignment to the card edge any more
         const top = document.querySelector('.sticky-top');
         T = Math.max(0, Math.min(max, T));
         if (!top || T <= 0 || T >= max - 4) return T;                  // край списку — не чіпаємо
@@ -2894,7 +2895,8 @@
     (function initScrollSettle() {
         const ca = document.querySelector('.content-area');
         const top = document.querySelector('.sticky-top');
-        if (!ca || !top || NATIVE_SNAP) return;                  // на телефонах — рідне прилипання (CSS scroll-snap)
+        return;                                                   // «дотягування» прибрано: після зупинки список лишається там, де зупинився
+        if (!ca || !top || NATIVE_SNAP) return;
         let timer = null, finger = false, prev = ca.scrollTop, origin = null, selfUntil = 0, anim = 0;
         let vel = 0, lastTop = ca.scrollTop, lastTs = performance.now(), lastTouchEnd = 0;   // швидкість прокрутки (px/мс) — для випереджального дотягування
         const stopAnim = () => { if (anim) { cancelAnimationFrame(anim); anim = 0; } };
@@ -3121,8 +3123,8 @@
             if (moved && scroller) {                       // автопрокрутка біля країв
                 const sr = scroller.getBoundingClientRect(), zone = 60;
                 let dy = 0;
-                if (ly < sr.top + zone) dy = -Math.ceil((sr.top + zone - ly) / 8);          // 2× slower than before (was /4)
-                else if (ly > sr.bottom - zone) dy = Math.ceil((ly - (sr.bottom - zone)) / 8);
+                if (ly < sr.top + zone) dy = -Math.ceil((sr.top + zone - ly) / 4);
+                else if (ly > sr.bottom - zone) dy = Math.ceil((ly - (sr.bottom - zone)) / 4);
                 if (dy) scroller.scrollTop += dy;
             }
             if (moved) update();
@@ -7373,7 +7375,7 @@
         sortMode = m;
         try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
         if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
-        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first' : (noResort ? 'Manual order' : 'GPS not found yet — order kept')); }
+        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
         renderSortChips();
         try { updateMapMarkers(); } catch (e) { }                // marker numbers follow the new order
     }
@@ -7383,7 +7385,7 @@
         box.innerHTML = [['group', WHEEL_SVG + ' By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
-        if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down every time the site is opened.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
+        if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down; hold a card and drag to change.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
     }
     let _distAt = 0, _distRef = null;
     function refreshDistances() {                            // card texts follow the current place
