@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SanMarynaGo — Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:light dark;--bg:#f4f6f8;--panel:#fff;--text:#18212b;--muted:#667085;--line:#e3e8ef;--accent:#2878c7;--bad:#c0392b}
+@media(prefers-color-scheme:dark){:root{--bg:#111820;--panel:#1b2632;--text:#edf2f7;--muted:#aab6c3;--line:#344252;--accent:#69aef0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1200px;margin:auto;padding:24px 16px 48px}h1{font-size:25px;margin:0 0 6px}h2{font-size:18px;margin:0 0 14px}.muted{color:var(--muted)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+input,button,select{font:inherit;border-radius:9px;border:1px solid var(--line);padding:10px 12px;background:var(--panel);color:var(--text)}
+button{background:var(--accent);border-color:var(--accent);color:white;cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row input{min-width:220px;flex:1}.hidden{display:none!important}
+#status{margin-top:10px;color:var(--muted)}#status.error{color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.stat{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px}.stat b{display:block;font-size:25px;margin-top:5px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-weight:600;position:sticky;top:0;background:var(--panel)}
+.tablewrap{overflow:auto;max-height:560px}pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:12px/1.4 ui-monospace,monospace}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 8px;font-size:12px}
+@media(max-width:600px){main{padding:16px 10px 32px}.panel{padding:13px}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SanMarynaGo — адмін-панель</h1>
+    <div class="muted">Статистика користувачів та журнал подій Supabase</div>
+  </header>
+
+  <section class="panel" id="loginPanel">
+    <h2>Вхід адміністратора</h2>
+    <form id="loginForm" class="row">
+      <input id="email" type="email" autocomplete="username" placeholder="Email" required>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Пароль" required>
+      <button id="loginBtn" type="submit">Увійти</button>
+    </form>
+    <div id="status" role="status">Підключення до Supabase…</div>
+  </section>
+
+  <section id="dashboard" class="hidden">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between">
+        <div><b id="who"></b><div class="muted">Адміністративний доступ підтверджено</div></div>
+        <button id="logoutBtn" type="button">Вийти</button>
+      </div>
+    </div>
+    <section class="panel">
+      <h2>Загальна статистика</h2>
+      <div class="stats">
+        <div class="stat"><span class="muted">Користувачів</span><b id="usersCount">—</b></div>
+        <div class="stat"><span class="muted">Неанонімних акаунтів</span><b id="registeredCount">—</b></div>
+        <div class="stat"><span class="muted">Подій у завантаженому журналі</span><b id="eventsCount">—</b></div>
+        <div class="stat"><span class="muted">Активних за 7 днів</span><b id="activeCount">—</b></div>
+      </div>
+      <div class="muted" id="loadedAt" style="margin-top:12px"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Користувачі</h2>
+      <div class="row" style="margin-bottom:12px"><input id="userFilter" type="search" placeholder="Пошук за email або ім’ям"></div>
+      <div class="tablewrap"><table><thead><tr><th>Email</th><th>Ім’я</th><th>Тип</th><th>Створено</th><th>Остання подія</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </section>
+
+    <section class="panel">
+      <h2>Журнал подій</h2>
+      <div class="row" style="margin-bottom:12px">
+        <input id="eventFilter" type="search" placeholder="Пошук email, назви події або типу">
+        <select id="typeFilter"><option value="">Усі типи</option><option value="login">login</option><option value="activity">activity</option><option value="change">change</option></select>
+        <button id="refreshBtn" type="button">Оновити</button>
+      </div>
+      <div class="muted" style="margin-bottom:10px">Показано до 500 останніх подій. Для великих журналів додамо посторінкове завантаження.</div>
+      <div class="tablewrap"><table><thead><tr><th>Дата</th><th>Користувач</th><th>Тип</th><th>Подія</th><th>Деталі</th></tr></thead><tbody id="eventsBody"></tbody></table></div>
+    </section>
+  </section>
+</main>
+<script>
+(() => {
+  // Використовується лише публічний Publishable key. Secret/service_role тут не потрібен.
+  const SUPABASE_URL = 'https://krdvrbphkzbkrrahiknq.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_rAEnvsjXJyUfHab4ynL3Wg_CquBYQVj';
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  const $ = id => document.getElementById(id);
+  let users = [], events = [];
+
+  function status(message, error=false) {
+    $('status').textContent = message;
+    $('status').classList.toggle('error', error);
+  }
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const dateText = value => value ? new Date(value).toLocaleString('uk-UA') : '—';
+
+  async function showSession(session) {
+    if (!session?.user) {
+      $('loginPanel').classList.remove('hidden');
+      $('dashboard').classList.add('hidden');
+      return;
+    }
+    $('loginPanel').classList.add('hidden');
+    $('dashboard').classList.remove('hidden');
+    $('who').textContent = session.user.email || 'Анонімний акаунт';
+    await loadDashboard(session.user);
+  }
+
+  async function loadDashboard(user) {
+    status('Перевіряємо адміністративні права…');
+    // admin_roles має політику читання власного рядка; наявність рядка підтверджує роль.
+    const { data: role, error: roleError } = await client.from('admin_roles')
+      .select('user_id').eq('user_id', user.id).maybeSingle();
+    if (roleError) throw roleError;
+    if (!role) {
+      $('dashboard').classList.add('hidden');
+      $('loginPanel').classList.remove('hidden');
+      status('Доступ заборонено: цей акаунт не має ролі адміністратора.', true);
+      await client.auth.signOut();
+      return;
+    }
+
+    status('Завантажуємо користувачів і журнал…');
+    const [profileResult, eventResult] = await Promise.all([
+      client.from('profiles').select('id,email,display_name,is_anonymous,created_at,updated_at').order('created_at',{ascending:false}).limit(2000),
+      client.from('activity_logs').select('user_id,event_type,event_name,details,created_at').order('created_at',{ascending:false}).limit(500)
+    ]);
+    if (profileResult.error) throw profileResult.error;
+    if (eventResult.error) throw eventResult.error;
+    users = profileResult.data || [];
+    events = eventResult.data || [];
+    render();
+    status('Дані завантажено.');
+  }
+
+  function render() {
+    const byId = new Map(users.map(u => [u.id,u]));
+    const latest = new Map();
+    for (const e of events) if (!latest.has(e.user_id)) latest.set(e.user_id,e.created_at);
+    const sevenDaysAgo = Date.now() - 7*24*60*60*1000;
+    const active = new Set(events.filter(e => new Date(e.created_at).getTime() >= sevenDaysAgo).map(e=>e.user_id));
+    $('usersCount').textContent = users.length;
+    $('registeredCount').textContent = users.filter(u=>!u.is_anonymous).length;
+    $('eventsCount').textContent = events.length;
+    $('activeCount').textContent = active.size;
+    $('loadedAt').textContent = 'Оновлено: ' + new Date().toLocaleString('uk-UA');
+
+    const q = $('userFilter').value.trim().toLowerCase();
+    $('usersBody').innerHTML = users.filter(u => [u.email,u.display_name].some(x=>String(x||'').toLowerCase().includes(q)))
+      .map(u => `<tr><td>${esc(u.email||'—')}</td><td>${esc(u.display_name||'—')}</td><td><span class="pill">${u.is_anonymous?'anonymous':'registered'}</span></td><td>${esc(dateText(u.created_at))}</td><td>${esc(dateText(latest.get(u.id)))}</td></tr>`).join('')
+      || '<tr><td colspan="5">Немає результатів</td></tr>';
+
+    const eq = $('eventFilter').value.trim().toLowerCase(), type = $('typeFilter').value;
+    $('eventsBody').innerHTML = events.filter(e => {
+      const u = byId.get(e.user_id);
+      const hay = [u?.email,u?.display_name,e.event_type,e.event_name,JSON.stringify(e.details||{})].join(' ').toLowerCase();
+      return (!type || e.event_type===type) && (!eq || hay.includes(eq));
+    }).map(e => {
+      const u = byId.get(e.user_id);
+      return `<tr><td>${esc(dateText(e.created_at))}</td><td>${esc(u?.email||u?.display_name||e.user_id)}</td><td><span class="pill">${esc(e.event_type)}</span></td><td>${esc(e.event_name)}</td><td><pre>${esc(JSON.stringify(e.details||{},null,2))}</pre></td></tr>`;
+    }).join('') || '<tr><td colspan="5">Немає результатів</td></tr>';
+  }
+
+  $('loginForm').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    $('loginBtn').disabled = true;
+    try {
+      const {data,error} = await client.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+      if(error) throw error;
+      $('password').value = '';
+      await showSession(data.session);
+    } catch(e) { status(e.message || 'Помилка входу',true); }
+    finally { $('loginBtn').disabled = false; }
+  });
+  $('logoutBtn').addEventListener('click', async () => {
+    await client.auth.signOut();
+    $('dashboard').classList.add('hidden');
+    $('loginPanel').classList.remove('hidden');
+    status('Ви вийшли з облікового запису.');
+  });
+  $('refreshBtn').addEventListener('click', async () => {
+    $('refreshBtn').disabled = true;
+    try {
+      const {data,error}=await client.auth.getUser();
+      if(error) throw error;
+      if(data.user) await loadDashboard(data.user);
+    } catch(e) { status(e.message || 'Не вдалося оновити дані',true); }
+    finally {$('refreshBtn').disabled=false;}
+  });
+  $('userFilter').addEventListener('input',render);
+  $('eventFilter').addEventListener('input',render);
+  $('typeFilter').addEventListener('change',render);
+  client.auth.getSession().then(({data,error}) => {
+    if(error) status(error.message,true);
+    else showSession(data.session).catch(e=>status(e.message||'Помилка завантаження',true));
+  });
+  client.auth.onAuthStateChange((_event,session) => {
+    if(!session) showSession(null);
+  });
+})();
+</script>
+</body>
+</html>
