@@ -2100,26 +2100,30 @@
   setInterval(render, 2000);
   // The main screen has no GPS until the map/speedometer is opened. If location access was granted before, start the same single stream now.
   window.addEventListener('load', () => {
-    // The permission question appears only on the very first visit. Later: if the browser still remembers the permission («granted») GPS connects by itself;
-    // if the browser forgot it («prompt») we do NOT ask again on load — GPS starts when you open the map / speedometer or tap the height.
+    // The permission question appears only on the very first visit. After a fix has been received once on this device («gps_ok») GPS is started on every load
+    // (the browser answers silently when the permission is still valid), so the height is on the screen right away; the pill shows «— m» until the first fix.
+    // If the browser did not let it start without a touch, the first touch of the screen starts it.
     const flag = k => { try { return localStorage.getItem(k) === '1'; } catch (e) { return false; } };
     const mark = k => { try { localStorage.setItem(k, '1'); } catch (e) { } };
     const first = () => { if (flag('gps_asked')) return false; mark('gps_asked'); return true; };
-    const go = granted => { try { if (typeof startGps === 'function') startGps(); if (granted) { seen = true; render(); } } catch (e) { } };
-    const noApi = () => { if (flag('gps_ok') || first()) go(false); };         // old browsers without the Permissions API
+    const go = show => { try { if (typeof startGps === 'function') startGps(); if (show) { seen = true; render(); } } catch (e) { } };
+    const known = () => flag('gps_ok');
+    const noApi = () => { if (known() || first()) go(known()); };              // old browsers without the Permissions API
     try {
       if (navigator.permissions && navigator.permissions.query)
         navigator.permissions.query({ name: 'geolocation' }).then(r => {
           if (r.state === 'granted') go(true);
-          else if (r.state === 'prompt' && first()) go(false);
+          else if (r.state === 'prompt' && (known() || first())) go(known());
           r.onchange = () => { if (r.state === 'granted') go(true); };
         }).catch(noApi);
       else noApi();
     } catch (e) { noApi(); }
+    document.addEventListener('pointerdown', () => { if (known() && !seen) go(true); }, { once: true, passive: true });          // a gesture is always allowed to start GPS
     const iv = setInterval(() => {                                               // remember that a fix was received at least once
       try { if (typeof lastGps !== 'undefined' && lastGps) { mark('gps_ok'); mark('gps_asked'); clearInterval(iv); } } catch (e) { }
     }, 3000);
   });
+
 })();
 </script>
 
