@@ -1105,6 +1105,7 @@
             body.form-open .form-container { width: 100%; max-width: 980px; margin-left: auto; margin-right: auto; }
         }
         /* ===== Altitude label (top centre) ===== */
+        #altBar.in-host { position: absolute; }                /* inside the header / map bar: it moves WITH the title (bounce, sticky) */
         #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 17px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.9); color: #2d3748; font-size: 19px; line-height: 32px; white-space: nowrap; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
         #altBar[hidden] { display: none; }
         #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -2050,12 +2051,21 @@
       const c = document.querySelector('.mobile-controls'); if (t && c && c.offsetParent !== null && t.closest('.mobile-header')) end = c.getBoundingClientRect().left;
     }
     el.style.fontSize = ''; el.style.padding = '';
-    if (!t) { el.style.top = ''; el.style.left = ''; return; }
+    let host = null;
+    if (t) host = bc.contains('map-open') ? document.getElementById('mapOverlay') : (t.closest('.sticky-top') || t.closest('.mobile-header') || t.closest('.sidebar'));
+    if (host && getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    if (!t || !host) {                                            // no title on the screen: a plain fixed label on the page
+      if (el.parentNode !== document.body) document.body.appendChild(el);
+      el.classList.remove('in-host'); el.style.top = ''; el.style.left = ''; return;
+    }
+    if (el.parentNode !== host) host.appendChild(el);             // the pill is a child of the header: it moves together with the title
+    el.classList.add('in-host');
+    const hr = host.getBoundingClientRect();
     const box = t.closest('.app-brand') || t, tr = t.getBoundingClientRect();
     let right = tr.right;                                         // права межа самого тексту (не розтягнутого контейнера)
     const au = box.querySelector && box.querySelector('.app-user');
     if (au && !au.hidden && au.offsetParent !== null) right = Math.max(right, au.getBoundingClientRect().right);
-    el.style.top = (tr.top + tr.height / 2) + 'px';
+    el.style.top = (tr.top + tr.height / 2 - hr.top) + 'px';
     const GAP = 12;                                               // відступ від напису і від кнопки спідометра
     let w = el.offsetWidth, left;
     if (end !== null) {
@@ -2064,7 +2074,7 @@
       if (w > room) { el.style.padding = '0 7px'; w = el.offsetWidth; }
       left = (w <= room) ? (right + end) / 2 : end - GAP - w / 2;  // не вміщується — притискаємо до кнопки з відступом, але не торкаємось її
     } else left = right + 16 + w / 2;
-    el.style.left = left + 'px';
+    el.style.left = (left - hr.left) + 'px';
   }
   window.addEventListener('resize', place); window.addEventListener('orientationchange', place);
   try { new MutationObserver(place).observe(document.body, { attributes: true, attributeFilter: ['class'] }); } catch (e) { }
