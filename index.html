@@ -2493,6 +2493,34 @@
     let catalogTypes = [];               // типи з data/types.json
     let catalogTypesLoaded = false;      // чи вдалося завантажити data/types.json (офлайн — ні, тоді локальні типи не чіпаємо)
     const nameKey = n => String(n || '').trim().toLowerCase();
+    // Everything that the logged-in user DELETED is written to their record (`del`): cards (id + name), catalog photos of a card, a card's reviews, types.
+    // Loading the catalog / «Update Data» skips these items and adds only what is really new.
+    function delJ() {
+        const r = curRec();
+        if (!r.del || typeof r.del !== 'object') r.del = {};
+        for (const k of ['p', 'n', 'd', 't']) if (!Array.isArray(r.del[k])) r.del[k] = [];
+        if (!r.del.f || typeof r.del.f !== 'object' || Array.isArray(r.del.f)) r.del.f = {};
+        return r.del;
+    }
+    function logDeleted(kind, a, b) {
+        try {
+            const d = delJ();
+            if (kind === 'place') { if (a.id && !d.p.includes(a.id)) d.p.push(a.id); const k = nameKey(a.name); if (k && !d.n.includes(k)) d.n.push(k); }
+            else if (kind === 'photo') { const arr = d.f[a] = d.f[a] || []; if (b && !arr.includes(b)) arr.push(b); }
+            else if (kind === 'desc') { if (!d.d.includes(a)) d.d.push(a); }
+            else if (kind === 'type') { if (!d.t.includes(a)) d.t.push(a); }
+            d.p = d.p.slice(-800); d.n = d.n.slice(-800); d.d = d.d.slice(-800); d.t = d.t.slice(-200);
+            usersPersist();
+        } catch (e) { }
+    }
+    const unlogDesc = id => { try { const d = delJ(); const i = d.d.indexOf(id); if (i >= 0) { d.d.splice(i, 1); usersPersist(); } } catch (e) { } };
+    function isDeletedCard(c) {                              // a catalog card the user has deleted (by id, alias or name)
+        let d = null; try { d = delJ(); } catch (e) { }
+        const ids = [c.id, ...(c.aliases || [])], k = nameKey(c.name);
+        return ids.some(i => deletedIds.includes(i) || (d && d.p.includes(i))) || deletedNames.includes(k) || !!(d && k && d.n.includes(k));
+    }
+    const isPhotoDeleted = (pid, path) => { try { const f = delJ().f; return !!(f[pid] && f[pid].includes(path)); } catch (e) { return false; } };
+    const isDescCleared = pid => { try { return delJ().d.includes(pid); } catch (e) { return false; } };
 
     function uid() { return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
     function normalize(p, i) {
@@ -3800,6 +3828,7 @@
             country: (document.getElementById('placeCountry').value.trim()) || (old ? (old.coords === coords ? old.country : undefined) : opts.country)
         };
         if (data.country === undefined) delete data.country;
+        if (old) (old.media || []).forEach(m => { if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !data.media.some(x => x.data === m.data)) logDeleted('photo', old.id, m.data); });   // a catalog photo removed by the user
         if (old) places[Number(eIdx)] = data;
         else {
             const at = insertIndexFor(data);
@@ -4113,6 +4142,7 @@
         if (!ok) return;
         const ed = document.getElementById('editIndex').value;
         if (nameKey(p.name) && !deletedNames.includes(nameKey(p.name))) deletedNames.push(nameKey(p.name));
+        logDeleted('place', p);
         places.splice(i, 1);
         if (ed !== '') {
             const e = Number(ed);
@@ -4559,7 +4589,7 @@
             for (const c of cat) {
                 const cands = places.filter(p => samePlace(p, c));
                 if (!cands.length) {
-                    if (!deletedNames.includes(key(c.name))) { places.push(c); added++; }   // відсутню картку додаємо повністю (з усіма фото); пропускаємо лише ті, що ви самі видалили
+                    if (!deletedNames.includes(key(c.name)) && !isDeletedCard(c)) { places.push(c); added++; }   // відсутню картку додаємо повністю (з усіма фото); пропускаємо лише ті, що ви самі видалили
                     continue;
                 }
                 // головна картка — ваша (змінена), інакше перша знайдена
@@ -4574,16 +4604,16 @@
                 { const before = JSON.stringify([target.id, target.aliases, target.country, target.types, target.near]); quickEnrich(target, c); if (before !== JSON.stringify([target.id, target.aliases, target.country, target.types, target.near])) changed = true; }
                 for (const d of extra) {                           // зливаємо дублі: фото й порожні поля переходять у головну
                     if (await addMedia(target, d.media)) changed = true;
-                    for (const f of ['gmapsUrl', 'desc', 'near', 'country']) if (!target[f] && d[f]) { target[f] = d[f]; changed = true; }
+                    for (const f of ['gmapsUrl', 'desc', 'near', 'country']) if (!target[f] && d[f] && !(f === 'desc' && isDescCleared(target.id))) { target[f] = d[f]; changed = true; }
                     for (const t of d.types || []) if (!target.types.includes(t)) { target.types.push(t); changed = true; }
                     for (const al of [d.id, ...(d.aliases || [])]) if (al !== target.id && !target.aliases.includes(al)) { target.aliases.push(al); changed = true; }
                     if (d.selected) target.selected = true;
                     places.splice(places.indexOf(d), 1);
                     merged++; changed = true;
                 }
-                if (await addMedia(target, c.media)) changed = true;
+                if (await addMedia(target, c.media.filter(m => !isPhotoDeleted(target.id, m.data) && !isPhotoDeleted(c.id, m.data)))) changed = true;      // photos that the user deleted are not brought back
                 if (await dropCatalogCopies(target)) changed = true;
-                for (const f of ['gmapsUrl', 'desc', 'near', 'coords']) if (!target[f] && c[f]) { target[f] = c[f]; changed = true; }
+                for (const f of ['gmapsUrl', 'desc', 'near', 'coords']) if (!target[f] && c[f] && !(f === 'desc' && (isDescCleared(target.id) || isDescCleared(c.id)))) { target[f] = c[f]; changed = true; }      // deleted reviews are not refilled
                 if (target.id !== c.id) { target.id = c.id; changed = true; }
                 if (changed) { target.dirty = true; enriched++; }
                 else if (adopted && !missingOnGithub(target)) { target.dirty = false; released++; }       // nothing differs from GitHub any more
@@ -4645,7 +4675,7 @@
     try { document.body.classList.toggle('app-update', localStorage.getItem('app_update_avail') === '1'); document.body.classList.toggle('data-update', localStorage.getItem('data_update_avail') === '1'); renderUpdBadges(); } catch (e) { }
     // fingerprint of the catalog (what GitHub has now): when it differs from the one that was applied by «Update Data», there is a data update
     function computeCatHash() { try { return hashText(JSON.stringify([[...catalogRaw.entries()], catalogTypes])); } catch (e) { return ''; } }
-    function markDataApplied() { try { localStorage.setItem('cat_applied_hash', computeCatHash()); } catch (e) { } setDataUpdate(false); }
+    function markDataApplied() { try { localStorage.setItem('cat_applied_hash', computeCatHash()); localStorage.setItem('cat_applied_ids', JSON.stringify([...catalogIds])); } catch (e) { } setDataUpdate(false); }
     async function checkAppUpdate(manual) {
         if (!manual && navigator.onLine === false) return false;
         _lastAppCheck = Date.now();
@@ -5242,7 +5272,7 @@
             const cur = parseReviews(p.desc);
             if (r) { if (cur[idx]) cur[idx].text = text; }
             else { const d = new Date(), pad = n => String(n).padStart(2, '0'); cur.push({ author: myName(), date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}`, text }); }
-            p.desc = serializeReviews(cur); p.dirty = true;
+            p.desc = serializeReviews(cur); p.dirty = true; unlogDesc(p.id);
             m.classList.remove('open'); _rvOpen.add(p.id); sync();
         };
         m.classList.add('open'); setTimeout(() => ta.focus(), 50);
@@ -5264,7 +5294,7 @@
             const p = places.find(x => x.id === pid); if (!p) return;
             const list = parseReviews(p.desc); if (!list[i] || !canEditReview(list[i])) { toast('You can edit only your own reviews'); return; }
             if (!confirm('Delete this review?')) return;
-            list.splice(i, 1); p.desc = serializeReviews(list); p.dirty = true; sync();
+            list.splice(i, 1); p.desc = serializeReviews(list); p.dirty = true; if (!list.length) logDeleted('desc', p.id); sync();
         }
     }, true);
 
@@ -6990,7 +7020,7 @@
         const al = new Set([...(lp.aliases || []), ...(cp.aliases || [])]);
         if (cp.id !== lp.id) { al.add(lp.id); lp.id = cp.id; }
         al.delete(lp.id); lp.aliases = [...al].slice(-8);
-        for (const f of ['desc', 'gmapsUrl', 'near', 'country']) if (!lp[f] && cp[f]) lp[f] = cp[f];
+        for (const f of ['desc', 'gmapsUrl', 'near', 'country']) if (!lp[f] && cp[f] && !(f === 'desc' && (isDescCleared(lp.id) || isDescCleared(cp.id)))) lp[f] = cp[f];      // reviews deleted by the user are not refilled
         if (!lp.types || !lp.types.length) lp.types = [...(cp.types || [])];
         return lp;
     }
@@ -7056,7 +7086,7 @@
             if (c) out.push(lt.dirty && lt.id === c.id ? lt : { ...c });
             else if (lt.dirty) out.push(lt);                // ваш власний тип, якого ще немає в каталозі
         }
-        for (const c of cat) if (!out.some(o => o.id === c.id) && !typesDeleted.includes(c.id)) out.push({ ...c });
+        for (const c of cat) if (!out.some(o => o.id === c.id) && !typesDeleted.includes(c.id) && !(function () { try { return delJ().t.includes(c.id); } catch (e) { return false; } })()) out.push({ ...c });
         typesDeleted = typesDeleted.filter(id => byId.has(id));
         if (remap.size) places.forEach(p => { p.types = [...new Set((p.types || []).map(id => remap.get(id) || id))]; });
         typeDefs = out;
@@ -7118,7 +7148,7 @@
             if (!old) typeDefs.push(next[next.length - 1]);   // щоб newTypeId не видав той самий id двічі
         }
         for (const r of _tmRows) if (r.id && r.del) {
-            if (catalogTypes.some(t => t.id === r.id) && !typesDeleted.includes(r.id)) typesDeleted.push(r.id);
+            if (catalogTypes.some(t => t.id === r.id) && !typesDeleted.includes(r.id)) { typesDeleted.push(r.id); logDeleted('type', r.id); }
             places.forEach(p => { if ((p.types || []).includes(r.id)) { p.types = p.types.filter(x => x !== r.id); p.dirty = true; } });
         }
         typeDefs = next;
@@ -7285,6 +7315,11 @@
         }
         out.routes = [...map.values()].sort((a, b) => (a.ts || 0) - (b.ts || 0));
         out.deletedRoutes = [...gone].slice(-200);
+        {   // journal of deletions: union
+            const a = loc.del || {}, b = db.del || {}, u = (x, y) => [...new Set([...(x || []), ...(y || [])])];
+            const f = {}; for (const k of new Set([...Object.keys(a.f || {}), ...Object.keys(b.f || {})])) f[k] = u((a.f || {})[k], (b.f || {})[k]);
+            out.del = { p: u(a.p, b.p).slice(-800), n: u(a.n, b.n).slice(-800), d: u(a.d, b.d).slice(-800), t: u(a.t, b.t).slice(-200), f };
+        }
         if (!out.name) out.name = db.name || '';
         return out;
     }
@@ -7330,7 +7365,7 @@
         const m = usersAll();
         return Object.keys(m).filter(k => k !== ANON && String(m[k].name || '').trim()).map(k => {
             const u = m[k];
-            return { name: u.name, cons: u.cons || '', price: u.price || '', cur: u.cur || '€', routes: u.routes || [], deletedRoutes: u.deletedRoutes || [], settings: u.settings || {} };
+            return { name: u.name, cons: u.cons || '', price: u.price || '', cur: u.cur || '€', routes: u.routes || [], deletedRoutes: u.deletedRoutes || [], ...(u.del ? { del: u.del } : {}), settings: u.settings || {} };
         });
     }
 
@@ -7514,6 +7549,10 @@
             if (localList && _appliedH) {                       // only a CHECK: nothing from the catalog is applied before «Update Data»
                 deletedIds = Array.isArray(st.deleted) ? st.deleted : [];
                 places = localList;
+                {   // catalogIds = the catalog this state is based on (NOT the current repo), otherwise a brand-new card would look «deleted by you»
+                    let saved = null; try { saved = JSON.parse(localStorage.getItem('cat_applied_ids') || 'null'); } catch (e) { }
+                    catalogIds = new Set(Array.isArray(saved) ? saved : [...localList.flatMap(p => [p.id, ...(p.aliases || [])]), ...deletedIds]);
+                }
             } else if (localList) {                             // one time (a version without the check): apply as before and remember what was applied
                 const byId = new Map(cat.map(p => [p.id, p]));
                 deletedIds = Array.isArray(st.deleted) ? st.deleted : [];
@@ -7526,7 +7565,7 @@
                 }
                 const have = new Set(places.map(p => p.id));
                 for (const cp of cat) {
-                    if (have.has(cp.id) || deletedIds.includes(cp.id) || deletedNames.includes(nameKey(cp.name))) continue;
+                    if (have.has(cp.id) || isDeletedCard(cp)) continue;
                     // ваша картка могла жити під іншим id (створена на сайті й імпортована в репозиторій) — тоді це та сама картка: збагачуємо, а не дублюємо
                     const m = findPlaceMatch(cp, places);
                     if (m) { const old = m.id; quickEnrich(m, cp); if (old !== m.id) idRemap.set(old, m.id); have.add(m.id); }
@@ -7540,7 +7579,7 @@
         places.forEach(normalize);
         if (cat) {                                               // is there new data? (badge «2»)
             const h = computeCatHash(); let applied = null; try { applied = localStorage.getItem('cat_applied_hash'); } catch (e) { }
-            if (!localList || !applied) { try { localStorage.setItem('cat_applied_hash', h); } catch (e) { } setDataUpdate(false); }
+            if (!localList || !applied) { try { localStorage.setItem('cat_applied_hash', h); localStorage.setItem('cat_applied_ids', JSON.stringify([...catalogIds])); } catch (e) { } setDataUpdate(false); }
             else setDataUpdate(applied !== h);
         }
         {   // Albanian names: cards not refreshed yet get re-detected in the background; refreshed ones use the saved Albanian values
