@@ -48,6 +48,11 @@
         }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .input-wrapper { display: flex; flex-direction: column; gap: 4px; }
+        .fld-wrap { position: relative; display: block; }
+        .fld-wrap > input { padding-right: 40px; box-sizing: border-box; }
+        .fld-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: #e2e8f0; color: #4a5568; font-size: 13px; line-height: 24px; text-align: center; cursor: pointer; }
+        .fld-clear[hidden] { display: none; }
+        html[data-theme="dark"] .fld-clear { background: #3a4558; color: #e2e8f0; }
         label { font-size: 9px; color: #a0aec0; font-weight: bold; text-transform: uppercase; }
         
         input[type="text"], input[type="file"] { width: 100%; padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 13px; }
@@ -2337,7 +2342,7 @@
                     <input type="text" id="placeGmapsUrl" placeholder="https://maps.app.goo.gl/...">
                 </div>
                 <div class="input-wrapper">
-                    <label>Country (Albanian, auto)</label>
+                    <label>Country (English, auto)</label>
                     <input type="text" id="placeCountry" placeholder="auto from coordinates" readonly tabindex="-1" autocomplete="off" autocapitalize="words" spellcheck="false">
                 </div>
                 <div class="input-wrapper input-wide">
@@ -3871,6 +3876,24 @@
         fxForm();
     }
 
+    // Every field of the card form has its own «✕» that erases only this field (it appears when the field is not empty)
+    const CLEARABLE = ['placeName', 'placeCoords', 'placeDesc', 'placeGmapsUrl'];
+    function syncFieldClear() { CLEARABLE.forEach(id => { const i = document.getElementById(id); if (i && i._syncClear) i._syncClear(); }); }
+    function initFieldClear() {
+        CLEARABLE.forEach(id => {
+            const inp = document.getElementById(id); if (!inp || inp._syncClear) return;
+            const holder = document.createElement('div'); holder.className = 'fld-wrap';
+            inp.parentNode.insertBefore(holder, inp); holder.appendChild(inp);
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'fld-clear'; b.hidden = true; b.setAttribute('aria-label', 'Clear this field'); b.title = 'Clear'; b.textContent = '✕';
+            holder.appendChild(b);
+            const sync = () => { b.hidden = !inp.value.length; };
+            inp._syncClear = sync;
+            inp.addEventListener('input', sync); inp.addEventListener('focus', sync);
+            b.addEventListener('pointerdown', e => e.preventDefault());           // the keyboard stays open
+            b.addEventListener('click', () => { inp.value = ''; inp.dispatchEvent(new Event('input', { bubbles: true })); sync(); inp.focus(); });
+        });
+        setInterval(() => { const n = document.getElementById('placeName'); if (n && n.offsetParent !== null) syncFieldClear(); }, 300);      // the form fills fields from code (edit, coordinates, plus codes)
+    }
     function clearForm() {
         ['placeName', 'placeCoords', 'placeDesc', 'placeGmapsUrl', 'placeCountry', 'editIndex'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('placeDesc').closest('.input-wrapper').style.display = '';
@@ -7624,6 +7647,7 @@
         if (sortMode === 'group') reorderAuto(); else buildDefaultOrder();      // порядок за замовчуванням: група → відстань до мого місця (остання відома позиція)
         render();
         syncStickyOffset();
+        initFieldClear();
         initMap();
         stateReady = true;
         if (_medNew) { try { persistPlaces(true); } catch (e) { } }
