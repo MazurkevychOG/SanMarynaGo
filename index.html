@@ -4176,7 +4176,7 @@
     }
     // Flag of the card's country (the country is stored by name, e.g. «Shqipëri»): names of all countries in several languages → ISO code → flag emoji
     let _countryCodes = null;
-    function countryFlag(name) {
+    function countryCode(name) {
         const nz = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         const n = nz(name); if (!n) return '';
         if (!_countryCodes) {
@@ -4196,7 +4196,20 @@
         }
         let code = _countryCodes.get(n);
         if (!code) for (const [k, c] of _countryCodes) { if (k.length > 3 && (n.includes(k) || k.includes(n))) { code = c; break; } }
-        return code ? String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : '';
+        return code || '';
+    }
+    function englishCountries() {                            // «Shqipëri» → «Albania» in the cards (the repo validation wants English); changed cards go to the next export
+        let n = 0;
+        places.forEach(p => { if (p.country) { const en = countryEnglish(p.country); if (en && en !== p.country) { p.country = en; p.dirty = true; try { rememberCountry(p); } catch (e) { } n++; } } });
+        return n;
+    }
+    function countryFlag(name) { const code = countryCode(name); return code ? String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : ''; }
+    // The catalog (README / validation) wants the country in ENGLISH («Albania»), not «Shqipëri»
+    function countryEnglish(name) {
+        const n = String(name || '').trim(); if (!n) return n;
+        const code = countryCode(n); if (!code) return n;
+        try { const en = new Intl.DisplayNames(['en'], { type: 'region' }).of(code); if (en && en !== code) return en; } catch (e) { }
+        return n;
     }
     function selectEffect(src, p) {                          // the square → flag (≈0.5 s) → footprint
         const box = src.parentElement; if (!box) return;
@@ -4623,6 +4636,7 @@
             catalogIds = new Set(cat.map(c => c.id));
             { const ids = new Set(cat.map(c => c.id)); places = places.filter(p => p.dirty || ids.has(p.id) || (p.aliases || []).some(a => ids.has(a))); }      // unchanged cards that are gone from the catalog are removed (as it was done on load before)
             places.forEach(normalize);
+            englishCountries();
             mergeTypes(catalogTypes); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
             sync();
             touchVersion();
@@ -5374,7 +5388,7 @@
     }
     // Назва країни АНГЛІЙСЬКОЮ за кодом країни (ISO 3166): Intl вбудований у браузер, тож окремого запиту не треба
     function countryNameEn(code, fallback) {
-        try { const n = new Intl.DisplayNames(['sq', 'en'], { type: 'region' }).of(String(code).toUpperCase()); if (n && n !== String(code).toUpperCase()) return n; } catch (e) { }
+        try { const n = new Intl.DisplayNames(['en'], { type: 'region' }).of(String(code).toUpperCase()); if (n && n !== String(code).toUpperCase()) return n; } catch (e) { }
         return fallback || '';
     }
     // Один запит зворотного геокодування → { near: селище/місто ('' якщо назви немає), country: країна англійською ('' якщо невідомо) } або null (помилка мережі)
@@ -7588,6 +7602,7 @@
                 if (!gd[p.id]) { p.near = undefined; p.country = undefined; }
                 else { p.near = nc[p.id] || ''; if (cc[p.id] !== undefined) p.country = cc[p.id]; }
             });
+            englishCountries();
         }
         if (_applyCat) mergeTypes(catalogTypes);                 // types of the catalog are applied only on the first run / by «Update Data»
         const _medNew = seedMedicalTypes() | seedDefaultIcons(); places.forEach(p => { p.types = p.types.filter(id => typeDefs.some(t => t.id === id)); }); renderFormTypes();
