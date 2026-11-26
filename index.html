@@ -48,6 +48,49 @@
         }
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .input-wrapper { display: flex; flex-direction: column; gap: 4px; }
+
+        /* ===== Full-screen card: photos on the top half, all information below ===== */
+        #cardView { position: fixed; inset: 0; z-index: 3400; background: #fff; display: flex; flex-direction: column; color: #2d3748; }
+        body.card-open { overflow: hidden; }
+        body.card-open #altBar, body.card-open .fab-add { display: none !important; }
+        .cv-photo { flex: 0 0 46%; min-height: 0; position: relative; background: #0f1319; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .cv-photo img, .cv-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .cv-none { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6b7a90; font-size: 15px; gap: 8px; }
+        .cv-none b { font-size: 54px; font-weight: 400; }
+        .cv-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); left: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(0,0,0,.55); color: #fff; font-size: 20px; cursor: pointer; z-index: 3; }
+        .cv-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 54px; border: 0; background: rgba(0,0,0,.4); color: #fff; font-size: 26px; cursor: pointer; z-index: 2; }
+        .cv-nav.l { left: 0; border-radius: 0 10px 10px 0; } .cv-nav.r { right: 0; border-radius: 10px 0 0 10px; }
+        .cv-count { position: absolute; right: 10px; bottom: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 3px 9px; border-radius: 12px; z-index: 2; }
+        .cv-zoom { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 3px 9px; border-radius: 12px; border: 0; z-index: 2; cursor: pointer; }
+        .cv-body { flex: 1 1 54%; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 12px; }
+        .cv-head { display: flex; align-items: center; gap: 4px; }
+        .cv-title { margin: 0; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere; }
+        .cv-near { margin: 6px 0 4px; font-size: 18px; color: #5a7184; }
+        .cv-types { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 8px; }
+        .cv-types button { font: inherit; font-size: 13px; font-weight: 600; border: 0; border-radius: 12px; padding: 4px 10px; background: #edf2f7; color: #4a5568; cursor: pointer; }
+        .cv-types button.on { background: #4285F4; color: #fff; }
+        .cv-types .tchip-s { margin: 0; }
+        .cv-lbl { display: block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #8a98ab; margin: 10px 0 3px; }
+        .cv-in { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; padding: 9px 10px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f7f9fc; color: #2d3748; }
+        .cv-in[readonly] { border-color: transparent; background: #f1f4f8; }
+        .cv-in:not([readonly]) { border-color: #4285F4; background: #fff; box-shadow: 0 0 0 2px rgba(66,133,244,.18); }
+        .cv-open { display: inline-block; margin: 10px 0 2px; color: #4285F4; text-decoration: none; font-weight: 600; font-size: 15px; }
+        .cv-sec { margin: 14px 0 4px; font-size: 14px; font-weight: 700; color: #5a7184; text-transform: uppercase; letter-spacing: .04em; }
+        .cv-note { margin: 10px 0; font-size: 13px; color: #8a98ab; }
+        .cv-bar { flex: 0 0 auto; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #e2e8f0; background: #fff; }
+        .cv-bar button { flex: 1; font: inherit; font-size: 16px; font-weight: 600; padding: 12px 10px; border: 0; border-radius: 12px; cursor: pointer; background: #edf2f7; color: #2d3748; }
+        .cv-bar .cv-edit, .cv-bar .cv-save { background: #4285F4; color: #fff; }
+        .cv-bar .cv-del { background: #fdecec; color: #c53030; flex: 0 0 auto; padding-left: 18px; padding-right: 18px; }
+        html[data-theme="dark"] #cardView { background: #181d26; color: #e2e8f0; }
+        html[data-theme="dark"] .cv-near { color: #9fb0c6; }
+        html[data-theme="dark"] .cv-in { background: #232b38; border-color: #2f3a4b; color: #e2e8f0; }
+        html[data-theme="dark"] .cv-in[readonly] { background: #202733; border-color: transparent; }
+        html[data-theme="dark"] .cv-in:not([readonly]) { background: #151a22; }
+        html[data-theme="dark"] .cv-types button { background: #2b3445; color: #c3cbd8; }
+        html[data-theme="dark"] .cv-bar { background: #181d26; border-color: #2a3342; }
+        html[data-theme="dark"] .cv-bar button { background: #2a3140; color: #e2e8f0; }
+        html[data-theme="dark"] .cv-bar .cv-edit, html[data-theme="dark"] .cv-bar .cv-save { background: #4285F4; color: #fff; }
+        html[data-theme="dark"] .cv-bar .cv-del { background: #3a2226; color: #ff8c8c; }
         .fld-wrap { position: relative; display: block; }
         .fld-wrap > input { padding-right: 40px; box-sizing: border-box; }
         .fld-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: #e2e8f0; color: #4a5568; font-size: 13px; line-height: 24px; text-align: center; cursor: pointer; }
@@ -4176,6 +4219,92 @@
             document.body.appendChild(wrap);
         });
     }
+
+    // ===== The full-screen card: a tap on the card (not on the map link, a review or the photo) opens it =====
+    let cvId = null, cvEdit = false, cvMedia = 0, cvTypes = [];
+    function canEditCard() {                                 // Alex and a user without a name (the owner of this device) edit cards; other named users only write their own reviews
+        try { return isOwner() || !String(curRec().name || '').trim(); } catch (e) { return true; }
+    }
+    function openCardView(i) { const p = places[i]; if (!p) return; cvId = p.id; cvEdit = false; cvMedia = 0; cvTypes = [...(p.types || [])]; document.body.classList.add('card-open'); renderCardView(); }
+    function closeCardView() { cvId = null; cvEdit = false; document.body.classList.remove('card-open'); const el = document.getElementById('cardView'); if (el) el.remove(); }
+    function renderCardView() {
+        if (cvId === null) return;
+        const i = places.findIndex(x => x.id === cvId), p = places[i];
+        if (!p) { closeCardView(); return; }
+        const can = canEditCard(), ro = (cvEdit && can) ? '' : ' readonly';
+        const media = p.media || [], n = media.length;
+        if (cvMedia >= n) cvMedia = Math.max(0, n - 1);
+        const m = media[cvMedia];
+        let photo;
+        if (!n) photo = '<div class="cv-none"><b>🖼</b>No photos</div>';
+        else photo = ((m.type || '').startsWith('video/') ? `<video src="${esc(m.data)}" controls playsinline></video>` : `<img src="${esc(m.data)}" alt="" draggable="false">`) +
+            (n > 1 ? `<button type="button" class="cv-nav l" data-d="-1">‹</button><button type="button" class="cv-nav r" data-d="1">›</button>` : '') +
+            `<span class="cv-count">${cvMedia + 1} / ${n}</span>` + (!(m.type || '').startsWith('video/') ? '<button type="button" class="cv-zoom">⤢ Full screen</button>' : '');
+        const url = safeUrl(p.gmapsUrl);
+        const chips = cvEdit && can
+            ? typeDefs.map(t => `<button type="button" data-t="${esc(t.id)}" class="${cvTypes.includes(t.id) ? 'on' : ''}">${typeLabelHtml(t)}</button>`).join('')
+            : (p.types || []).map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${typeLabelHtml(t)}</span>` : ''; }).join('');
+        let el = document.getElementById('cardView');
+        if (!el) { el = document.createElement('div'); el.id = 'cardView'; document.body.appendChild(el); }
+        const keep = { name: (document.getElementById('cvName') || {}).value, coords: (document.getElementById('cvCoords') || {}).value, url: (document.getElementById('cvUrl') || {}).value };
+        const scroll = (el.querySelector('.cv-body') || {}).scrollTop || 0;
+        el.innerHTML =
+            `<div class="cv-photo">${photo}<button type="button" class="cv-x" aria-label="Close">✕</button></div>` +
+            `<div class="cv-body">` +
+              `<div class="cv-head">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="gm-chain-link" title="Google Maps">🔗</a>` : ''}<h2 class="cv-title">${esc(p.name)}</h2></div>` +
+              `<div class="cv-near">${nearHtml(p)}</div>` +
+              `<div class="cv-types">${chips}</div>` +
+              `<label class="cv-lbl" for="cvName">Name</label><input class="cv-in" id="cvName" type="text" value="${esc(cvEdit && keep.name !== undefined ? keep.name : p.name)}"${ro}>` +
+              `<label class="cv-lbl" for="cvCoords">Coordinates</label><input class="cv-in" id="cvCoords" type="text" value="${esc(cvEdit && keep.coords !== undefined ? keep.coords : p.coords)}"${ro}>` +
+              `<label class="cv-lbl" for="cvUrl">Google Maps link</label><input class="cv-in" id="cvUrl" type="text" value="${esc(cvEdit && keep.url !== undefined ? keep.url : (p.gmapsUrl || ''))}"${ro} placeholder="${cvEdit ? 'https://maps.app.goo.gl/…' : '—'}">` +
+              `<label class="cv-lbl">Country</label><input class="cv-in" type="text" value="${esc(p.country || '')}" readonly>` +
+              `<a class="cv-open" href="${esc(gUrl(p))}" target="_blank" rel="noopener">📍 Open in Google Maps</a>` +
+              `<div class="cv-sec">Reviews</div>${reviewsHtml(p)}` +
+              (can ? (cvEdit ? '<div class="cv-note">Photos and videos are changed in the full form («Photos…»).</div>' : '') : '<div class="cv-note">View only: you can add your own reviews. Cards are edited by Alex.</div>') +
+            `</div>` +
+            `<div class="cv-bar">` +
+              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-photos">Photos…</button><button type="button" class="cv-save">Save</button>'
+                : (can ? '<button type="button" class="cv-edit">✎ Edit</button><button type="button" class="cv-del">🗑 Delete</button>' : '<button type="button" class="cv-close">Close</button>')) +
+            `</div>`;
+        const body = el.querySelector('.cv-body'); if (body) body.scrollTop = scroll;
+        const v = el.querySelector('.cv-photo video'); if (v) v.addEventListener('click', e => e.stopPropagation());
+    }
+    function cvStep(d) { const p = places.find(x => x.id === cvId); if (!p || !p.media || p.media.length < 2) return; cvMedia = (cvMedia + d + p.media.length) % p.media.length; renderCardView(); }
+    async function cvSave() {
+        const i = places.findIndex(x => x.id === cvId); if (i < 0) return;
+        const name = document.getElementById('cvName').value.trim(), coords = document.getElementById('cvCoords').value.trim(), url = document.getElementById('cvUrl').value.trim();
+        if (!name) { toast('The name is empty'); return; }
+        if (!parseCoordsDetailed(coords)) { toast('Coordinates are not recognized'); return; }
+        handleEdit(i);                                        // the proven save pipeline: fill the form, then save it (checks, country, town, duplicates…)
+        document.getElementById('placeName').value = name; document.getElementById('placeCoords').value = coords; document.getElementById('placeGmapsUrl').value = url;
+        formTypes = [...cvTypes];
+        handleSave();
+        if (document.body.classList.contains('form-open') && document.getElementById('editIndex').value !== '') { try { closeFormDissolve(); } catch (e) { } toast('Could not save — check the name, coordinates and the link'); return; }
+        cvEdit = false; renderCardView();
+    }
+    document.addEventListener('click', e => {
+        const t = e.target; if (!t || !t.closest) return;
+        const cv = t.closest('#cardView');
+        if (cv) {
+            if (t.closest('.cv-x, .cv-close')) { closeCardView(); return; }
+            const nav = t.closest('.cv-nav'); if (nav) { cvStep(Number(nav.dataset.d)); return; }
+            if (t.closest('.cv-zoom') || (t.closest('.cv-photo img'))) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { openGallery(i); currentGalleryIndex = cvMedia; showCurrentMedia(); } return; }
+            if (t.closest('.cv-edit')) { cvEdit = true; cvTypes = [...((places.find(x => x.id === cvId) || {}).types || [])]; renderCardView(); return; }
+            if (t.closest('.cv-cancel')) { cvEdit = false; renderCardView(); return; }
+            if (t.closest('.cv-save')) { cvSave(); return; }
+            if (t.closest('.cv-photos')) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { closeCardView(); handleEdit(i); } return; }
+            if (t.closest('.cv-del')) { (async () => { const i = places.findIndex(x => x.id === cvId); if (i < 0) return; await handleDelete(i); if (!places.some(x => x.id === cvId)) closeCardView(); })(); return; }
+            const tb = t.closest('.cv-types button[data-t]'); if (tb) { const id = tb.dataset.t; cvTypes = cvTypes.includes(id) ? cvTypes.filter(x => x !== id) : [...cvTypes, id]; renderCardView(); return; }
+            return;
+        }
+        // a tap on the card itself opens it (not on the checkbox column, the photo, the map link, the reviews)
+        const row = t.closest('.place-row'); if (!row || !document.getElementById('placesTable').contains(row)) return;
+        if (t.closest('.c-left, .c-photo, .gm-chain-link, .c-reviews, .rv-toggle, .rv-add, .rv-b, .swipe-actions, a, button, input, textarea, select, label')) return;
+        if (row.classList.contains('open') || Date.now() < suppressClickUntil || Date.now() - (row._swipedAt || 0) < 350) return;
+        const i = places.findIndex(p => p.id === row.dataset.id); if (i >= 0) openCardView(i);
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && cvId !== null && !document.querySelector('.mdl.open, .imp-modal')) closeCardView(); });
+    { const _renderBase = render; render = function () { const r = _renderBase.apply(this, arguments); try { if (cvId !== null) renderCardView(); } catch (e) { } return r; }; }
     async function handleDelete(i) {
         const p = places[i];
         if (!p) return;
