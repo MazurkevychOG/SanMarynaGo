@@ -178,6 +178,9 @@
         .btn-edit { background-color: #f1c40f; color: #333; padding: 10px; border-radius: 5px; font-size: 20px; cursor: pointer; }
         .btn-delete { background-color: #e74c3c; padding: 10px; border-radius: 5px; font-size: 20px; cursor: pointer; }
         .gm-chain { font-size: .7em; vertical-align: .08em; }
+        .name-row { display: flex; align-items: flex-start; gap: 0; min-width: 0; }
+        .name-row .gm-chain-link { flex: 0 0 auto; align-self: flex-start; }
+        .name-row .place-name-link { flex: 1 1 auto; min-width: 0; }
         .gm-chain-link { display: inline-block; font-size: 15.7px; line-height: 1; padding: 6px 7px 6px 0; margin-right: 1px; text-decoration: none; vertical-align: .12em; cursor: pointer; -webkit-touch-callout: none; }
         .place-name-link.pn-static, .place-name-link.pn-static:hover { cursor: default; text-decoration: none; color: #2c3e50; }
         html[data-theme="dark"] .place-name-link.pn-static, html[data-theme="dark"] .place-name-link.pn-static:hover { color: #9cb2c9; }
@@ -280,6 +283,8 @@
         .cell-near { font-size: 20px; color: #5a7184; margin-top: 6px; overflow-wrap: anywhere; }
         .cell-near .nw { white-space: nowrap; }
         .wheel { width: 1em; height: 1em; vertical-align: -.15em; flex: none; }
+        .car-ico { display: inline-flex; align-items: center; justify-content: center; width: 1.3em; height: 1.1em; border-radius: .28em; background: #3b82f6; color: #3b82f6; vertical-align: -.2em; }
+        .car-ico svg { width: 1.05em; height: 1.05em; display: block; }
         .cell-near .wheel { vertical-align: -.13em; }
         .cell-desc { font-size: 18px; color: #718096; margin-top: 4px; overflow-wrap: anywhere; }
         .rc { display: inline-block; color: #d62828; background: #fff; border-radius: 4px; padding: 0 3px; line-height: 1.15; font-weight: 700; box-shadow: 0 0 0 1px #e8b9b9; font-variant-emoji: text; }
@@ -2738,7 +2743,7 @@
                     </div>
                     <div class="c-photo"><div class="cell-photo-img" onclick="openGallery(${i})">${thumbHtml(p)}</div></div>
                     <div class="c-name">
-                        <div>${link}</div>
+                        <div class="name-row">${link}</div>
                         <div class="cell-near">${nearHtml(p)}</div>
                         <div class="cell-types">${(p.types || []).map(id => { const t = typeById(id); return t ? `<span class="tchip-s">${typeLabelHtml(t)}</span>` : ''; }).join('')}${reviewsToggleHtml(p)}</div>
                     </div>
@@ -5522,10 +5527,12 @@
             }
         } finally { driveBusy = false; try { refreshDistances(); } catch (e) { } }
     }
+    // a small WHITE car on a rounded blue sign (white on white would not be seen); the wheel stays in the other places
+    const CAR_SVG = '<span class="car-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M3.4 15.6v-3.1c0-.7.3-1.3.9-1.7l1.6-1.1 1.2-2.6c.3-.7 1-1.1 1.8-1.1h6.2c.8 0 1.5.4 1.8 1.1l1.2 2.6 1.6 1.1c.6.4.9 1 .9 1.7v3.1c0 .5-.4.9-.9.9h-1.2a2.4 2.4 0 0 1-4.6 0h-3.8a2.4 2.4 0 0 1-4.6 0H4.3c-.5 0-.9-.4-.9-.9z"/><path fill="currentColor" d="M9 8.3h2.5v2.4H7.8zM12.7 8.3h2.4l1.1 2.4h-3.5z"/><circle cx="7.9" cy="16.7" r="1.9" fill="#fff"/><circle cx="16.1" cy="16.7" r="1.9" fill="#fff"/><circle cx="7.9" cy="16.7" r=".8" fill="currentColor"/><circle cx="16.1" cy="16.7" r=".8" fill="currentColor"/></svg></span>';
     function nearHtml(p) {
         const units = [];
         if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
-        const dt = distText(p); if (dt) units.push('<span class="nw">' + WHEEL_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
+        const dt = distText(p); if (dt) units.push('<span class="nw">' + CAR_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
         const dr = driveText(p); if (dr) units.push('<span class="nw">⏱&nbsp;' + esc(dr).replace(/ /g, '&nbsp;') + '</span>');
         const e = elevOf(p); if (e !== null && Math.round(e) >= 100) units.push('<span class="nw">⛰&nbsp;' + Math.round(e) + '&nbsp;m</span>');
         return units.map((u, i) => i < units.length - 1 ? u.replace(/<\/span>$/, '&nbsp;·</span>') : u).join(' ');
