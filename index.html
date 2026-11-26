@@ -50,10 +50,11 @@
         .input-wrapper { display: flex; flex-direction: column; gap: 4px; }
 
         /* ===== Full-screen card: photos on the top half, all information below ===== */
+        #mediaModal.modal { z-index: 3700; }                         /* the zoomable gallery is above the full-screen card */
         #cardView { position: fixed; inset: 0; z-index: 3400; background: #fff; display: flex; flex-direction: column; color: #2d3748; }
         body.card-open { overflow: hidden; }
         body.card-open #altBar, body.card-open .fab-add { display: none !important; }
-        .cv-photo { flex: 0 0 46%; min-height: 0; position: relative; background: #0f1319; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .cv-photo { flex: 0 0 46%; min-height: 0; position: relative; background: #0f1319; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
         .cv-photo img, .cv-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
         .cv-none { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6b7a90; font-size: 15px; gap: 8px; }
         .cv-none b { font-size: 54px; font-weight: 400; }
@@ -283,8 +284,8 @@
         .cell-near { font-size: 20px; color: #5a7184; margin-top: 6px; overflow-wrap: anywhere; }
         .cell-near .nw { white-space: nowrap; }
         .wheel { width: 1em; height: 1em; vertical-align: -.15em; flex: none; }
-        .car-ico { display: inline-flex; align-items: center; justify-content: center; width: 1.3em; height: 1.1em; border-radius: .28em; background: #3b82f6; color: #3b82f6; vertical-align: -.2em; }
-        .car-ico svg { width: 1.05em; height: 1.05em; display: block; }
+        .car-ico { display: inline-flex; align-items: center; justify-content: center; width: 1.25em; height: 1.1em; color: #3b82f6; vertical-align: -.2em; }
+        .car-ico svg { width: 1.2em; height: 1.2em; display: block; overflow: visible; }
         .cell-near .wheel { vertical-align: -.13em; }
         .cell-desc { font-size: 18px; color: #718096; margin-top: 4px; overflow-wrap: anywhere; }
         .rc { display: inline-block; color: #d62828; background: #fff; border-radius: 4px; padding: 0 3px; line-height: 1.15; font-weight: 700; box-shadow: 0 0 0 1px #e8b9b9; font-variant-emoji: text; }
@@ -4293,7 +4294,7 @@
         if (cv) {
             if (t.closest('.cv-x, .cv-close')) { closeCardView(); return; }
             const nav = t.closest('.cv-nav'); if (nav) { cvStep(Number(nav.dataset.d)); return; }
-            if (t.closest('.cv-zoom') || (t.closest('.cv-photo img'))) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { openGallery(i); currentGalleryIndex = cvMedia; showCurrentMedia(); } return; }
+            if (t.closest('.cv-zoom')) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { openGallery(i); currentGalleryIndex = cvMedia; showCurrentMedia(); } return; }
             if (t.closest('.cv-edit')) { cvEdit = true; cvTypes = [...((places.find(x => x.id === cvId) || {}).types || [])]; renderCardView(); return; }
             if (t.closest('.cv-cancel')) { cvEdit = false; renderCardView(); return; }
             if (t.closest('.cv-save')) { cvSave(); return; }
@@ -4308,6 +4309,22 @@
         if (row.classList.contains('open') || Date.now() < suppressClickUntil || Date.now() - (row._swipedAt || 0) < 350) return;
         const i = places.findIndex(p => p.id === row.dataset.id); if (i >= 0) openCardView(i);
     });
+    let cvPt = null;
+    document.addEventListener('pointerdown', e => {
+        const ph = e.target.closest && e.target.closest('#cardView .cv-photo');
+        if (!ph || e.target.closest('button')) { cvPt = null; return; }
+        cvPt = { x: e.clientX, y: e.clientY, video: !!e.target.closest('video'), vy: e.clientY - ph.getBoundingClientRect().top, h: ph.clientHeight };
+    }, true);
+    document.addEventListener('pointerup', e => {
+        if (!cvPt) return;
+        const q = cvPt; cvPt = null;
+        const dx = e.clientX - q.x, dy = e.clientY - q.y, ax = Math.abs(dx), ay = Math.abs(dy);
+        if (q.video && q.vy > q.h - 80 && ax < 60 && ay < 60) return;                       // the player's own controls
+        if (dy > 70 && ay > ax * 1.3) { closeCardView(); return; }                           // swipe down — close the card
+        if (ax > 45 && ax > ay * 1.3) { cvStep(dx < 0 ? 1 : -1); return; }                  // swipe left → next, swipe right → previous
+        if (ax < 12 && ay < 12 && !q.video) cvStep(1);                                       // a tap on the photo → the next photo
+    }, true);
+    document.addEventListener('pointercancel', () => { cvPt = null; }, true);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && cvId !== null && !document.querySelector('.mdl.open, .imp-modal')) closeCardView(); });
     { const _renderBase = render; render = function () { const r = _renderBase.apply(this, arguments); try { if (cvId !== null) renderCardView(); } catch (e) { } return r; }; }
     async function handleDelete(i) {
@@ -5528,7 +5545,7 @@
         } finally { driveBusy = false; try { refreshDistances(); } catch (e) { } }
     }
     // a small WHITE car on a rounded blue sign (white on white would not be seen); the wheel stays in the other places
-    const CAR_SVG = '<span class="car-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M3.4 15.6v-3.1c0-.7.3-1.3.9-1.7l1.6-1.1 1.2-2.6c.3-.7 1-1.1 1.8-1.1h6.2c.8 0 1.5.4 1.8 1.1l1.2 2.6 1.6 1.1c.6.4.9 1 .9 1.7v3.1c0 .5-.4.9-.9.9h-1.2a2.4 2.4 0 0 1-4.6 0h-3.8a2.4 2.4 0 0 1-4.6 0H4.3c-.5 0-.9-.4-.9-.9z"/><path fill="currentColor" d="M9 8.3h2.5v2.4H7.8zM12.7 8.3h2.4l1.1 2.4h-3.5z"/><circle cx="7.9" cy="16.7" r="1.9" fill="#fff"/><circle cx="16.1" cy="16.7" r="1.9" fill="#fff"/><circle cx="7.9" cy="16.7" r=".8" fill="currentColor"/><circle cx="16.1" cy="16.7" r=".8" fill="currentColor"/></svg></span>';
+    const CAR_SVG = '<span class="car-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1" stroke-linejoin="round" fill="#fff"><path d="M3.4 15.6v-3.1c0-.7.3-1.3.9-1.7l1.6-1.1 1.2-2.6c.3-.7 1-1.1 1.8-1.1h6.2c.8 0 1.5.4 1.8 1.1l1.2 2.6 1.6 1.1c.6.4.9 1 .9 1.7v3.1c0 .5-.4.9-.9.9h-1.2a2.4 2.4 0 0 1-4.6 0h-3.8a2.4 2.4 0 0 1-4.6 0H4.3c-.5 0-.9-.4-.9-.9z"/><path fill="none" d="M9 8.3h2.5v2.4H7.8zM12.7 8.3h2.4l1.1 2.4h-3.5z"/><circle cx="7.9" cy="16.7" r="1.9"/><circle cx="16.1" cy="16.7" r="1.9"/></g></svg></span>';
     function nearHtml(p) {
         const units = [];
         if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
