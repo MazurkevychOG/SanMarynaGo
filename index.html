@@ -875,10 +875,12 @@
         html[data-theme="dark"] .finger-btn { background:#1e2530 }
         html[data-theme="dark"] .fab-add.finger-btn { background:#1e2530 }
         html[data-theme="dark"] .fab-add.editing { background:#1e2530 }
-        html[data-theme="dark"] .route-label { background:#1e2530;color:#78a1ed }
-        html[data-theme="dark"] .route-label.est { color:#f0b475 }
-        html[data-theme="dark"] .route-summary { background:rgba(30,37,48,0.95) }
-        html[data-theme="dark"] .route-summary small { color:#aeb9ca }
+        /* dark map: the distance / time of the selected route are LIGHT */
+        html[data-theme="dark"] .route-label { background:#1e2530;color:#f1f5fb;border-color:#8fb4ff;text-shadow:none }
+        html[data-theme="dark"] .route-label.est { color:#ffe2bd;border-color:#f0b475 }
+        html[data-theme="dark"] .route-summary { background:rgba(30,37,48,0.95);color:#f1f5fb }
+        html[data-theme="dark"] .route-summary b, html[data-theme="dark"] .route-summary span { color:#f1f5fb }
+        html[data-theme="dark"] .route-summary small { color:#cfd8e6 }
         html[data-theme="dark"] .gps-dot { border:3px solid #364054 }
         html[data-theme="dark"] .map-name-tip { color:#0d131c; background:#f4f6fa; border-color:#9aa6b8; text-shadow:none }
         html[data-theme="dark"] .map-reset a { color:#ee8277 !important }
