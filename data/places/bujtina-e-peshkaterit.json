@@ -1,13 +1,13 @@
 {
   "id": "bujtina-e-peshkaterit",
-  "order": 12,
+  "order": 4,
   "name": "Bujtina e peshkaterit",
   "lat": 40.361562,
   "lng": 19.480187,
-  "desc": "",
+  "desc": "[Alex · 2026-11-23 21:18]\nЗазвичай дуже вітряно), багато свіжої риби після вибору якої вам її приготують, ціни вище помірних, блюда на грилі або в фритюр",
   "gmapsUrl": "https://maps.app.goo.gl/kPyKfR9szQJzVffx8?g_st=ic",
   "near": "Radhimë",
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "restaurant",
     "food"
@@ -32,7 +32,7 @@
       "srcSha256": "3b5a274be96214bee6a761fb71d23000cc5f63775c318cda160b9f40c104ab34"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-27",
   "aliases": [
     "pmvxzbhwgg7fq5"
   ]

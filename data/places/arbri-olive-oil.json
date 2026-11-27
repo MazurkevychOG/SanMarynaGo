@@ -1,10 +1,10 @@
 {
   "id": "arbri-olive-oil",
-  "order": 5,
+  "order": 6,
   "name": "Arbri Olive Oil",
   "lat": 40.3274774,
   "lng": 19.5110889,
-  "desc": "",
+  "desc": "[Alex · 2026-11-23 21:23]\nФабрика олії, дуже смачна, 1000 лек за літр в склі, 800 в пластику",
   "gmapsUrl": "https://maps.app.goo.gl/WXvTRUcX4EUULmmG7?g_st=ic",
   "category": null,
   "media": [
@@ -54,8 +54,8 @@
       "srcSha256": "fee9fe1797b2176353e44da3538363f68fd2edb489fc21a0d7d3ea6b5f60fae8"
     }
   ],
-  "updated": "2026-11-19",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "near": "Tragjas",
   "types": [
     "food"

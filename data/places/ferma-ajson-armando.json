@@ -1,13 +1,13 @@
 {
   "id": "ferma-ajson-armando",
-  "order": 21,
+  "order": 7,
   "name": "Ferma Ajson - Armando",
   "lat": 40.382712,
   "lng": 19.612297,
-  "desc": "Glietdeti Turkey",
-  "gmapsUrl": "https://maps.app.goo.gl/5sfRoqpuXy9zyAdq5?g_st=ic",
+  "desc": "Glietdeti Turkey\n\n[Alex · 2026-11-23 21:24]\n1000 лек за кг індика",
+  "gmapsUrl": "https://maps.google.com/?q=40.379704,19.617666",
   "near": "Shkallë-Mavrovë",
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "food"
   ],
@@ -31,7 +31,7 @@
       "srcSha256": "b2f0f015229ebb1d3e2312fbce87f486a47265c2db2fa22f89ad62340a592ad2"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-27",
   "aliases": [
     "pmwgg0wvsrzr3d"
   ]

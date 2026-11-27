@@ -4,7 +4,7 @@
   "name": "Home Vlore Joanna",
   "lat": 40.4241,
   "lng": 19.493856,
-  "desc": "Current",
+  "desc": "Current home",
   "gmapsUrl": "https://maps.app.goo.gl/GEvPZwVLZ32QeakT7?g_st=ic",
   "category": null,
   "media": [
@@ -53,8 +53,8 @@
       "srcSha256": "56eeca08dd2aba40c8560c0a2c14092dc7cb984b131e00d025972af3a932de25"
     }
   ],
-  "updated": "2026-11-16",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "stay"
   ],

@@ -1,6 +1,6 @@
 {
   "id": "ile-bridge-kutal",
-  "order": 23,
+  "order": 27,
   "name": "Ile bridge (Kutal)",
   "lat": 40.2575881,
   "lng": 20.3232416,
@@ -17,8 +17,8 @@
       "bytes": 198268
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "near": "Bual",
   "types": [
     "extreme"

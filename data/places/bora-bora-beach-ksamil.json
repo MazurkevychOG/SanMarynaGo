@@ -1,6 +1,6 @@
 {
   "id": "bora-bora-beach-ksamil",
-  "order": 8,
+  "order": 33,
   "name": "Bora Bora beach | Ksamil",
   "lat": 39.7713041,
   "lng": 19.9984411,
@@ -17,11 +17,10 @@
       "bytes": 191112
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
-    "beach",
-    "restaurant"
+    "beach"
   ],
   "near": "Ksamil"
 }

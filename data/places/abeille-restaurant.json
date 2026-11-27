@@ -1,6 +1,6 @@
 {
   "id": "abeille-restaurant",
-  "order": 9,
+  "order": 20,
   "name": "Abeille Restaurant",
   "lat": 40.1574251,
   "lng": 19.8151497,
@@ -26,8 +26,8 @@
       "srcSha256": "b25b5328b54e64c837cfe19a5f30d158c37fc6caf5f4385f0cd94c45f9d91207"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "restaurant",
     "nature"

@@ -1,10 +1,10 @@
 {
   "id": "wine-cellar-kantina-eneo-kote",
-  "order": 14,
+  "order": 5,
   "name": "\"Wine Cellar\" Kantina Eneo (Kotë)",
   "lat": 40.387768,
   "lng": 19.605723,
-  "desc": "",
+  "desc": "[Alex · 2026-11-23 21:22]\nЧервоне вино, трохи затяжке, в прикуску з водою норм, продається в пластику,",
   "gmapsUrl": "https://maps.app.goo.gl/m164mAzR67RxzU5s8?g_st=ic",
   "category": null,
   "media": [
@@ -17,8 +17,8 @@
       "bytes": 58152
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "winery",
     "food"

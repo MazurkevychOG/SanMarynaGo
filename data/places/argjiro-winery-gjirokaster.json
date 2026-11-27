@@ -1,6 +1,6 @@
 {
   "id": "argjiro-winery-gjirokaster",
-  "order": 22,
+  "order": 24,
   "name": "\"Argjiro\" Winery (Gjirokastër)",
   "lat": 40.0990336,
   "lng": 20.1501935,
@@ -44,8 +44,8 @@
       "srcSha256": "74e339ed4abc5f7bbbca87ea3e7e68156937495747d663c94dc1674fca4156b8"
     }
   ],
-  "updated": "2026-11-19",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "winery",
     "food"

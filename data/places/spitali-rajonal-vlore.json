@@ -1,0 +1,29 @@
+{
+  "id": "spitali-rajonal-vlore",
+  "order": 3,
+  "name": "Spitali Rajonal Vlorë",
+  "lat": 40.477562,
+  "lng": 19.500312,
+  "desc": "24/7",
+  "gmapsUrl": "https://maps.app.goo.gl/C7c5E87qTnMXPe5x5?g_st=ic",
+  "near": "Vlorë",
+  "country": "Albania",
+  "types": [
+    "medicine"
+  ],
+  "media": [
+    {
+      "type": "image",
+      "file": "photos/spitali-rajonal-vlore/01.webp",
+      "thumb": "photos/spitali-rajonal-vlore/01_thumb.webp",
+      "width": 1320,
+      "height": 1474,
+      "bytes": 98048,
+      "srcSha256": "5e105afec68c703b527efa6c418a00eed9f3869f28582a479aa21f844202f581"
+    }
+  ],
+  "updated": "2026-11-27",
+  "aliases": [
+    "pmwrwajx0if96q"
+  ]
+}

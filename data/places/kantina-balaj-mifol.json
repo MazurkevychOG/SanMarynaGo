@@ -1,10 +1,10 @@
 {
   "id": "kantina-balaj-mifol",
-  "order": 13,
+  "order": 10,
   "name": "Kantina Balaj (Mifol)",
   "lat": 40.5963295,
   "lng": 19.483349,
-  "desc": "",
+  "desc": "[Alex · 2026-11-23 21:26]\nГарне червоне вино на кшталт примітиво, 1500 лек за пляшку",
   "gmapsUrl": "https://maps.app.goo.gl/XVZ2suFnkKSnNc2N8?g_st=ic",
   "category": null,
   "media": [
@@ -44,8 +44,8 @@
       "srcSha256": "7740131fd7353370e16caa438c8201fd23ee58a019ee7bd1313789d6b17f29c7"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "winery",
     "food"

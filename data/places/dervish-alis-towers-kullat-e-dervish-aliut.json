@@ -1,13 +1,13 @@
 {
   "id": "dervish-alis-towers-kullat-e-dervish-aliut",
-  "order": 11,
+  "order": 12,
   "name": "Dervish Ali's Towers Kullat e Dervish Aliut",
   "lat": 40.2513794,
   "lng": 19.5684183,
   "desc": "",
   "gmapsUrl": "https://maps.app.goo.gl/aEtNK9P1XpeXGYu46?g_st=ic",
   "near": "Dukat",
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "history"
   ],
@@ -49,7 +49,7 @@
       "srcSha256": "d8446d646d9ae9ad6de1b58c991c522912f9a04b1e0438f2917ec083d8c28440"
     }
   ],
-  "updated": "2026-11-19",
+  "updated": "2026-11-27",
   "aliases": [
     "pmwmdqfyelc0i2"
   ]

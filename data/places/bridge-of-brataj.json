@@ -1,6 +1,6 @@
 {
   "id": "bridge-of-brataj",
-  "order": 15,
+  "order": 13,
   "name": "Bridge of Brataj",
   "lat": 40.2668864,
   "lng": 19.6718241,
@@ -44,8 +44,8 @@
       "srcSha256": "101caef3dfe19424a8ce75950443c98d356c2ce8cb6f97b270b8b8b917978241"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "near": "Brataj",
   "types": [
     "prohulyanka",

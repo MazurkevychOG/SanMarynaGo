@@ -1,6 +1,6 @@
 {
   "id": "fish-hub-albadriatico",
-  "order": 33,
+  "order": 8,
   "name": "Fish HUB AlbAdriatico",
   "lat": 40.2955308,
   "lng": 19.4882518,
@@ -27,8 +27,8 @@
       "srcSha256": "d4dde4faa004caec7beb13d7d18bf3e6c9ed3811e5987dccc6c4d0cd6808ae23"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "food"
   ],

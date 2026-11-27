@@ -1,6 +1,6 @@
 {
   "id": "the-castle-of-porto-palermo",
-  "order": 27,
+  "order": 22,
   "name": "The Castle of Porto Palermo",
   "lat": 40.0622157,
   "lng": 19.790746,
@@ -53,8 +53,8 @@
       "srcSha256": "44549f37efaa7d0a90b493c028aa92d51f8f914046bcd95e2400d50320056fd4"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "history"
   ],

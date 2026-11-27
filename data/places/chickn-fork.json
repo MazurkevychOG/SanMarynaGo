@@ -7,11 +7,10 @@
   "desc": "Укр сет",
   "gmapsUrl": "https://maps.app.goo.gl/QRnn8iGjxkcgsVyv7?g_st=ic",
   "near": "Vlorë",
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "restaurant",
-    "beach",
-    "food"
+    "beach"
   ],
   "media": [
     {
@@ -42,7 +41,7 @@
       "srcSha256": "e3b5d0bc6c384db38d5706b7b644b4324223362fab3718c813410bec9190c4bb"
     }
   ],
-  "updated": "2026-11-16",
+  "updated": "2026-11-27",
   "aliases": [
     "pmvxmrlw7k07wb"
   ]

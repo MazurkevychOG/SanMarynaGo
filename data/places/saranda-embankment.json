@@ -1,6 +1,6 @@
 {
   "id": "saranda-embankment",
-  "order": 6,
+  "order": 28,
   "name": "Saranda Embankment",
   "lat": 39.8734834,
   "lng": 20.0104313,
@@ -44,8 +44,8 @@
       "srcSha256": "9a3cfa1e3b4a0450d1d386c5621f4b2052d0a706da242477ccd713a11867878a"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "near": "Gjashtë",
   "types": [
     "prohulyanka",

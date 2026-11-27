@@ -1,13 +1,13 @@
 {
   "id": "mrizi-i-pishave",
-  "order": 34,
+  "order": 11,
   "name": "Mrizi I pishave",
   "lat": 40.25362,
   "lng": 19.535055,
   "desc": "",
   "gmapsUrl": "https://maps.app.goo.gl/zBqpNTHnZfafqzYn6?g_st=ic",
   "near": "Dukat",
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "food",
     "nature",
@@ -26,7 +26,7 @@
       "srcSha256": "80c7b94ee45e97971f09d0218e539715ecb6e756262b3e026454a47eb76d0e81"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-27",
   "aliases": [
     "pmwhhnwivqojgf"
   ]

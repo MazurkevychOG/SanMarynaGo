@@ -1,10 +1,10 @@
 {
   "id": "footbridge-ura-e-walesatit-lepenice",
-  "order": 17,
+  "order": 9,
   "name": "Footbridge - Ura e Wałęsatit (Lepenice)",
   "lat": 40.3038256,
   "lng": 19.6524006,
-  "desc": "",
+  "desc": "[Alex · 2026-11-23 21:25]\nМіст сцикунів)",
   "gmapsUrl": "https://maps.app.goo.gl/LBBqH9Lq5wq3hKGv7?g_st=ic",
   "category": null,
   "media": [
@@ -17,8 +17,8 @@
       "bytes": 344214
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "near": "Lepenicë",
   "types": [
     "extreme"

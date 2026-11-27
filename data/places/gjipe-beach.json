@@ -1,6 +1,6 @@
 {
   "id": "gjipe-beach",
-  "order": 4,
+  "order": 19,
   "name": "Gjipe beach",
   "lat": 40.126937,
   "lng": 19.670437,
@@ -45,11 +45,11 @@
       "srcSha256": "a3400915fa291c9c24778e7e35052a70de5315ed6a1fd998981780fc41edf2b9"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-27",
   "aliases": [
     "pmvldpvf9d5399"
   ],
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "beach",
     "nature"

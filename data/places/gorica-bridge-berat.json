@@ -1,6 +1,6 @@
 {
   "id": "gorica-bridge-berat",
-  "order": 28,
+  "order": 23,
   "name": "Gorica Bridge (Berat)",
   "lat": 40.7032111,
   "lng": 19.9446481,
@@ -25,8 +25,8 @@
       "bytes": 101338
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "history"
   ],

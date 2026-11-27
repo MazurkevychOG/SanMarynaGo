@@ -38,11 +38,18 @@
     },
     {
       "id": "prohulyanka",
-      "name": "Walking"
+      "name": "Walking",
+      "icon": "📍"
     },
     {
       "id": "food",
-      "name": "Food"
+      "name": "Food",
+      "icon": "🍽️"
+    },
+    {
+      "id": "medicine",
+      "name": "Medicine",
+      "icon": "✚"
     }
   ]
 }

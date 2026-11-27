@@ -1,6 +1,6 @@
 {
   "id": "vjosa-albania-rafting-group-glamping",
-  "order": 19,
+  "order": 14,
   "name": "Vjosa Albania Rafting Group Glamping",
   "lat": 40.224062,
   "lng": 19.373812,
@@ -17,11 +17,11 @@
       "srcSha256": "175e2d63542470bfad42b4922805da0ec329db1bb1a5f2dd48b2069d1c6add60"
     }
   ],
-  "updated": "2026-11-18",
+  "updated": "2026-11-27",
   "aliases": [
     "pmvm4wjbiki5k7"
   ],
-  "country": "Shqipëri",
+  "country": "Albania",
   "types": [
     "extreme",
     "stay",

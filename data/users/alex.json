@@ -2,7 +2,7 @@
   "id": "alex",
   "name": "Alex",
   "cons": "10",
-  "price": "69",
+  "price": "71",
   "cur": "Lek",
   "routes": [
     {
@@ -20,28 +20,18 @@
       "dist": 576146.5,
       "dur": 40419,
       "est": false
-    },
-    {
-      "id": "mwjoaex618wx",
-      "name": "Trip 2026-11-16 20:31",
-      "ts": 1794858298892,
-      "ids": [],
-      "ret": false,
-      "dist": 5747.143127603189,
-      "dur": 787,
-      "est": false,
-      "trk": "tmwjnt9qi5fg"
     }
   ],
   "settings": {
     "theme": "dark",
     "fab": {
-      "fx": 0.9936,
-      "fy": 0.9263
+      "fx": 0.9817,
+      "fy": 0.9327
     }
   },
-  "updated": "2026-11-19",
+  "updated": "2026-11-27",
   "deletedRoutes": [
-    "mwgbbiu1wd8h"
+    "mwgbbiu1wd8h",
+    "mwjoaex618wx"
   ]
 }

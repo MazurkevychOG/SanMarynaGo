@@ -1,6 +1,6 @@
 {
   "id": "apollonia-pojan",
-  "order": 25,
+  "order": 16,
   "name": "Apollonia (Pojan)",
   "lat": 40.72134,
   "lng": 19.4710887,
@@ -34,8 +34,8 @@
       "srcSha256": "e6956d5ff63cbe4438d88aae659dd8676bcb1e3103fa4adfe4d82ea9e9e62224"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "history"
   ],

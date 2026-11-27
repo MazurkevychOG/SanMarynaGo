@@ -1,6 +1,6 @@
 {
   "id": "llogara-view-point",
-  "order": 18,
+  "order": 15,
   "name": "Llogora View point",
   "lat": 40.1894877,
   "lng": 19.6000919,
@@ -44,8 +44,8 @@
       "srcSha256": "addc91a520cc79891118a0cd150eec2ef523c8ca1d7bf78637786c506a89de80"
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "nature",
     "extreme"

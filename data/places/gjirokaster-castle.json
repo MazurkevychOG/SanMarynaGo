@@ -1,6 +1,6 @@
 {
   "id": "gjirokaster-castle",
-  "order": 20,
+  "order": 25,
   "name": "Фортеця Гірокастра (Gjirokastër Castle)",
   "lat": 40.0727906,
   "lng": 20.1392199,
@@ -17,8 +17,8 @@
       "bytes": 255894
     }
   ],
-  "updated": "2026-11-18",
-  "country": "Shqipëri",
+  "updated": "2026-11-27",
+  "country": "Albania",
   "types": [
     "history",
     "extreme",
