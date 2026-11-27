@@ -1,97 +1,105 @@
-// Service worker: офлайн-режим для SanMarynaGO.
-// Стратегія: сторінка й дані — «спершу мережа» (завжди свіже з GitHub), а коли інтернету немає — остання збережена копія.
-// Фото, бібліотека карти й плитки карти — «спершу кеш», щоб було швидко й працювало без мережі.
-const SHELL = 'sanmaryna-shell-v1', RUNTIME = 'sanmaryna-data-v1', TILES = 'sanmaryna-tiles-v1';
-const LEAFLET = [
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-    'https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js'
-];
-const MEDIA_RE = /\.(webp|jpe?g|png|gif|mp4|webm|mov)$/i;
-const MAX_TILES = 600;
+/* SanMarynaGO — service worker
+ *
+ *  • index.html (the program) is served from the saved copy and is replaced ONLY when the page asks for it
+ *    (the «Update Software» button sends {type:'refresh-app'}). Opening the site never changes the program.
+ *  • data (data/…), photos and other files of the site: the network first (fresh), the saved copy when there is no internet.
+ *  • map tiles and CDN files (Leaflet…): the saved copy first, refreshed in the background.
+ *  • the check «is there a new version?» (index.html?_=…) always goes to the network, it is never cached.
+ */
+const APP_CACHE = 'smg-app-v1';        // index.html (the program)
+const DATA_CACHE = 'smg-data-v1';      // data, photos, other files of the site
+const TILE_CACHE = 'smg-tiles-v1';     // map tiles (images of other sites)
+const CDN_CACHE = 'smg-cdn-v1';        // scripts / styles of other sites
+const TILE_LIMIT = 3000;
+const INDEX_URL = new URL('index.html', self.registration.scope).href;
 
-self.addEventListener('install', e => {
-    e.waitUntil((async () => {
-        const c = await caches.open(SHELL);
-        const own = ['./', 'index.html', 'apple-touch-icon.png'].map(u => fetch(u, { cache: 'reload' }).then(r => { if (r.ok) return c.put(u, r); }).catch(() => { }));
-        const libs = LEAFLET.map(u => fetch(u, { mode: 'cors', credentials: 'omit' }).then(r => { if (r.ok) return c.put(u, r); }).catch(() => { }));
-        await Promise.all([...own, ...libs]);
+self.addEventListener('install', event => {
+    event.waitUntil((async () => {
+        const c = await caches.open(APP_CACHE);
+        if (!(await c.match(INDEX_URL))) {                  // the very first install: remember the current program once
+            try { await c.put(INDEX_URL, await fetch(new Request(INDEX_URL, { cache: 'reload' }))); } catch (e) { }
+        }
         await self.skipWaiting();
     })());
 });
 
-self.addEventListener('activate', e => {
-    e.waitUntil((async () => {
-        const keep = [SHELL, RUNTIME, TILES];
-        for (const k of await caches.keys()) if (!keep.includes(k)) await caches.delete(k);
+self.addEventListener('activate', event => {
+    event.waitUntil((async () => {
+        const keep = [APP_CACHE, DATA_CACHE, TILE_CACHE, CDN_CACHE];
+        for (const k of await caches.keys()) if (k.startsWith('smg-') && !keep.includes(k)) await caches.delete(k);
         await self.clients.claim();
     })());
 });
 
-self.addEventListener('fetch', e => {
-    const req = e.request;
-    if (req.method !== 'GET') return;
-    const url = new URL(req.url);
-    if (url.searchParams.has('_')) return;                         // службові перевірки версії йдуть напряму в мережу
-    if (req.mode === 'navigate') { e.respondWith(navigate(req, url)); return; }
-    if (url.origin === location.origin) {
-        e.respondWith(MEDIA_RE.test(url.pathname) ? cacheFirst(req, RUNTIME) : networkFirst(req, RUNTIME));
-        return;
+self.addEventListener('message', event => {
+    const d = event.data || {}, port = event.ports && event.ports[0];
+    if (d.type === 'ping') { if (port) port.postMessage({ pong: true, version: 1 }); return; }
+    if (d.type === 'refresh-app') {                         // «Update Software»: download the new index.html and keep it
+        event.waitUntil((async () => {
+            let ok = false;
+            try {
+                const r = await fetch(new Request(INDEX_URL + '?_=' + Date.now(), { cache: 'reload' }));
+                if (r.ok) { const c = await caches.open(APP_CACHE); await c.put(INDEX_URL, r); ok = true; }
+            } catch (e) { }
+            if (port) port.postMessage({ ok });
+        })());
     }
-    if (url.hostname === 'unpkg.com') { e.respondWith(cacheFirst(new Request(req.url, { mode: 'cors', credentials: 'omit' }), SHELL)); return; }
-    if (/(^|\.)arcgisonline\.com$|(^|\.)tile\.openstreetmap\.org$/.test(url.hostname)) { e.respondWith(tile(req)); return; }
 });
 
-async function navigate(req, url) {
-    const cache = await caches.open(SHELL), key = url.origin + url.pathname;
-    try {
-        const r = await fetch(req.url.split('#')[0], { cache: 'no-store', redirect: 'manual' });
-        if (r.type === 'opaqueredirect') return r;
-        if (r.ok) { cache.put(key, r.clone()); return r; }
-        return (await cache.match(key)) || r;
-    } catch (err) {
-        return (await cache.match(key)) || (await cache.match(self.registration.scope)) ||
-            (await cache.match(self.registration.scope + 'index.html')) || Response.error();
-    }
+async function trim(cacheName, limit) {
+    const c = await caches.open(cacheName), keys = await c.keys();
+    for (let i = 0; i < keys.length - limit; i++) await c.delete(keys[i]);
 }
 
-async function networkFirst(req, name) {
-    const cache = await caches.open(name);
-    try {
-        const r = await fetch(req);
-        if (r && r.status === 200) cache.put(req, r.clone());
-        return r;
-    } catch (err) {
-        const hit = await cache.match(req, { ignoreSearch: true });
-        return hit || Response.error();
-    }
-}
-
-async function cacheFirst(req, name) {
-    const cache = await caches.open(name);
-    const hit = await cache.match(req);
+async function appShell(request) {
+    const c = await caches.open(APP_CACHE);
+    const hit = await c.match(INDEX_URL, { ignoreSearch: true });
     if (hit) return hit;
-    try {
-        const r = await fetch(req);
-        if (r && (r.status === 200 || r.type === 'opaque')) cache.put(req, r.clone());
+    try {                                                   // nothing saved yet (should not happen): take the network and save it
+        const r = await fetch(new Request(INDEX_URL, { cache: 'reload' }));
+        if (r.ok) c.put(INDEX_URL, r.clone());
         return r;
-    } catch (err) { return Response.error(); }
+    } catch (e) { return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } }); }
 }
 
-async function tile(req) {
-    const cache = await caches.open(TILES);
-    const hit = await cache.match(req.url);
-    if (hit) return hit;
+async function networkFirst(request) {
+    const c = await caches.open(DATA_CACHE);
     try {
-        const r = await fetch(req.url, { mode: 'cors', credentials: 'omit' });   // не «opaque», щоб не роздувати квоту
-        if (r.ok) { cache.put(req.url, r.clone()); if (Math.random() < 0.05) trim(cache); }
+        const r = await fetch(request, { cache: 'no-cache' });
+        if (r && r.ok && r.status === 200) c.put(request, r.clone());
         return r;
-    } catch (err) {
-        try { return await fetch(req); } catch (e2) { return Response.error(); }
+    } catch (e) {
+        const hit = await c.match(request, { ignoreSearch: false });
+        if (hit) return hit;
+        throw e;
     }
 }
 
-async function trim(cache) {
-    const keys = await cache.keys();
-    for (let i = 0; i < keys.length - MAX_TILES; i++) await cache.delete(keys[i]);
+async function staleWhileRevalidate(request, cacheName, limit) {
+    const c = await caches.open(cacheName);
+    const hit = await c.match(request);
+    const net = fetch(request).then(r => {
+        if (r && (r.ok || r.type === 'opaque')) { c.put(request, r.clone()); if (limit) trim(cacheName, limit); }
+        return r;
+    }).catch(() => null);
+    return hit || (await net) || new Response('', { status: 504 });
 }
+
+self.addEventListener('fetch', event => {
+    const req = event.request;
+    if (req.method !== 'GET' || req.headers.has('range')) return;
+    const url = new URL(req.url);
+    if (url.origin === self.location.origin) {
+        if (url.pathname.endsWith('/sw.js')) return;
+        const isIndex = req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('/index.html');
+        if (isIndex) {
+            if (url.searchParams.has('_')) return;          // «is there a new version?» → straight to the network
+            event.respondWith(appShell(req));
+            return;
+        }
+        event.respondWith(networkFirst(req));
+        return;
+    }
+    if (req.destination === 'image') { event.respondWith(staleWhileRevalidate(req, TILE_CACHE, TILE_LIMIT)); return; }
+    if (req.destination === 'script' || req.destination === 'style' || req.destination === 'font') { event.respondWith(staleWhileRevalidate(req, CDN_CACHE, 200)); return; }
+});

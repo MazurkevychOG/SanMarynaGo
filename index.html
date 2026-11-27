@@ -4900,6 +4900,7 @@
             }
             if (prev !== h) {
                 if (!manual) { setAppUpdate(true); return false; }    // only a hint
+                if (!(await refreshSwCache())) { toast('Could not download the new version — try again'); return false; }
                 try { localStorage.setItem(APP_HASH_KEY, h); localStorage.setItem(VER_KEY, String(Date.now())); } catch (e) { }
                 setAppUpdate(false);
                 toast('New version found — updating…');
@@ -4909,6 +4910,23 @@
             setAppUpdate(false); if (manual) toast('Software is up to date');
         } catch (e) { if (manual) toast('No connection — using local version'); }
         return false;
+    }
+    // With the service worker sw.js the program is served from a saved copy; «Update Software» asks the worker to download the new index.html and keep it.
+    // An old sw.js (network first) does not know this message: then the page is simply reloaded as before.
+    function refreshSwCache() {
+        return new Promise(resolve => {
+            const ctl = ('serviceWorker' in navigator) && navigator.serviceWorker.controller;
+            if (!ctl) { resolve(true); return; }
+            const ping = new MessageChannel(); let answered = false;
+            const legacy = setTimeout(() => { if (!answered) resolve(true); }, 900);                 // no answer = an old worker
+            ping.port1.onmessage = () => {
+                answered = true; clearTimeout(legacy);
+                const ch = new MessageChannel(), limit = setTimeout(() => resolve(false), 25000);
+                ch.port1.onmessage = e => { clearTimeout(limit); resolve(!!(e.data && e.data.ok)); };
+                ctl.postMessage({ type: 'refresh-app' }, [ch.port2]);
+            };
+            ctl.postMessage({ type: 'ping' }, [ping.port2]);
+        });
     }
     let _runSw = false;
     async function runSoftwareUpdate() {
