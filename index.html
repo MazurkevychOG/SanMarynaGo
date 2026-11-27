@@ -3904,10 +3904,12 @@
             dirty: true,
             types: formTypes.filter(id => typeDefs.some(t => t.id === id)),
             aliases: old ? [...(old.aliases || [])] : [],
+            owner: old ? old.owner : myName(),                    // who created the card
             near: old ? (old.coords === coords ? old.near : undefined) : opts.near,   // нові/змінені координати — шукаємо селище заново
             country: (document.getElementById('placeCountry').value.trim()) || (old ? (old.coords === coords ? old.country : undefined) : opts.country)
         };
         if (data.country === undefined) delete data.country;
+        if (!data.owner) delete data.owner;
         if (old) (old.media || []).forEach(m => { if (typeof m.data === 'string' && m.data.startsWith(DATA_BASE) && !data.media.some(x => x.data === m.data)) logDeleted('photo', old.id, m.data); });   // a catalog photo removed by the user
         if (old) places[Number(eIdx)] = data;
         else {
@@ -3923,6 +3925,7 @@
     function handleEdit(i) {
         finishPendingClose();
         const p = places[i];
+        if (p && !canEditCard(p)) { toast('Only the owner of the card and Alex can edit it'); return; }
         document.getElementById('placeName').value = p.name;
         document.getElementById('placeCoords').value = p.coords;
         document.getElementById('placeDesc').value = '';
@@ -4236,8 +4239,13 @@
 
     // ===== The full-screen card: a tap on the card (not on the map link, a review or the photo) opens it =====
     let cvId = null, cvEdit = false, cvMedia = 0, cvTypes = [], cvMediaEdit = [];
-    function canEditCard() {                                 // Alex and a user without a name (the owner of this device) edit cards; other named users only write their own reviews
-        try { return isOwner() || !String(curRec().name || '').trim(); } catch (e) { return true; }
+    // A card is edited / deleted by its owner (who created it) and by Alex. Old cards without an owner: Alex and the user without a name (the owner of this device), as before.
+    function canEditCard(p) {
+        try {
+            if (isOwner()) return true;
+            if (!p || !p.owner) return !String(curRec().name || '').trim();
+            return String(p.owner).trim().toLowerCase() === myName().toLowerCase();
+        } catch (e) { return true; }
     }
     function openCardView(i) { const p = places[i]; if (!p) return; cvId = p.id; cvEdit = false; cvMedia = 0; cvMediaEdit = []; cvTypes = [...(p.types || [])]; document.body.classList.add('card-open'); renderCardView(); }
     function closeCardView() { cvId = null; cvEdit = false; document.body.classList.remove('card-open'); const el = document.getElementById('cardView'); if (el) el.remove(); }
@@ -4245,7 +4253,7 @@
         if (cvId === null) return;
         const i = places.findIndex(x => x.id === cvId), p = places[i];
         if (!p) { closeCardView(); return; }
-        const can = canEditCard(), ro = (cvEdit && can) ? '' : ' readonly';
+        const can = canEditCard(p), ro = (cvEdit && can) ? '' : ' readonly';
         const editing = cvEdit && can;
         const media = editing ? cvMediaEdit : (p.media || []), n = media.length;
         if (cvMedia >= n) cvMedia = Math.max(0, n - 1);
@@ -4276,11 +4284,12 @@
               `<a class="cv-open" href="${esc(gUrl(p))}" target="_blank" rel="noopener">📍 Open in Google Maps</a>` +
               (editing ? `<div class="cv-sec">Photos / videos — max 5 MB</div><input class="cv-file" id="cvFiles" type="file" accept="image/*,video/*" multiple><div class="cv-media" id="cvMediaEdit"></div>` : '') +
               `<div class="cv-sec">Reviews</div>${reviewsHtml(p, can && !cvEdit)}` +
-              (can ? '' : '<div class="cv-note">View only: you can add your own reviews. Cards are edited by Alex.</div>') +
+              (p.owner ? `<div class="cv-note">Owner: ${esc(p.owner)}</div>` : '') +
+              (can ? '' : '<div class="cv-note">View only: you can add your own reviews. A card is edited by its owner and by Alex.</div>') +
             `</div>` +
             `<div class="cv-bar">` +
-              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-save">Save</button><button type="button" class="cv-close">✕ Close</button>'
-                : (can ? '<button type="button" class="cv-del" aria-label="Delete" title="Delete">🗑</button><button type="button" class="cv-edit">✎ Edit</button><button type="button" class="cv-close">✕ Close</button>' : '<button type="button" class="cv-close">✕ Close</button>')) +
+              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-save">Save</button><button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>'
+                : (can ? '<button type="button" class="cv-del" aria-label="Delete" title="Delete">🗑</button><button type="button" class="cv-edit">✎ Edit</button><button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>' : '<button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>')) +
             `</div>`;
         const body = el.querySelector('.cv-body'); if (body) body.scrollTop = scroll;
         const v = el.querySelector('.cv-photo video'); if (v) v.addEventListener('click', e => e.stopPropagation());
@@ -4384,6 +4393,7 @@
     async function handleDelete(i) {
         const p = places[i];
         if (!p) return;
+        if (!canEditCard(p)) { toast('Only the owner of the card and Alex can delete it'); return; }
         const ok = await confirmDialog('Delete place?', '«' + p.name + '» will be deleted with all photos and videos.', 'Delete');
         if (!ok) return;
         const ed = document.getElementById('editIndex').value;
@@ -5790,7 +5800,7 @@
             _lastExportReport = missing.map(p => ({ id: p.id, name: p.name, fields: diffFields(p) }));
             console.info('Export: places that differ from GitHub →', Object.fromEntries(missing.map(p => [p.name, diffFields(p).join(', ')])));
             for (const p of missing) {
-                const base = { id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...((p.aliases || []).length ? { aliases: p.aliases } : {}) };
+                const base = { id: p.id, order: places.indexOf(p) + 1, name: p.name, coords: p.coords, desc: p.desc || '', gmapsUrl: p.gmapsUrl || '', ...(p.near ? { near: p.near } : {}), ...(p.country ? { country: p.country } : {}), types: p.types || [], ...(p.owner ? { owner: p.owner } : {}), ...((p.aliases || []).length ? { aliases: p.aliases } : {}) };
                 let used = JSON.stringify({ ...base, media: [] }).length;
                 const media = [];
                 for (const m of p.media) {
@@ -5961,6 +5971,7 @@
                 ...(p.country ? { country: String(p.country).trim() } : {}),
                 types: Array.isArray(p.types) ? p.types.map(String) : [],
                 aliases: Array.isArray(p.aliases) ? p.aliases.map(String).slice(0, 8) : [],
+                ...(p.owner ? { owner: String(p.owner).trim() } : {}),
                 ...(Number.isFinite(Number(p.order)) && p.order !== null && p.order !== '' ? { order: Number(p.order) } : {}),
                 selected: !!p.selected,
                 media
@@ -7793,6 +7804,7 @@
             ...((c.near || near[c.id]) ? { near: c.near || near[c.id] } : {}),
             ...((c.country || ctry[c.id] !== undefined) ? { country: c.country || ctry[c.id] } : {}),
             types: Array.isArray(c.types) ? c.types.slice() : [], aliases: Array.isArray(c.aliases) ? c.aliases.slice() : [],
+            ...(c.owner ? { owner: String(c.owner) } : {}),
             media: (c.media || []).map(m => ({ type: m.type === 'video' ? (m.mime || 'video/mp4') : 'image/webp', data: DATA_BASE + m.file, ...(m.thumb ? { thumb: DATA_BASE + m.thumb } : {}) })),
             selected: false, dirty: false
         }));
