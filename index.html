@@ -54,7 +54,7 @@
         #cardView { position: fixed; inset: 0; z-index: 3400; background: #fff; display: flex; flex-direction: column; color: #2d3748; }
         body.card-open { overflow: hidden; }
         body.card-open #altBar, body.card-open .fab-add { display: none !important; }
-        .cv-photo { flex: 0 0 46%; min-height: 0; position: relative; background: #0f1319; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+        .cv-photo { flex: 0 0 39.1%; min-height: 0; position: relative; background: #0f1319; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
         .cv-photo img, .cv-photo video { width: 100%; height: 100%; object-fit: contain; display: block; }
         .cv-none { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6b7a90; font-size: 15px; gap: 8px; }
         .cv-none b { font-size: 54px; font-weight: 400; }
@@ -63,7 +63,7 @@
         .cv-nav.l { left: 0; border-radius: 0 10px 10px 0; } .cv-nav.r { right: 0; border-radius: 10px 0 0 10px; }
         .cv-count { position: absolute; right: 10px; bottom: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 3px 9px; border-radius: 12px; z-index: 2; }
         .cv-zoom { position: absolute; left: 10px; bottom: 10px; background: rgba(0,0,0,.6); color: #fff; font-size: 13px; padding: 3px 9px; border-radius: 12px; border: 0; z-index: 2; cursor: pointer; }
-        .cv-body { flex: 1 1 54%; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 12px; }
+        .cv-body { flex: 1 1 60.9%; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 12px; }
         .cv-head { display: flex; align-items: center; gap: 4px; }
         .cv-title { margin: 0; font-size: 24px; line-height: 1.2; overflow-wrap: anywhere; }
         .cv-near { margin: 6px 0 4px; font-size: 18px; color: #5a7184; }
@@ -77,6 +77,10 @@
         .cv-in:not([readonly]) { border-color: #4285F4; background: #fff; box-shadow: 0 0 0 2px rgba(66,133,244,.18); }
         .cv-open { display: inline-block; margin: 10px 0 2px; color: #4285F4; text-decoration: none; font-weight: 600; font-size: 15px; }
         .cv-sec { margin: 14px 0 4px; font-size: 14px; font-weight: 700; color: #5a7184; text-transform: uppercase; letter-spacing: .04em; }
+        .cv-media { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 2px; }
+        .cv-media .media-item-edit { width: 72px; height: 72px; }
+        .cv-media .del-media { width: 20px; height: 20px; font-size: 11px; }
+        .cv-file { width: 100%; box-sizing: border-box; font-size: 14px; }
         .cv-note { margin: 10px 0; font-size: 13px; color: #8a98ab; }
         .cv-bar { flex: 0 0 auto; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #e2e8f0; background: #fff; }
         .cv-bar button { flex: 1; font: inherit; font-size: 16px; font-weight: 600; padding: 12px 10px; border: 0; border-radius: 12px; cursor: pointer; background: #edf2f7; color: #2d3748; }
@@ -303,7 +307,7 @@
         .rv-box textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px; padding: 8px; border: 1px solid #cbd5e0; border-radius: 8px; resize: vertical; }
         .rv-who { font-size: 14px; color: #718096; }
         .rv-btns { display: flex; gap: 8px; justify-content: flex-end; }
-        .rv-btns button { font: inherit; padding: 8px 16px; border-radius: 10px; border: 0; cursor: pointer; background: #edf2f7; }
+        .rv-btns button { font: inherit; padding: 8px 16px; border-radius: 10px; border: 0; cursor: pointer; background: #edf2f7; color: #2d3748; }
         .rv-btns .rv-save { background: #4285F4; color: #fff; }
         html[data-theme="dark"] .rv { background: #232b38; }
         html[data-theme="dark"] .rv-t, html[data-theme="dark"] .rv-h b { color: #e2e8f0; }
@@ -4229,20 +4233,21 @@
     }
 
     // ===== The full-screen card: a tap on the card (not on the map link, a review or the photo) opens it =====
-    let cvId = null, cvEdit = false, cvMedia = 0, cvTypes = [];
+    let cvId = null, cvEdit = false, cvMedia = 0, cvTypes = [], cvMediaEdit = [];
     function canEditCard() {                                 // Alex and a user without a name (the owner of this device) edit cards; other named users only write their own reviews
         try { return isOwner() || !String(curRec().name || '').trim(); } catch (e) { return true; }
     }
-    function openCardView(i) { const p = places[i]; if (!p) return; cvId = p.id; cvEdit = false; cvMedia = 0; cvTypes = [...(p.types || [])]; document.body.classList.add('card-open'); renderCardView(); }
+    function openCardView(i) { const p = places[i]; if (!p) return; cvId = p.id; cvEdit = false; cvMedia = 0; cvMediaEdit = []; cvTypes = [...(p.types || [])]; document.body.classList.add('card-open'); renderCardView(); }
     function closeCardView() { cvId = null; cvEdit = false; document.body.classList.remove('card-open'); const el = document.getElementById('cardView'); if (el) el.remove(); }
     function renderCardView() {
         if (cvId === null) return;
         const i = places.findIndex(x => x.id === cvId), p = places[i];
         if (!p) { closeCardView(); return; }
         const can = canEditCard(), ro = (cvEdit && can) ? '' : ' readonly';
-        const media = p.media || [], n = media.length;
+        const editing = cvEdit && can;
+        const media = editing ? cvMediaEdit : (p.media || []), n = media.length;
         if (cvMedia >= n) cvMedia = Math.max(0, n - 1);
-        const m = media[cvMedia];
+        const m = media[cvMedia] || {};
         let photo;
         if (!n) photo = '<div class="cv-none"><b>🖼</b>No photos</div>';
         else photo = ((m.type || '').startsWith('video/') ? `<video src="${esc(m.data)}" controls playsinline></video>` : `<img src="${esc(m.data)}" alt="" draggable="false">`) +
@@ -4262,20 +4267,65 @@
               `<div class="cv-head">${url ? `<a href="${esc(url)}" target="_blank" rel="noopener" class="gm-chain-link" title="Google Maps">🔗</a>` : ''}<h2 class="cv-title">${esc(p.name)}</h2></div>` +
               `<div class="cv-near">${nearHtml(p)}</div>` +
               `<div class="cv-types">${chips}</div>` +
-              `<label class="cv-lbl" for="cvName">Name</label><input class="cv-in" id="cvName" type="text" value="${esc(cvEdit && keep.name !== undefined ? keep.name : p.name)}"${ro}>` +
-              `<label class="cv-lbl" for="cvCoords">Coordinates</label><input class="cv-in" id="cvCoords" type="text" value="${esc(cvEdit && keep.coords !== undefined ? keep.coords : p.coords)}"${ro}>` +
-              `<label class="cv-lbl" for="cvUrl">Google Maps link</label><input class="cv-in" id="cvUrl" type="text" value="${esc(cvEdit && keep.url !== undefined ? keep.url : (p.gmapsUrl || ''))}"${ro} placeholder="${cvEdit ? 'https://maps.app.goo.gl/…' : '—'}">` +
+              `<label class="cv-lbl" for="cvName">Name</label>${cvFld('<input class="cv-in" id="cvName" type="text" value="' + esc(cvEdit && keep.name !== undefined ? keep.name : p.name) + '"' + ro + '>', editing)}` +
+              `<label class="cv-lbl" for="cvCoords">Coordinates</label>${cvFld('<input class="cv-in" id="cvCoords" type="text" value="' + esc(cvEdit && keep.coords !== undefined ? keep.coords : p.coords) + '"' + ro + '>', editing)}` +
+              `<label class="cv-lbl" for="cvUrl">Google Maps link</label>${cvFld('<input class="cv-in" id="cvUrl" type="text" value="' + esc(cvEdit && keep.url !== undefined ? keep.url : (p.gmapsUrl || '')) + '"' + ro + ' placeholder="' + (cvEdit ? 'https://maps.app.goo.gl/…' : '—') + '">', editing)}` +
               `<label class="cv-lbl">Country</label><input class="cv-in" type="text" value="${esc(p.country || '')}" readonly>` +
               `<a class="cv-open" href="${esc(gUrl(p))}" target="_blank" rel="noopener">📍 Open in Google Maps</a>` +
-              `<div class="cv-sec">Reviews</div>${reviewsHtml(p)}` +
-              (can ? (cvEdit ? '<div class="cv-note">Photos and videos are changed in the full form («Photos…»).</div>' : '') : '<div class="cv-note">View only: you can add your own reviews. Cards are edited by Alex.</div>') +
+              (editing ? `<div class="cv-sec">Photos / videos — max 5 MB</div><input class="cv-file" id="cvFiles" type="file" accept="image/*,video/*" multiple><div class="cv-media" id="cvMediaEdit"></div>` : '') +
+              `<div class="cv-sec">Reviews</div>${reviewsHtml(p, can && !cvEdit)}` +
+              (can ? '' : '<div class="cv-note">View only: you can add your own reviews. Cards are edited by Alex.</div>') +
             `</div>` +
             `<div class="cv-bar">` +
-              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-photos">Photos…</button><button type="button" class="cv-save">Save</button>'
+              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-save">Save</button>'
                 : (can ? '<button type="button" class="cv-edit">✎ Edit</button><button type="button" class="cv-del">🗑 Delete</button>' : '<button type="button" class="cv-close">Close</button>')) +
             `</div>`;
         const body = el.querySelector('.cv-body'); if (body) body.scrollTop = scroll;
         const v = el.querySelector('.cv-photo video'); if (v) v.addEventListener('click', e => e.stopPropagation());
+        if (editing) cvBindEdit(el);
+    }
+    function cvFld(inputHtml, editing) {                     // in edit mode every cell gets its own «✕» that erases the whole cell
+        return editing ? `<div class="fld-wrap">${inputHtml}<button type="button" class="fld-clear cv-clear" aria-label="Clear this field" title="Clear">✕</button></div>` : inputHtml;
+    }
+    function cvBindEdit(el) {
+        el.querySelectorAll('.fld-wrap').forEach(w => {
+            const inp = w.querySelector('input'), b = w.querySelector('.cv-clear'); if (!inp || !b) return;
+            const sync = () => { b.hidden = !inp.value.length; };
+            sync(); inp.addEventListener('input', sync);
+            b.addEventListener('pointerdown', e => e.preventDefault());
+            b.addEventListener('click', e => { e.stopPropagation(); inp.value = ''; sync(); inp.focus(); });
+        });
+        const f = el.querySelector('#cvFiles'); if (f) f.addEventListener('change', () => cvFileSelect(f));
+        const area = el.querySelector('#cvMediaEdit'); if (!area) return;
+        cvMediaEdit.forEach((m, idx) => {
+            const div = document.createElement('div'); div.className = 'media-item-edit';
+            div.innerHTML = ((m.type || '').startsWith('video/')
+                ? '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;background:#eee;">🎞</div>'
+                : `<img src="${esc(m.data)}">`) + `<button type="button" class="del-media" data-i="${idx}">✕</button>`;
+            div.querySelector('.del-media').addEventListener('click', e => { e.stopPropagation(); cvMediaEdit.splice(idx, 1); if (cvMedia >= cvMediaEdit.length) cvMedia = Math.max(0, cvMediaEdit.length - 1); renderCardView(); });
+            div.addEventListener('pointerdown', ev => startReorder(ev, div, () => Array.from(area.children),
+                (from, to) => { const mv = cvMediaEdit.splice(from, 1)[0]; cvMediaEdit.splice(to, 0, mv); renderCardView(); },
+                { grid: true, ghost: mediaGhost }));
+            div.addEventListener('click', () => { cvMedia = idx; renderCardView(); });
+            area.appendChild(div);
+        });
+    }
+    async function cvFileSelect(input) {                     // same rules as the old form: images >5 MB / HEIC → JPEG, videos ≤5 MB
+        const files = Array.from(input.files); input.value = '';
+        for (const f of files) {
+            try {
+                const isImg = f.type.startsWith('image/') || (!f.type && /\.(heic|heif|jpe?g|png|webp|gif|avif)$/i.test(f.name));
+                if (isImg) {
+                    let data = await readFileAsDataURL(f), type = f.type;
+                    if (decodedBytes(data) > MAX_BYTES || !['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(type)) { data = await shrinkImage(data, MAX_BYTES); type = 'image/jpeg'; }
+                    cvMediaEdit.push({ type, data, ...(await thumbExtra(type, data)) });
+                } else if (f.type.startsWith('video/')) {
+                    if (f.size > MAX_BYTES) { alert('Video "' + f.name + '" over 5 MB — cannot compress in browser, skipped.'); continue; }
+                    cvMediaEdit.push({ type: f.type, data: await readFileAsDataURL(f) });
+                } else { alert('File "' + f.name + '" has unsupported type.'); continue; }
+                cvMedia = cvMediaEdit.length - 1; renderCardView();
+            } catch (err) { console.error('File add error:', err); alert('Could not add file: ' + (f.name || '') + ' (' + err.message + ').'); }
+        }
     }
     function cvStep(d) { const p = places.find(x => x.id === cvId); if (!p || !p.media || p.media.length < 2) return; cvMedia = (cvMedia + d + p.media.length) % p.media.length; renderCardView(); }
     async function cvSave() {
@@ -4284,11 +4334,12 @@
         if (!name) { toast('The name is empty'); return; }
         if (!parseCoordsDetailed(coords)) { toast('Coordinates are not recognized'); return; }
         handleEdit(i);                                        // the proven save pipeline: fill the form, then save it (checks, country, town, duplicates…)
+        currentEditMedia = [...cvMediaEdit];                  // photos edited on the card
         document.getElementById('placeName').value = name; document.getElementById('placeCoords').value = coords; document.getElementById('placeGmapsUrl').value = url;
         formTypes = [...cvTypes];
         handleSave();
         if (document.body.classList.contains('form-open') && document.getElementById('editIndex').value !== '') { try { closeFormDissolve(); } catch (e) { } toast('Could not save — check the name, coordinates and the link'); return; }
-        cvEdit = false; renderCardView();
+        cvEdit = false; cvMediaEdit = []; cvMedia = 0; renderCardView();
     }
     document.addEventListener('click', e => {
         const t = e.target; if (!t || !t.closest) return;
@@ -4297,10 +4348,9 @@
             if (t.closest('.cv-x, .cv-close')) { closeCardView(); return; }
             const nav = t.closest('.cv-nav'); if (nav) { cvStep(Number(nav.dataset.d)); return; }
             if (t.closest('.cv-zoom')) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { openGallery(i); currentGalleryIndex = cvMedia; showCurrentMedia(); } return; }
-            if (t.closest('.cv-edit')) { cvEdit = true; cvTypes = [...((places.find(x => x.id === cvId) || {}).types || [])]; renderCardView(); return; }
-            if (t.closest('.cv-cancel')) { cvEdit = false; renderCardView(); return; }
+            if (t.closest('.cv-edit')) { const pe = places.find(x => x.id === cvId) || {}; cvEdit = true; cvTypes = [...(pe.types || [])]; cvMediaEdit = [...(pe.media || [])]; renderCardView(); return; }
+            if (t.closest('.cv-cancel')) { cvEdit = false; cvMediaEdit = []; cvMedia = 0; renderCardView(); return; }
             if (t.closest('.cv-save')) { cvSave(); return; }
-            if (t.closest('.cv-photos')) { const i = places.findIndex(x => x.id === cvId); if (i >= 0) { closeCardView(); handleEdit(i); } return; }
             if (t.closest('.cv-del')) { (async () => { const i = places.findIndex(x => x.id === cvId); if (i < 0) return; await handleDelete(i); if (!places.some(x => x.id === cvId)) closeCardView(); })(); return; }
             const tb = t.closest('.cv-types button[data-t]'); if (tb) { const id = tb.dataset.t; cvTypes = cvTypes.includes(id) ? cvTypes.filter(x => x !== id) : [...cvTypes, id]; renderCardView(); return; }
             return;
@@ -5455,16 +5505,16 @@
         const n = parseReviews(p.desc).length;
         return `<button type="button" class="rv-toggle${_rvOpen.has(p.id) ? ' on' : ''}" data-pid="${esc(p.id)}" title="Reviews">${n ? '💬 ' + n : '＋ Review'}</button>`;
     }
-    function reviewsHtml(p) {                                // the opened history (under the photo): who, when, text; ✎ / ✕ only where allowed
+    function reviewsHtml(p, readOnly) {                      // the opened history (under the photo): who, when, text; ✎ / ✕ only where allowed (readOnly: text only)
         const list = parseReviews(p.desc);
         let h = '<div class="cell-rv">';
         list.forEach((r, i) => {
-            const can = canEditReview(r);
+            const can = !readOnly && canEditReview(r);
             h += `<div class="rv"><div class="rv-h"><b>${esc(r.author)}</b><span>${esc(rvDate(r))}</span><span class="rv-sp"></span>` +
                 (can ? `<button type="button" class="rv-b rv-edit" data-pid="${esc(p.id)}" data-i="${i}" title="Edit">✎</button><button type="button" class="rv-b rv-del" data-pid="${esc(p.id)}" data-i="${i}" title="Delete">✕</button>` : '') +
                 `</div><div class="rv-t">${esc(r.text)}</div></div>`;
         });
-        return h + `<button type="button" class="rv-add" data-pid="${esc(p.id)}">＋ Review</button></div>`;
+        return h + (readOnly ? '' : `<button type="button" class="rv-add" data-pid="${esc(p.id)}">＋ Review</button>`) + '</div>';
     }
     function refreshReviewRow(pid) {                         // only this card is redrawn (the list does not jump)
         const p = places.find(x => x.id === pid), row = [...document.querySelectorAll('#placesTable .place-row')].find(r => r.dataset.id === pid);
