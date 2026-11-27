@@ -5509,9 +5509,9 @@
     function distText(p) {                                    // straight-line distance from the current place (GPS or the last known position)
         let ref = null; try { ref = sortRef(); } catch (e) { }
         const c = parseCoords(p.coords); if (!ref || !c) return '';
-        const m = haversine(ref, c);
-        return m < 1000 ? Math.round(m < 100 ? m : m / 10) * (m < 100 ? 1 : 10) + ' m' : (m < 10000 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km';
+        return fmtDist(haversine(ref, c));
     }
+    function fmtDist(m) { return m < 1000 ? Math.round(m < 100 ? m : m / 10) * (m < 100 ? 1 : 10) + ' m' : (m < 10000 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km'; }
     // Card line: 📍 town · (modern alloy wheel) distance · ⛰ height. Every unit is "no-wrap": an icon is never separated from its number —
     // when the line is too narrow the whole unit (icon + number) moves to the next line.
     const WHEEL_SVG = '<svg class="wheel" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3.4"/><circle cx="12" cy="12" r="6.9" fill="none" stroke="currentColor" stroke-width="1"/><path d="M10.9 9.7L11.1 5.5M13.1 9.7L12.9 5.5M13.9 10.2L17.9 9.1M14.6 12.4L18.5 10.9M14.3 13.2L16.6 16.7M12.5 14.6L15.1 17.8M11.5 14.6L8.9 17.8M9.7 13.2L7.4 16.7M9.4 12.4L5.5 10.9M10.1 10.2L6.1 9.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/></svg>';
@@ -5612,14 +5612,20 @@
 
     // ===== Travel time by car from the current place (OSRM table, one request for all cards; estimate if offline) =====
     const DRIVE_KEY = 'mymaps_drive', TABLE_SERVERS = ['https://routing.openstreetmap.de/routed-car/table/v1/driving/', 'https://router.project-osrm.org/table/v1/driving/'];
-    let driveMap = new Map(), driveEst = new Set(), driveOrigin = null, driveAt = 0, driveBusy = false, driveFailAt = 0;
-    try { const c = JSON.parse(localStorage.getItem(DRIVE_KEY) || 'null'); if (c && c.o && c.d) { driveOrigin = c.o; driveAt = c.t || 0; Object.entries(c.d).forEach(([k, v]) => driveMap.set(k, v)); } } catch (e) { }
+    let driveMap = new Map(), driveDist = new Map(), driveEst = new Set(), driveOrigin = null, driveAt = 0, driveBusy = false, driveFailAt = 0;
+    try { const c = JSON.parse(localStorage.getItem(DRIVE_KEY) || 'null'); if (c && c.o && c.d) { driveOrigin = c.o; driveAt = c.t || 0; Object.entries(c.d).forEach(([k, v]) => driveMap.set(k, v)); if (c.m) Object.entries(c.m).forEach(([k, v]) => driveDist.set(k, v)); } } catch (e) { }
     function fmtDrive(sec) { const m = Math.max(1, Math.round(sec / 60)); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : ''); }
     function driveText(p) {
         const sec = driveMap.get(p.id); if (sec == null) return '';
         let ref = null; try { ref = sortRef(); } catch (e) { }
         if (ref && driveOrigin && haversine(ref, driveOrigin) > 5000) return '';              // numbers are for another place: wait for the fresh ones
         return (driveEst.has(p.id) ? '≈ ' : '') + fmtDrive(sec);
+    }
+    function roadText(p) {                                    // distance BY ROAD (from the same routing answer as the drive time); '' when it is not known / only estimated
+        const m = driveDist.get(p.id); if (m == null || driveEst.has(p.id) || !driveMap.has(p.id)) return '';
+        let ref = null; try { ref = sortRef(); } catch (e) { }
+        if (ref && driveOrigin && haversine(ref, driveOrigin) > 5000) return '';
+        return fmtDist(m);
     }
     async function refreshDrive() {
         if (driveBusy) return;
@@ -5631,20 +5637,20 @@
         if (now - driveFailAt < 120000) return;
         driveBusy = true;
         try {
-            const nm = new Map();
+            const nm = new Map(), nd = new Map();
             for (let k = 0; k < pts.length; k += 99) {
                 const ch = pts.slice(k, k + 99), coords = [ref, ...ch.map(x => x.c)].map(c => (+c[1]).toFixed(5) + ',' + (+c[0]).toFixed(5)).join(';');
-                let row = null;
-                for (const base of TABLE_SERVERS) { try { const r = await fetch(base + coords + '?sources=0&annotations=duration'); if (!r.ok) continue; const j = await r.json(); if (j && j.code === 'Ok' && j.durations && j.durations[0]) { row = j.durations[0]; break; } } catch (e) { } }
+                let row = null, rowD = null;
+                for (const base of TABLE_SERVERS) { try { const r = await fetch(base + coords + '?sources=0&annotations=duration,distance'); if (!r.ok) continue; const j = await r.json(); if (j && j.code === 'Ok' && j.durations && j.durations[0]) { row = j.durations[0]; rowD = (j.distances && j.distances[0]) || null; break; } } catch (e) { } }
                 if (!row) throw new Error('routing unavailable');
-                ch.forEach((x, i) => { if (Number.isFinite(row[i + 1])) nm.set(x.p.id, row[i + 1]); });
+                ch.forEach((x, i) => { if (Number.isFinite(row[i + 1])) { nm.set(x.p.id, row[i + 1]); if (rowD && Number.isFinite(rowD[i + 1])) nd.set(x.p.id, rowD[i + 1]); } });
             }
-            driveMap = nm; driveEst.clear(); driveOrigin = ref.slice(); driveAt = Date.now();
-            try { localStorage.setItem(DRIVE_KEY, JSON.stringify({ o: driveOrigin, t: driveAt, d: Object.fromEntries(nm) })); } catch (e) { }
+            driveMap = nm; driveDist = nd; driveEst.clear(); driveOrigin = ref.slice(); driveAt = Date.now();
+            try { localStorage.setItem(DRIVE_KEY, JSON.stringify({ o: driveOrigin, t: driveAt, d: Object.fromEntries(nm), m: Object.fromEntries(nd) })); } catch (e) { }
         } catch (e) {
             driveFailAt = Date.now();
             if (moved || !driveMap.size) {                                                  // offline: a rough estimate (straight line × 1.4 at 50 km/h), marked with ≈
-                driveMap = new Map(); driveEst.clear();
+                driveMap = new Map(); driveDist = new Map(); driveEst.clear();
                 pts.forEach(x => { driveMap.set(x.p.id, haversine(ref, x.c) * 1.4 / (50 / 3.6)); driveEst.add(x.p.id); });
                 driveOrigin = ref.slice();
             }
@@ -5655,7 +5661,7 @@
     function nearHtml(p) {
         const units = [];
         if (p.near) units.push('<span>📍&nbsp;' + esc(p.near).replace(/ /g, ' ') + '</span>');
-        const dt = distText(p); if (dt) units.push('<span class="nw">' + CAR_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
+        const dt = roadText(p) || distText(p); if (dt) units.push('<span class="nw">' + CAR_SVG + '&nbsp;' + esc(dt).replace(/ /g, '&nbsp;') + '</span>');
         const dr = driveText(p); if (dr) units.push('<span class="nw">⏱&nbsp;' + esc(dr).replace(/ /g, '&nbsp;') + '</span>');
         const e = elevOf(p); if (e !== null && Math.round(e) >= 100) units.push('<span class="nw">⛰&nbsp;' + Math.round(e) + '&nbsp;m</span>');
         return units.map((u, i) => i < units.length - 1 ? u.replace(/<\/span>$/, '&nbsp;·</span>') : u).join(' ');
