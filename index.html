@@ -85,7 +85,9 @@
         .cv-bar { flex: 0 0 auto; display: flex; gap: 10px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #e2e8f0; background: #fff; }
         .cv-bar button { flex: 1; font: inherit; font-size: 16px; font-weight: 600; padding: 12px 10px; border: 0; border-radius: 12px; cursor: pointer; background: #edf2f7; color: #2d3748; }
         .cv-bar .cv-edit, .cv-bar .cv-save { background: #4285F4; color: #fff; }
-        .cv-bar .cv-del { background: #fdecec; color: #c53030; flex: 0 0 auto; padding-left: 18px; padding-right: 18px; }
+        .cv-bar .cv-del { background: #fdecec; color: #c53030; }
+        .cv-bar .cv-del, .cv-bar .cv-close { flex: 0 0 48px; width: 48px; height: 48px; padding: 0; display: flex; align-items: center; justify-content: center; }
+        .cv-bar .cv-close { font-size: 18px; }
         html[data-theme="dark"] #cardView { background: #181d26; color: #e2e8f0; }
         html[data-theme="dark"] .cv-near { color: #9fb0c6; }
         html[data-theme="dark"] .cv-in { background: #232b38; border-color: #2f3a4b; color: #e2e8f0; }
@@ -381,7 +383,8 @@
         .modal-content { position: relative; }
         .vid-swipe { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 5; touch-action: none; background: transparent; }
         #galleryCount { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); color: #fff; background: rgba(0,0,0,.45); padding: 4px 12px; border-radius: 14px; font-size: 14px; pointer-events: none; }
-        .gal-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; padding: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 34px; justify-content: center; border-radius: 10px; }
+        .gal-nav { display: none !important; }
+        .gal-nav-old { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; padding: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 34px; justify-content: center; border-radius: 10px; }
         .gal-prev { left: 8px; } .gal-next { right: 8px; }
         @media (pointer: coarse) { .gal-nav { opacity: .35; } }
 
@@ -1171,8 +1174,9 @@
         }
         /* ===== Altitude label (top centre) ===== */
         #altBar.in-host { position: absolute; }                /* inside the header / map bar: it moves WITH the title (bounce, sticky) */
-        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 17px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 16px; background: rgba(255,255,255,.9); color: #2d3748; font-size: 19px; line-height: 32px; white-space: nowrap; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; width: 44px; height: 44px; padding: 0; border-radius: 50%; box-sizing: border-box; background: rgba(255,255,255,.9); color: #2d3748; font-size: 12px; line-height: 1.1; text-align: center; white-space: nowrap; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
         #altBar[hidden] { display: none; }
+        #altBar span { font-size: 16px; line-height: 1; display: block; }
         #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
         html[data-theme="dark"] #altBar, body.speedo-open #altBar { background: rgba(30,37,48,.84); color: #e2e8f0; }
         body.profile-open #altBar, body.settings-open #altBar, body.mdl-open #altBar, body.form-open #altBar, body:has(.sidebar.open) #altBar { display: none; }
@@ -2100,6 +2104,7 @@
     if (!seen) { el.hidden = true; return; }                  // nothing until the first GPS fix
     el.hidden = false;
     const fresh = alt !== null && Date.now() - at < FRESH_MS;  // stale altitude is never shown as current
+    if (fresh && alt < 10) { el.hidden = true; return; }      // lower than 10 m above the sea: the label is not shown (main screen and map)
     const txt = fresh ? Math.round(alt) + ' m' : (Date.now() - retryAt < 2500 ? '… m' : '— m');
     const v = document.getElementById('altVal'); if (v && v.textContent !== txt) v.textContent = txt;
     place();
@@ -2135,8 +2140,6 @@
     let w = el.offsetWidth, left;
     if (end !== null) {
       const room = end - right - 2 * GAP;
-      if (w > room) { el.style.fontSize = Math.max(11, 19 * Math.max(room, 40) / w) + 'px'; w = el.offsetWidth; }
-      if (w > room) { el.style.padding = '0 7px'; w = el.offsetWidth; }
       left = (w <= room) ? (right + end) / 2 : end - GAP - w / 2;  // не вміщується — притискаємо до кнопки з відступом, але не торкаємось її
     } else left = right + 16 + w / 2;
     el.style.left = (left - hr.left) + 'px';
@@ -2426,7 +2429,7 @@
             </div>
         </div>
     </div>
-    <div class="map-hint" id="mapHint">Click point — show/hide name · hold point — add/remove from route · double-click point — stop costs · right click — menu · ⟲ — reset all points · touchpad: two fingers — pan, pinch — zoom · rotate: two fingers or Shift+drag · green dot — you (GPS)</div>
+    <div class="map-hint" id="mapHint">Click point — show/hide name · hold point — add/remove from route · double-click point — stop costs · right click — menu · ⟲ — reset all points</div>
 
 <div id="albaniaMap"></div></div>
 
@@ -3392,6 +3395,9 @@
         document.getElementById('mediaModal').style.removeProperty('background');
         document.getElementById('mediaContainer').innerHTML = '';
         document.getElementById('mediaModal').style.display = 'none';
+        try { if (window.galReset) window.galReset(); } catch (e) { }
+        try { cvPt = null; } catch (e) { }
+        setTimeout(() => { try { if (cvId !== null) renderCardView(); } catch (e) { } }, 0);   // back on the full card: rebuild it fresh for the current screen size
     }
     (function initGalleryGestures() {
         const stage = document.getElementById('mediaContainer');
@@ -3481,6 +3487,12 @@
         };
         stage.addEventListener('pointerup', up);
         stage.addEventListener('pointercancel', up);
+        window.galReset = () => {                                    // forget every finger / zoom (after a rotation or when the gallery closes)
+            ptrs.forEach((_, id) => { try { stage.releasePointerCapture(id); } catch (err) { } });
+            ptrs.clear(); down = null; pinched = false; pinch0 = null; galZoom = { s: 1, x: 0, y: 0 };
+        };
+        const galRotated = () => { const m = document.getElementById('mediaModal'); if (m && m.style.display === 'flex') { window.galReset(); applyGalTransform(); } };
+        window.addEventListener('resize', galRotated); window.addEventListener('orientationchange', () => setTimeout(galRotated, 250));
         stage.addEventListener('wheel', e => {                       // комп'ютер: колесо / щипок тачпада = масштаб
             if (isVideo()) return;
             e.preventDefault();
@@ -4239,13 +4251,13 @@
 
     // ===== The full-screen card: a tap on the card (not on the map link, a review or the photo) opens it =====
     let cvId = null, cvEdit = false, cvMedia = 0, cvTypes = [], cvMediaEdit = [];
-    // A card is edited / deleted by its owner (who created it) and by Alex. Old cards without an owner: Alex and the user without a name (the owner of this device), as before.
+    // Alex has exclusive rights: he edits / deletes any card (including old cards without an owner). Everybody else only the cards created by them (the owner = the cabinet name).
     function canEditCard(p) {
         try {
             if (isOwner()) return true;
-            if (!p || !p.owner) return !String(curRec().name || '').trim();
+            if (!p || !p.owner) return false;
             return String(p.owner).trim().toLowerCase() === myName().toLowerCase();
-        } catch (e) { return true; }
+        } catch (e) { return false; }
     }
     function openCardView(i) { const p = places[i]; if (!p) return; cvId = p.id; cvEdit = false; cvMedia = 0; cvMediaEdit = []; cvTypes = [...(p.types || [])]; document.body.classList.add('card-open'); renderCardView(); }
     function closeCardView() { cvId = null; cvEdit = false; document.body.classList.remove('card-open'); const el = document.getElementById('cardView'); if (el) el.remove(); }
@@ -4261,7 +4273,6 @@
         let photo;
         if (!n) photo = '<div class="cv-none"><b>🖼</b>No photos</div>';
         else photo = ((m.type || '').startsWith('video/') ? `<video src="${esc(m.data)}" controls playsinline></video>` : `<img src="${esc(m.data)}" alt="" draggable="false">`) +
-            (n > 1 ? `<button type="button" class="cv-nav l" data-d="-1">‹</button><button type="button" class="cv-nav r" data-d="1">›</button>` : '') +
             `<span class="cv-count">${cvMedia + 1} / ${n}</span>`;
         const url = safeUrl(p.gmapsUrl);
         const chips = cvEdit && can
@@ -4288,13 +4299,17 @@
               (can ? '' : '<div class="cv-note">View only: you can add your own reviews. A card is edited by its owner and by Alex.</div>') +
             `</div>` +
             `<div class="cv-bar">` +
-              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-save">Save</button><button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>'
+              (cvEdit && can ? '<button type="button" class="cv-cancel">Cancel</button><button type="button" class="cv-save">Save</button>'
                 : (can ? '<button type="button" class="cv-del" aria-label="Delete" title="Delete">🗑</button><button type="button" class="cv-edit">✎ Edit</button><button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>' : '<button type="button" class="cv-close" aria-label="Close" title="Close">✕</button>')) +
             `</div>`;
         const body = el.querySelector('.cv-body'); if (body) body.scrollTop = scroll;
         const v = el.querySelector('.cv-photo video'); if (v) v.addEventListener('click', e => e.stopPropagation());
+        cvFitHeight();
         if (editing) cvBindEdit(el);
     }
+    function cvFitHeight() { const el = document.getElementById('cardView'); if (el) el.style.height = window.innerHeight + 'px'; }
+    window.addEventListener('resize', cvFitHeight);
+    window.addEventListener('orientationchange', () => { setTimeout(cvFitHeight, 120); setTimeout(cvFitHeight, 500); });
     function cvFld(inputHtml, editing) {                     // in edit mode every cell gets its own «✕» that erases the whole cell
         return editing ? `<div class="fld-wrap">${inputHtml}<button type="button" class="fld-clear cv-clear" aria-label="Clear this field" title="Clear">✕</button></div>` : inputHtml;
     }
@@ -4737,13 +4752,22 @@
                 routeButtonAction();                 // одразу Google Maps (вікно вибору збережено — див. ROUTE_CHOOSER_ENABLED)
             };
         });
+        const sig = links.join('\n');                           // a different route → start again from part 1
+        if (sig !== routePartsSig) { routePartsSig = sig; routePartIdx = 0; }
+        if (routePartIdx >= links.length) routePartIdx = 0;
         document.querySelectorAll('.route-parts').forEach(box => {
+            // many parts: ONE button «P1 ▸»; after a tap the next number is shown («P2 ▸» …), so the row never covers the title and the name
+            const k = routePartIdx, last = k === links.length - 1;
             box.innerHTML = (links.length > 1
-                ? links.map((u, k) => `<a class="link-btn part-btn" target="_blank" rel="noopener" href="${esc(u)}">P${k + 1}</a>`).join('')
-                : '') + (links.length ? '<a class="link-btn part-btn" href="#" data-off="1"' + (NET_WEAK ? '' : ' style="display:none"') + ' title="Route offline" aria-label="Route offline">📴</a>' : '');
-            box.querySelectorAll('a').forEach(a => a.onclick = e => { if (a.dataset.off || isOfflineRoute()) { e.preventDefault(); openOfflineRoute(); } });
+                ? `<a class=\"link-btn part-btn\" target=\"_blank\" rel=\"noopener\" href=\"${esc(links[k])}\" title=\"Part ${k + 1} of ${links.length}\" aria-label=\"Route part ${k + 1} of ${links.length}\">P${k + 1}${last ? '' : ' ▸'}</a>`
+                : '') + (links.length ? '<a class=\"link-btn part-btn\" href=\"#\" data-off=\"1\"' + (NET_WEAK ? '' : ' style=\"display:none\"') + ' title=\"Route offline\" aria-label=\"Route offline\">📴</a>' : '');
+            box.querySelectorAll('a').forEach(a => a.onclick = e => {
+                if (a.dataset.off || isOfflineRoute()) { e.preventDefault(); openOfflineRoute(); return; }
+                if (links.length > 1) setTimeout(() => { routePartIdx = (routePartIdx + 1) % links.length; updateLinks(); }, 0);   // the link opens first, then the button shows the next part
+            });
         });
     }
+    let routePartsSig = '', routePartIdx = 0;
 
     // ===== Віддати файл користувачу =====
     // На телефоні (iOS/Android) відкриваємо системне меню «Поділитися» («Зберегти у Файли», AirDrop,
