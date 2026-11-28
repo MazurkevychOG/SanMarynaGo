@@ -295,7 +295,7 @@
         .car-ico svg { width: 1.2em; height: 1.2em; display: block; overflow: visible; }
         .cell-near .wheel { vertical-align: -.13em; }
         .cell-desc { font-size: 18px; color: #718096; margin-top: 4px; overflow-wrap: anywhere; }
-        .rc { display: inline-block; color: #d62828; background: #fff; border-radius: 4px; padding: 0 3px; line-height: 1.15; font-weight: 700; box-shadow: 0 0 0 1px #e8b9b9; font-variant-emoji: text; }
+        .rc { display: inline-block; margin: 0 3px 0 4px; color: #d62828; background: #fff; border-radius: 4px; padding: 0 3px; line-height: 1.15; font-weight: 700; box-shadow: 0 0 0 1px #e8b9b9; font-variant-emoji: text; }
         .cell-rv { margin-top: 6px; }
         .rv { background: #f3f6fa; border-left: 3px solid #4285F4; border-radius: 6px; padding: 5px 8px; margin: 4px 0; }
         .rv-h { display: flex; align-items: center; gap: 6px; font-size: 15px; color: #5a7184; flex-wrap: wrap; }
@@ -585,6 +585,11 @@
         .app-brand .mobile-title, .app-brand .app-brand-title { font-size: 17px; font-weight: 800; color: #2c3e50; white-space: nowrap; letter-spacing: -0.2px; }
         .app-user { font-size: 12px; font-weight: 600; color: #718096; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .app-user[hidden] { display: none; }
+        .app-urow { display: flex; align-items: center; gap: 3px; min-width: 0; margin-top: 2px; overflow: hidden; }
+        .app-urow .app-user { margin-top: 0; min-width: 0; }
+        .app-urow .app-pin { flex: none; font-size: 11px; line-height: 1; }
+        .app-urow:has(.app-user[hidden]) { display: none; }
+        .app-brand:has(.app-user:not([hidden])) .app-pin-t { display: none; }
         .app-brand-desk { margin-bottom: 8px; }
         .app-brand-desk .app-brand-title { font-size: 20px; }
         .app-brand-desk .app-user { font-size: 13px; }
@@ -987,8 +992,8 @@
         .mobile-controls .spd-sq { margin-left: 0; }
         .mobile-header { flex-wrap: nowrap; }
         .mh-left { flex: 1 1 0; min-width: 0; }
-        .mh-left .app-brand { min-width: 0; overflow: hidden; }
-        .mh-left .app-brand .mobile-title { display: block; overflow: hidden; text-overflow: ellipsis; }
+        .mh-left .app-brand { min-width: 0; overflow: visible; }
+        .mh-left .app-brand .mobile-title { display: block; overflow: visible; text-overflow: clip; }   /* the title is always complete; the user name is what gets shortened */
         .mh-left .app-brand .app-user { overflow: hidden; text-overflow: ellipsis; }
         .mh-left .app-brand .mobile-title { font-size: clamp(9px, 3.05vw, 13px); letter-spacing: -0.4px; }
         /* друга смужка: вибір усіх, цифри розрахунку, зберегти, фільтр */
@@ -2332,7 +2337,7 @@
     <div class="sticky-top">
         <div class="mobile-header">
         <div class="mh-left"><button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
-        <div class="app-brand"><span class="mobile-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div></div>
+        <div class="app-brand"><span class="mobile-title"><span class="app-pin app-pin-t">📍 </span>SanMarynaGO</span><span class="app-urow"><span class="app-pin app-pin-u">📍</span><span class="app-user" hidden></span></span></div></div>
         <div class="mobile-controls">
             <button type="button" class="spd-sq wait" id="speedoPill" onclick="openSpeedo()" title="Speedometer (GPS)" aria-label="Speedometer: speed unknown"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" focusable="false"><circle cx="24" cy="24" r="22" fill="#fff"/><circle cx="24" cy="24" r="22" fill="none" stroke="#cbd5e0" stroke-width="1"/><path d="M13.75 34.25L10.85 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M8.74 28.09L6.03 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M8.74 19.91L6.03 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M13.75 13.75L10.85 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M19.91 8.74L19.19 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M28.09 8.74L28.81 6.03" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 13.75L37.15 10.85" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><path d="M39.26 19.91L41.97 19.19" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M39.26 28.09L41.97 28.81" stroke="#334155" stroke-width="1.5" stroke-linecap="round"/><path d="M34.25 34.25L37.15 37.15" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/><g id="spdNeedle" style="transform-origin:24px 24px;transform:rotate(-135deg)"><path d="M24 24L24 9.4" stroke="#e74c3c" stroke-width="2.8" stroke-linecap="round"/></g><circle class="hub" cx="24" cy="24" r="7.2" stroke="#1b2430" stroke-width="1.6"/><circle cx="21.6" cy="21.6" r="2" fill="#fff" fill-opacity=".45"/></svg></button>
             <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Map" aria-label="Map"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
@@ -2365,7 +2370,7 @@
 <div class="sidebar" id="sidebar">
     <button type="button" class="form-x" id="formX" onclick="closeFormDissolve()" aria-label="Close form">✕</button>
     <div class="sidebar-inner">
-        <div class="app-brand app-brand-desk"><span class="app-brand-title">📍 SanMarynaGO</span><span class="app-user" hidden></span></div>
+        <div class="app-brand app-brand-desk"><span class="app-brand-title"><span class="app-pin app-pin-t">📍 </span>SanMarynaGO</span><span class="app-urow"><span class="app-pin app-pin-u">📍</span><span class="app-user" hidden></span></span></div>
         <div class="header-top">
             <h1>📍 Add place</h1>
             <div class="top-controls desktop-only">
@@ -4731,6 +4736,7 @@
             const el = document.getElementById(id);
             if (!el) return;
             el.href = href;
+            el.style.display = href === '#' ? 'none' : '';         // no point selected → no «Route» button on the bar
             el.dataset.tip = links.length > 1 ? 'Route too long for one link — opens part 1' : 'Route';
             el.onclick = (e) => {
                 e.preventDefault();
