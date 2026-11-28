@@ -93,7 +93,8 @@
         html[data-theme="dark"] .cv-in { background: #232b38; border-color: #2f3a4b; color: #e2e8f0; }
         html[data-theme="dark"] .cv-in[readonly] { background: #202733; border-color: transparent; }
         html[data-theme="dark"] .cv-in:not([readonly]) { background: #151a22; }
-        html[data-theme="dark"] .cv-types button { background: #2b3445; color: #c3cbd8; }
+        html[data-theme="dark"] .cv-types button { background: #4b5870; color: #eef2f8; }
+        html[data-theme="dark"] .cv-types button.on { background: #4285F4; color: #fff; }
         html[data-theme="dark"] .cv-bar { background: #181d26; border-color: #2a3342; }
         html[data-theme="dark"] .cv-bar button { background: #2a3140; color: #e2e8f0; }
         html[data-theme="dark"] .cv-bar .cv-edit, html[data-theme="dark"] .cv-bar .cv-save { background: #4285F4; color: #fff; }
@@ -648,7 +649,7 @@
         .list-head.has-count .lh-br { display: block; }
         .return-toggle { margin-left: 0; margin-right: auto; }
         .save-route-btn { width: 38px; height: 38px; margin-left: auto; }
-        .spd-sq { flex: none; width: 38px; height: 38px; margin-left: auto; padding: 0; border: none; border-radius: 8px; background: #10151c; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); -webkit-tap-highlight-color: transparent; }
+        .spd-sq { flex: none; width: 38px; height: 38px; margin-left: auto; padding: 0; border: none; border-radius: 8px; background: #3a414d; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.25); -webkit-tap-highlight-color: transparent; }
         .spd-sq:active { transform: scale(.94); }
         .spd-sq .hub { fill: #718096; }
         .spd-sq.ok .hub { fill: #2ecc71; }
@@ -674,7 +675,7 @@
         .top-controls .btn-profile .offline-ic { width: 18px; height: 18px; padding: 2px; right: -4px; bottom: -4px; }
         .offline-ic[hidden] { display: none; }
         /* ===== Спідометр (GPS): індикатор у списку й повноекранний екран ===== */
-        .spd-pill { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 38px; padding: 0 11px 0 9px; border: none; border-radius: 10px; background: #10151c; color: #fff; font-size: 20px; font-weight: 800; line-height: 1; cursor: pointer; font-variant-numeric: tabular-nums; -webkit-tap-highlight-color: transparent; }
+        .spd-pill { flex: none; display: inline-flex; align-items: center; gap: 5px; height: 38px; padding: 0 11px 0 9px; border: none; border-radius: 10px; background: #3a414d; color: #fff; font-size: 20px; font-weight: 800; line-height: 1; cursor: pointer; font-variant-numeric: tabular-nums; -webkit-tap-highlight-color: transparent; }
         .spd-pill .v { min-width: 2ch; text-align: right; }
         .spd-pill .u { font-size: 11px; font-weight: 700; color: #9fb0c3; }
         .spd-pill .dot, .spd-gps .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #718096; flex: none; }
@@ -1174,11 +1175,11 @@
         }
         /* ===== Altitude label (top centre) ===== */
         #altBar.in-host { position: absolute; }                /* inside the header / map bar: it moves WITH the title (bounce, sticky) */
-        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 50%; transform: translate(-50%, -50%); z-index: 4600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; width: 44px; height: 44px; padding: 0; border-radius: 50%; box-sizing: border-box; background: rgba(255,255,255,.9); color: #2d3748; font-size: 12px; line-height: 1.1; text-align: center; white-space: nowrap; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; box-shadow: 0 1px 4px rgba(0,0,0,.3); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+        #altBar { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); left: calc(env(safe-area-inset-left, 0px) + 14px); z-index: 4600; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; flex: none; width: 38px; height: 38px; min-width: 38px; padding: 0; margin: 0; border-radius: 8px; box-sizing: border-box; background: #3a414d; color: #fff; font-size: 10.5px; font-weight: 700; line-height: 1.1; text-align: center; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; touch-action: manipulation; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+        #altBar.in-bar { position: static; z-index: auto; }
         #altBar[hidden] { display: none; }
-        #altBar span { font-size: 16px; line-height: 1; display: block; }
+        #altBar span { font-size: 13px; line-height: 1; display: block; }
         #altBar b { font-weight: 700; font-variant-numeric: tabular-nums; }
-        html[data-theme="dark"] #altBar, body.speedo-open #altBar { background: rgba(30,37,48,.84); color: #e2e8f0; }
         body.profile-open #altBar, body.settings-open #altBar, body.mdl-open #altBar, body.form-open #altBar, body:has(.sidebar.open) #altBar { display: none; }
     </style>
 </head>
@@ -2109,40 +2110,25 @@
     const v = document.getElementById('altVal'); if (v && v.textContent !== txt) v.textContent = txt;
     place();
   }
-  // Put the label on the same line as the «SanMarynaGO» title (vertical centre), in the free space right after it
+  // The label is a square button like the others and stands in their row: after the speedometer (main screen), first in the map's button row, first in the desktop top row
   function place() {
     if (!el || el.hidden) return;
     const bc = document.body.classList;
-    let t = null, end = null;
-    if (bc.contains('speedo-open')) t = null;
-    else if (bc.contains('map-open')) { t = document.querySelector('#mapOverlay .map-bar-title'); const a = document.querySelector('#mapOverlay .map-bar-actions'); if (a) end = a.getBoundingClientRect().left; }
+    let host = null, before = null;
+    if (bc.contains('speedo-open')) host = null;
+    else if (bc.contains('map-open')) { host = document.querySelector('#mapOverlay .map-bar-actions'); before = host && host.firstElementChild; }
     else {
-      t = Array.prototype.find.call(document.querySelectorAll('.mobile-title, .app-brand-title'), x => x.offsetParent !== null && x.getBoundingClientRect().width > 0);
-      const c = document.querySelector('.mobile-controls'); if (t && c && c.offsetParent !== null && t.closest('.mobile-header')) end = c.getBoundingClientRect().left;
+      const mc = document.querySelector('.mobile-controls');
+      if (mc && mc.offsetParent !== null) { host = mc; const sp = document.getElementById('speedoPill'); before = sp ? sp.nextElementSibling : mc.firstElementChild; }
+      else { const tc = document.querySelector('.top-controls'); if (tc && tc.offsetParent !== null) { host = tc; before = tc.firstElementChild; } }
     }
-    el.style.fontSize = ''; el.style.padding = '';
-    let host = null;
-    if (t) host = bc.contains('map-open') ? document.getElementById('mapOverlay') : (t.closest('.sticky-top') || t.closest('.mobile-header') || t.closest('.sidebar'));
-    if (host && getComputedStyle(host).position === 'static') host.style.position = 'relative';
-    if (!t || !host) {                                            // no title on the screen: a plain fixed label on the page
+    if (!host) {                                                  // no button row on the screen (speedometer): a plain fixed square in the corner
       if (el.parentNode !== document.body) document.body.appendChild(el);
-      el.classList.remove('in-host'); el.style.top = ''; el.style.left = ''; return;
+      el.classList.remove('in-bar'); return;
     }
-    if (el.parentNode !== host) host.appendChild(el);             // the pill is a child of the header: it moves together with the title
-    el.classList.add('in-host');
-    const hr = host.getBoundingClientRect();
-    const box = t.closest('.app-brand') || t, tr = t.getBoundingClientRect();
-    let right = tr.right;                                         // права межа самого тексту (не розтягнутого контейнера)
-    const au = box.querySelector && box.querySelector('.app-user');
-    if (au && !au.hidden && au.offsetParent !== null) right = Math.max(right, au.getBoundingClientRect().right);
-    el.style.top = (tr.top + tr.height / 2 - hr.top) + 'px';
-    const GAP = 12;                                               // відступ від напису і від кнопки спідометра
-    let w = el.offsetWidth, left;
-    if (end !== null) {
-      const room = end - right - 2 * GAP;
-      left = (w <= room) ? (right + end) / 2 : end - GAP - w / 2;  // не вміщується — притискаємо до кнопки з відступом, але не торкаємось її
-    } else left = right + 16 + w / 2;
-    el.style.left = (left - hr.left) + 'px';
+    el.classList.add('in-bar');
+    if (el.parentNode === host && (before === el || el.nextElementSibling === before)) return;
+    host.insertBefore(el, before === el ? el.nextSibling : before);
   }
   window.addEventListener('resize', place); window.addEventListener('orientationchange', place);
   try { new MutationObserver(place).observe(document.body, { attributes: true, attributeFilter: ['class'] }); } catch (e) { }
