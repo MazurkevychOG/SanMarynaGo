@@ -550,9 +550,9 @@
         html[data-theme="dark"] .share-box { background: #2a323c; color: #e2e8f0; }
         html[data-theme="dark"] .share-box input { background: #1f262e; border-color: #465068; color: #e2e8f0; }
         html[data-theme="dark"] .share-act button.sec { background: #3a4452; color: #e2e8f0; }
-        #qrScreen { display: none; position: fixed; inset: 0; z-index: 9100; background: #fff; color: #2d3748; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 6px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        #qrScreen { display: none; position: fixed; inset: 0; z-index: 9100; background: #fff; color: #2d3748; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         #qrScreen.show { display: flex; }
-        #qrScreen .qr-img { width: min(98vw, 84vh, 860px); height: min(98vw, 84vh, 860px); }
+        #qrScreen .qr-img { width: min(88vw, 78vh, 620px); height: min(88vw, 78vh, 620px); }
         #qrScreen .qr-img svg { width: 100%; height: 100%; display: block; }
         #qrScreen .qr-url { font-size: 14px; color: #4a5568; word-break: break-all; text-align: center; max-width: 92vw; }
         #qrScreen .qr-x { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); right: 14px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #edf2f7; color: #2d3748; font-size: 20px; cursor: pointer; }
@@ -606,9 +606,6 @@
         .app-brand .mobile-title, .app-brand .app-brand-title { font-size: 17px; font-weight: 800; color: #2c3e50; white-space: nowrap; letter-spacing: -0.2px; }
         .app-user { font-size: 12px; font-weight: 600; color: #718096; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .app-user[hidden] { display: none; }
-        body.logged-in .btn-profile { display: none !important; }
-        body.logged-in .app-brand { cursor: pointer; }
-        body.logged-in .mobile-header .app-brand .mobile-title { font-size: clamp(13px, 5.2vw, 21px) !important; letter-spacing: -0.2px; }
         .app-urow { display: flex; align-items: center; gap: 3px; min-width: 0; margin-top: 2px; overflow: hidden; }
         .app-urow .app-user { margin-top: 0; min-width: 0; }
         .app-urow .app-pin { flex: none; font-size: 11px; line-height: 1; }
@@ -913,7 +910,7 @@
         html[data-theme="dark"] .sticky-top { background:#1e2530 }
         html[data-theme="dark"] .list-head { background:#252d3a;color:#aeb9ca }
         html[data-theme="dark"] .lh-count { color:#8fd6ab;background:#254132 }
-        html[data-theme="dark"] .place-row { background:#1e2530; border-bottom-color:#2b3444 }
+        html[data-theme="dark"] .place-row { background:#1e2530 }
         html[data-theme="dark"] .swipe-content { background:#1e2530 }
         html[data-theme="dark"] .act-edit { color:#d3dae5 }
         html[data-theme="dark"] .cell-near { color:#aeb9ca }
@@ -5151,8 +5148,7 @@
         pf$('pfTitle').textContent = p.name ? p.name : 'Profile';
         pf$('pfSub').textContent = p.name ? 'Profile' : '';
         document.querySelectorAll('.btn-profile').forEach(b => { b.title = p.name ? 'Profile — ' + p.name : 'Profile'; });
-        document.querySelectorAll('.app-user').forEach(el => { el.textContent = p.name || ''; el.hidden = !p.name; });
-        document.body.classList.toggle('logged-in', !!p.name);                       // a signed-in user: no blue profile sign, the title is bigger   // ім'я під назвою додатку
+        document.querySelectorAll('.app-user').forEach(el => { el.textContent = p.name || ''; el.hidden = !p.name; });   // ім'я під назвою додатку
     }
     function pfSaveProfile() {
         const p = pfFormValues(), u = curRec();
@@ -5314,7 +5310,6 @@
             }, 350);
         }
     }
-    document.addEventListener('click', e => { if (document.body.classList.contains('logged-in') && e.target.closest && e.target.closest('.app-brand')) openProfile(); });   // the profile opens from the title / name
     function openProfile() {
         closeCtx();
         pfFillForm();
@@ -8055,17 +8050,24 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         if (!ok) { try { inp.focus(); inp.select(); inp.setSelectionRange(0, 9999); ok = document.execCommand('copy'); } catch (e) { } }
         try { if (typeof toast === 'function') toast(ok ? 'Link copied' : 'Select the link and copy it'); } catch (e) { }
     };
-    // a white car on a rounded blue sign — the picture in the middle of the QR code
-    const HIKER = '<svg x="X" y="Y" width="S" height="S" viewBox="0 0 100 100">' +
-        '<rect width="100" height="100" rx="22" fill="#fff"/><rect x="6" y="6" width="88" height="88" rx="17" fill="#4285F4"/>' +
-        '<g transform="translate(9 9) scale(3.4)" stroke="#174ea6" stroke-width="0.9" stroke-linejoin="round" fill="#fff">' +
-        '<path d="M3.4 15.6v-3.1c0-.7.3-1.3.9-1.7l1.6-1.1 1.2-2.6c.3-.7 1-1.1 1.8-1.1h6.2c.8 0 1.5.4 1.8 1.1l1.2 2.6 1.6 1.1c.6.4.9 1 .9 1.7v3.1c0 .5-.4.9-.9.9h-1.2a2.4 2.4 0 0 1-4.6 0h-3.8a2.4 2.4 0 0 1-4.6 0H4.3c-.5 0-.9-.4-.9-.9z"/>' +
-        '<path fill="#9cc2ff" d="M9 8.3h2.5v2.4H7.8zM12.7 8.3h2.4l1.1 2.4h-3.5z"/><circle cx="7.9" cy="16.7" r="1.9" fill="#fff"/><circle cx="16.1" cy="16.7" r="1.9" fill="#fff"/></g></svg>';
+    // a hiker with a walking stick against the mountains — the picture in the middle of the QR code
+    const HIKER = '<svg x="X" y="Y" width="S" height="S" viewBox="0 0 100 100"><defs><clipPath id="qrLogoClip"><rect width="100" height="100" rx="20"/></clipPath></defs>' +
+        '<rect width="100" height="100" rx="20" fill="#fff"/>' +
+        '<g clip-path="url(#qrLogoClip)"><rect x="6" y="6" width="88" height="88" rx="15" fill="#cfe8ff"/>' +
+        '<circle cx="76" cy="27" r="8" fill="#ffd166"/>' +
+        '<path d="M0 80 L30 30 L54 68 L68 47 L100 82 V100 H0Z" fill="#5b7c99"/>' +
+        '<path d="M30 30 L21 45 L27 42 L31 48 L36 41 L40 45Z" fill="#fff"/>' +
+        '<path d="M0 86 Q30 68 60 82 T100 78 V100 H0Z" fill="#3e7d4f"/></g>' +
+        '<rect x="36" y="53" width="9" height="14" rx="3" fill="#e67e22"/>' +
+        '<g stroke="#2d3748" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">' +
+        '<circle cx="47" cy="44" r="5" fill="#2d3748"/><path d="M47 50 L47 69"/><path d="M47 69 L40 85 M47 69 L54 85"/><path d="M47 56 L57 63"/>' +
+        '<path d="M58 52 L61 89" stroke="#8b5a2b"/></g>' +
+        '<rect x="3" y="3" width="94" height="94" rx="18" fill="none" stroke="#fff" stroke-width="6"/></svg>';
     window.openQr = function () {
         const url = appUrl();
         try {
             const q = qrcode(0, 'H'); q.addData(url); q.make();             // level H: up to 30% may be covered by the picture
-            const n = q.getModuleCount(), quiet = 2, size = n + quiet * 2;
+            const n = q.getModuleCount(), quiet = 4, size = n + quiet * 2;
             let d = '';
             for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += 'M' + (c + quiet) + ' ' + (r + quiet) + 'h1v1h-1z';
             const logo = Math.round(n * 0.26), lx = (size - logo) / 2;      // ≈ 7% of the area
