@@ -405,6 +405,8 @@
         .route-summary small { display: block; font-size: 11px; color: #718096; }
         .route-summary small.rs-ex { color: #2d3748; }
         .gps-dot { width: 20px; height: 20px; border-radius: 50%; background: #2ecc71; border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(46,204,113,.45), 0 2px 6px rgba(0,0,0,.4); }
+        .btn-save-file .gear-w { display: flex !important; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 0 !important; line-height: 0 !important; transform: none !important; }
+        .btn-save-file .gear-w svg { width: 26px; height: 26px; display: block; fill: #fff; }
         .gear-w { color: #fff !important; -webkit-text-fill-color: #fff; font-family: 'Segoe UI Symbol', 'Arial Unicode MS', sans-serif; font-variant-emoji: text; }
         .map-name-tip { font-size: 15px; font-weight: 700; color: #2d3748; padding: 4px 10px; border-radius: 8px; pointer-events: none; }
         .map-filter { display: flex; flex-direction: column; }
@@ -646,6 +648,18 @@
         .mdl-box { max-width: 440px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .flt-sec { margin-bottom: 12px; }
         .flt-lab { font-size: 13px; color: #718096; font-weight: 700; margin-bottom: 6px; }
+        .flt-lab output { float: right; color: #2d3748; font-weight: 700; }
+        html[data-theme="dark"] .flt-lab output { color: #e2e8f0; }
+        .dual { position: relative; height: 34px; }
+        .dual-track { position: absolute; left: 13px; right: 13px; top: 50%; height: 6px; margin-top: -3px; border-radius: 3px; background: #d5dce6; }
+        html[data-theme="dark"] .dual-track { background: #465068; }
+        .dual-fill { position: absolute; top: 0; bottom: 0; left: 0; right: 0; border-radius: 3px; background: #4285F4; }
+        .dual input[type=range] { position: absolute; left: 0; top: 0; width: 100%; height: 34px; margin: 0; padding: 0; border: 0; background: transparent; pointer-events: none; -webkit-appearance: none; appearance: none; }
+        .dual input[type=range]:disabled { opacity: .4; }
+        .dual input[type=range]::-webkit-slider-runnable-track { background: transparent; height: 34px; border: 0; }
+        .dual input[type=range]::-moz-range-track { background: transparent; border: 0; }
+        .dual input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 26px; height: 26px; margin-top: 4px; border-radius: 50%; background: #fff; border: 2px solid #4285F4; box-shadow: 0 1px 4px rgba(0,0,0,.3); cursor: pointer; }
+        .dual input[type=range]::-moz-range-thumb { pointer-events: auto; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2px solid #4285F4; box-shadow: 0 1px 4px rgba(0,0,0,.3); cursor: pointer; }
         .flt-pair { display: flex; align-items: center; gap: 8px; }
         .flt-pair input { flex: 1; min-width: 0; }
         .flt-pair span { color: #718096; }
@@ -2236,8 +2250,8 @@
         <div class="flt-sec"><div class="flt-lab">Sort</div><div class="flt-chips" id="fltSort"></div><div class="srm-meta" id="fltSortHint" style="margin-top:6px"></div></div>
         <div class="flt-sec"><div class="flt-lab">Country</div><div class="flt-chips" id="fltCountries"></div></div>
         <div class="flt-sec"><div class="flt-lab">Place type</div><div class="flt-chips" id="fltTypes"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Drive time, min</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_tMin" placeholder="from" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_tMax" placeholder="to" autocomplete="off"></div></div>
-        <div class="flt-sec"><div class="flt-lab">Distance, km</div><div class="flt-pair"><input type="text" inputmode="decimal" id="flt_dMin" placeholder="from" autocomplete="off"><span>—</span><input type="text" inputmode="decimal" id="flt_dMax" placeholder="to" autocomplete="off"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Drive time, min <output id="flt_tOut">any</output></div><div class="dual"><div class="dual-track"><div class="dual-fill" id="flt_tFill"></div></div><input type="range" id="flt_tMin" min="0" max="0" step="1" value="0" aria-label="Drive time from"><input type="range" id="flt_tMax" min="0" max="0" step="1" value="0" aria-label="Drive time to"></div></div>
+        <div class="flt-sec"><div class="flt-lab">Distance, km <output id="flt_dOut">any</output></div><div class="dual"><div class="dual-track"><div class="dual-fill" id="flt_dFill"></div></div><input type="range" id="flt_dMin" min="0" max="0" step="1" value="0" aria-label="Distance from"><input type="range" id="flt_dMax" min="0" max="0" step="1" value="0" aria-label="Distance to"></div></div>
         <div class="srm-meta flt-info" id="fltInfo"></div>
         <div class="srm-acts"><button type="button" onclick="resetFilter()">Reset</button><button type="button" class="ok" onclick="closeFilter()">Done</button></div>
     </div>
@@ -2368,7 +2382,7 @@
             <button class="btn-map-open sq-btn" onclick="openMobileMap()" data-tip="Map" aria-label="Map"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></button>
             <a id="gmapsLink" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><span class="route-parts"></span>
             <label class="return-toggle sq-btn" id="returnToggle" data-tip="Return to start"><input type="checkbox" id="returnToStart" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label>
-            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-badge" aria-hidden="true"></span></button>
+            <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span><span class="upd-badge" aria-hidden="true"></span></button>
         </div>
     </div>
         <div class="search-bar" id="searchBar">
@@ -2402,7 +2416,7 @@
                 <button type="button" class="desk-add" id="deskAddBtn" onclick="deskAddClick()" title="Add place" aria-label="Add place">＋</button>
                 <button type="button" class="btn-profile" onclick="openProfile()" title="Profile" aria-label="Profile"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4.3" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7.2 8-7.2s8 2.8 8 7.2z" fill="currentColor"/></svg><svg class="offline-ic" hidden viewBox="0 0 24 24" role="img" aria-label="Offline"><title>No internet — offline mode</title><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16.2a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.6" r="1.6" fill="currentColor"/><path d="M3.5 3.5l17 17" stroke="#e74c3c" stroke-width="2.6" stroke-linecap="round"/></svg></button>
                 <a id="gmapsLinkDesktop" class="link-btn btn-export sq-btn" href="#" target="_blank" data-tip="Route" aria-label="Route"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="6" cy="18" r="2.3" fill="#fff"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 18H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.7"/></svg></a><label class="return-toggle sq-btn" id="returnToggleDesk" data-tip="Return to start"><input type="checkbox" id="returnToStartDesktop" onchange="onReturnToggle(this)" aria-label="Return to start"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/><circle cx="12" cy="12" r="1.6" fill="#fff"/></svg></label><span class="route-parts"></span><button type="button" class="trip-cost-btn" onclick="showTripCost()" title="Trip cost" aria-label="Trip cost">💶</button><button type="button" class="save-route-btn" onclick="openSaveRoute()" title="Save route" aria-label="Save route">💾</button>
-                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w">⚙&#xFE0E;</span><span class="upd-badge" aria-hidden="true"></span></button>
+                <button class="btn-save-file" onclick="openSettings()" title="Settings" aria-label="Settings"><span class="gear-w"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></span><span class="upd-badge" aria-hidden="true"></span></button>
             </div>
         </div>
         <div class="form-container">
@@ -5671,7 +5685,14 @@
                 pts.forEach(x => { driveMap.set(x.p.id, haversine(ref, x.c) * 1.4 / (50 / 3.6)); driveEst.add(x.p.id); });
                 driveOrigin = ref.slice();
             }
-        } finally { driveBusy = false; try { refreshDistances(); } catch (e) { } }
+        } finally {
+            driveBusy = false; try { refreshDistances(); } catch (e) { }
+            try {                                                                          // road distances arrived → the order follows the numbers on the cards
+                if (sortMode === 'group') scheduleAutoResort();
+                else if (!localStorage.getItem('mymaps_order_dirty')) { _defaultPending = true; scheduleDefaultBuild(); }
+            } catch (e) { }
+            try { if (document.getElementById('filterModal').classList.contains('open')) renderFltSliders(); } catch (e) { }
+        }
     }
     // a small WHITE car on a rounded blue sign (white on white would not be seen); the wheel stays in the other places
     const CAR_SVG = '<span class="car-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1" stroke-linejoin="round" fill="#fff"><path d="M3.4 15.6v-3.1c0-.7.3-1.3.9-1.7l1.6-1.1 1.2-2.6c.3-.7 1-1.1 1.8-1.1h6.2c.8 0 1.5.4 1.8 1.1l1.2 2.6 1.6 1.1c.6.4.9 1 .9 1.7v3.1c0 .5-.4.9-.9.9h-1.2a2.4 2.4 0 0 1-4.6 0h-3.8a2.4 2.4 0 0 1-4.6 0H4.3c-.5 0-.9-.4-.9-.9z"/><path fill="none" d="M9 8.3h2.5v2.4H7.8zM12.7 8.3h2.4l1.1 2.4h-3.5z"/><circle cx="7.9" cy="16.7" r="1.9"/><circle cx="16.1" cy="16.7" r="1.9"/></g></svg></span>';
@@ -7547,6 +7568,8 @@
     function placeMetrics(p, ref) {                         // орієнтовно: відстань по прямій × 1,3, швидкість 50 км/год — як у «≈» маршруту
         const c = parseCoords(p.coords);
         if (!c || !ref) return null;
+        const sec = driveMap.get(p.id), road = driveDist.get(p.id);
+        if (sec != null && road != null && !driveEst.has(p.id) && driveOrigin && haversine(ref.c, driveOrigin) <= 1000) return { km: road / 1000, min: sec / 60 };   // real road numbers (as on the card)
         const d = haversine(ref.c, c) * 1.3;
         return { km: d / 1000, min: d / (50 / 3.6) / 60 };
     }
@@ -7580,7 +7603,7 @@
         document.getElementById('fltCountries').innerHTML = countries.map(c => chip('c', c, c || 'unknown', flt.countries.includes(c))).join('') || '<span class="tm-empty">No data</span>';
         const hasNone = places.some(p => !(p.types || []).length);
         document.getElementById('fltTypes').innerHTML = typeDefs.map(t => chip('t', t.id, typeLabelHtml(t), flt.types.includes(t.id), true)).join('') + (hasNone ? chip('t', '__none__', 'no type', flt.types.includes('__none__')) : '') || '<span class="tm-empty">No types yet</span>';
-        ['tMin', 'tMax', 'dMin', 'dMax'].forEach(k => { document.getElementById('flt_' + k).value = flt[k]; });
+        renderFltSliders();
         document.querySelectorAll('#filterModal .tchip').forEach(b => b.onclick = () => {
             const arr = b.dataset.k === 'c' ? flt.countries : flt.types, v = b.dataset.v, i = arr.indexOf(v);
             if (i >= 0) arr.splice(i, 1); else arr.push(v);
@@ -7589,6 +7612,31 @@
         updateFilterInfo();
         renderSortChips();                                   // після призначення обробників фільтра — щоб їх не перебити
     }
+    // two-thumb sliders: the ends are the smallest / biggest value among the cards; a thumb at its end = no limit on that side
+    function fltBounds() {
+        const ref = filterRef(); if (!ref) return null;
+        let t0 = Infinity, t1 = -Infinity, d0 = Infinity, d1 = -Infinity;
+        places.forEach(p => { const m = placeMetrics(p, ref); if (!m) return; t0 = Math.min(t0, m.min); t1 = Math.max(t1, m.min); d0 = Math.min(d0, m.km); d1 = Math.max(d1, m.km); });
+        return isFinite(t0) ? { t: [Math.floor(t0), Math.ceil(t1)], d: [Math.floor(d0), Math.ceil(d1)] } : null;
+    }
+    function paintDual(k) {
+        const a = document.getElementById('flt_' + k + 'Min'), b = document.getElementById('flt_' + k + 'Max'), out = document.getElementById('flt_' + k + 'Out'), fill = document.getElementById('flt_' + k + 'Fill');
+        const lo = +a.min, hi = +a.max, v0 = +a.value, v1 = +b.value, pc = v => hi > lo ? (v - lo) / (hi - lo) * 100 : 0;
+        fill.style.left = pc(v0) + '%'; fill.style.right = (100 - pc(v1)) + '%';
+        a.style.zIndex = v0 > (lo + hi) / 2 ? 3 : 1; b.style.zIndex = 2;                 // the thumb nearer the end stays on top, so both can always be grabbed
+        out.textContent = hi <= lo ? 'no data' : (v0 <= lo && v1 >= hi ? 'any (' + lo + '–' + hi + ')' : v0 + ' – ' + v1);
+    }
+    function renderFltSliders() {
+        const bd = fltBounds();
+        ['t', 'd'].forEach(k => {
+            const a = document.getElementById('flt_' + k + 'Min'), b = document.getElementById('flt_' + k + 'Max'); if (!a || !b) return;
+            const [lo, hi] = bd ? bd[k] : [0, 0], c0 = fnum(flt[k + 'Min']), c1 = fnum(flt[k + 'Max']);
+            [a, b].forEach(el => { el.min = lo; el.max = hi; el.step = 1; el.disabled = !(hi > lo); });
+            a.value = isFinite(c0) ? Math.min(Math.max(c0, lo), hi) : lo;
+            b.value = isFinite(c1) ? Math.min(Math.max(c1, lo), hi) : hi;
+            paintDual(k);
+        });
+    }
     function onFilterChange() { saveFilter(); if (hasMetricFilter()) { try { startGps(); } catch (e) { } } applySearch(); updateFilterInfo(); }   // час/відстань рахуються від мене — потрібен GPS
     function updateFilterInfo() {
         const m = matchIdx();
@@ -7596,9 +7644,16 @@
     }
     function resetFilter() { flt = { countries: [], types: [], tMin: '', tMax: '', dMin: '', dMax: '' }; saveFilter(); renderFilter(); applySearch(); }
     (function initFilter() {
-        ['tMin', 'tMax', 'dMin', 'dMax'].forEach(k => {
-            const el = document.getElementById('flt_' + k);
-            if (el) el.addEventListener('input', () => { flt[k] = el.value.trim(); onFilterChange(); });
+        ['t', 'd'].forEach(k => {
+            const a = document.getElementById('flt_' + k + 'Min'), b = document.getElementById('flt_' + k + 'Max'); if (!a || !b) return;
+            const upd = which => {
+                if (which === 'a' && +a.value > +b.value) a.value = b.value;
+                if (which === 'b' && +b.value < +a.value) b.value = a.value;
+                flt[k + 'Min'] = +a.value <= +a.min ? '' : String(a.value);                 // at the end of the slider = no limit
+                flt[k + 'Max'] = +b.value >= +b.max ? '' : String(b.value);
+                paintDual(k); onFilterChange();
+            };
+            a.addEventListener('input', () => upd('a')); b.addEventListener('input', () => upd('b'));
         });
         const m = document.getElementById('filterModal');
         if (m) m.addEventListener('click', e => { if (e.target === m) closeFilter(); });
@@ -7751,10 +7806,15 @@
         return i < 0 ? typeDefs.length + 1 : i;
     }
     function sortRef() { return lastGps ? lastGps.ll : cachedPos; }
+    function sortDist(p, c, ref) {                           // the number the card shows: distance by road when known, else straight line
+        const m = driveDist.get(p.id);
+        if (m != null && !driveEst.has(p.id) && driveMap.has(p.id) && (!driveOrigin || haversine(ref, driveOrigin) <= 5000)) return m;
+        return haversine(ref, c);
+    }
     function reorderAuto() {                                 // впорядковує places у пам'яті; true — якщо порядок змінився
         if (!places.length) return false;
         const ref = sortRef();
-        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, g: groupIndex(p), d: (ref && c) ? haversine(ref, c) : Infinity }; });
+        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, g: groupIndex(p), d: (ref && c) ? sortDist(p, c, ref) : Infinity }; });
         it.sort((a, b) => (a.g - b.g) || (a.d === b.d ? 0 : (a.d < b.d ? -1 : 1)) || (a.i - b.i));
         _sortRef = ref ? ref.slice() : null;
         const changed = it.some((x, k) => x.p !== places[k]);
@@ -7763,7 +7823,7 @@
     }
     function orderByDistance() {                             // top → bottom: from the smallest distance from the current place
         const ref = sortRef(); if (!ref) return false;
-        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, d: c ? haversine(ref, c) : Infinity }; });
+        const it = places.map((p, i) => { const c = parseCoords(p.coords); return { p, i, d: c ? sortDist(p, c, ref) : Infinity }; });
         it.sort((a, b) => (a.d === b.d ? 0 : (a.d < b.d ? -1 : 1)) || (a.i - b.i));
         places = it.map(x => x.p);
         return true;
@@ -7790,14 +7850,14 @@
         sortMode = m;
         try { localStorage.setItem(SORT_KEY, m); } catch (e) { }
         if (m === 'group') { reorderAuto(); sync(); if (!quiet) toast('Sorted: by group, then distance'); }
-        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'My order: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
+        else { const built = !noResort && orderByDistance(); if (built) sync(); if (!quiet) toast(built ? 'Distance: nearest first — hold a card to drag' : (noResort ? 'Manual order: hold a card to drag' : 'GPS not found yet — order kept')); }
         renderSortChips();
         try { updateMapMarkers(); } catch (e) { }                // marker numbers follow the new order
     }
     function renderSortChips() {
         const box = document.getElementById('fltSort');
         if (!box) return;
-        box.innerHTML = [['group', WHEEL_SVG + ' By group & distance'], ['manual', '✋ My order']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
+        box.innerHTML = [['group', WHEEL_SVG + ' By group & distance'], ['manual', '📏 Distance']].map(([v, l]) => `<button type="button" class="tchip${sortMode === v ? ' on' : ''}" data-sort="${v}">${l}</button>`).join('');
         box.querySelectorAll('button').forEach(b => { b.onclick = () => setSortMode(b.dataset.sort); });
         const hint = document.getElementById('fltSortHint');
         if (hint) hint.textContent = sortMode === 'manual' ? 'Built from the nearest place down; hold a card and drag to change.' : (sortRef() ? 'Groups by type order; inside a group — nearest first.' : 'GPS not found yet — places sorted by group only.');
